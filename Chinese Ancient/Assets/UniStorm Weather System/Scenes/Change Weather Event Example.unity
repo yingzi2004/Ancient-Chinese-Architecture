@@ -408,7 +408,7 @@ MonoBehaviour:
   BottomThreshold: 0
   TopThreshold: 1
   ShadowIntensity: 1
-  ScreenSpaceShadowsMaterial: {fileID: 892012104}
+  ScreenSpaceShadowsMaterial: {fileID: 730465814}
   ShadowDirection: {x: 0, y: 0, z: 0}
 --- !u!1 &436372277
 GameObject:
@@ -722,7 +722,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 1.3260001}
---- !u!21 &892012104
+--- !u!21 &730465814
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0
