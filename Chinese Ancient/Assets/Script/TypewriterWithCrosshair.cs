@@ -2,108 +2,138 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
-public class TypewriterSimple : MonoBehaviour
+public class TypewriterTrigger : MonoBehaviour
 {
     [Header("--- UI 组件 ---")]
     public TextMeshProUGUI displayText;    
     public GameObject introPanel;          
-    public CanvasGroup crosshairGroup;     
-    public Button closeButton;             // 拖入你的关闭按钮
+    public Button closeButton;             
+
+    [Header("--- 准星交互设置 ---")]
+    public Color hoverColor = Color.yellow; 
+    private Color originalColor;           
+    private bool isHovering = false;
+
+    [Header("--- 触发设置 ---")]
+    private bool hasBeenTriggered = false; // 确保只能触发一次
 
     [Header("--- 文本内容 ---")]
     [TextArea(3, 10)]
-    public string[] paragraphs = new string[] { "欢迎来到苏州古典园林。", "在这里你可以自由走动。" };
+    public string[] paragraphs = new string[] { "这是固定在世界空间的文字。", "只会触发一次。" };
 
-    [Header("--- 打字设置 ---")]
+    [Header("--- 打字与自动关闭设置 ---")]
     public float typingSpeed = 0.05f;
-    public float displayDuration = 2.5f;
+    public float displayDuration = 2.5f;   
+    public float autoCloseDelay = 3.0f;    
+
+    private Coroutine typewriterCoroutine;
 
     private void Start()
     {
-        // 1. 初始化状态
-        if (introPanel != null) introPanel.SetActive(true);
-        if (closeButton != null) closeButton.gameObject.SetActive(false); // 播放时先隐藏按钮
-
-        // 2. 玩家控制：为了能点到按钮，初始状态需要显示鼠标
-        UnlockCursor(true);
-
-        if (crosshairGroup != null) crosshairGroup.alpha = 1f;
-
-        if (displayText != null)
+        // 初始关闭，但不移动它的坐标
+        if (introPanel != null) introPanel.SetActive(false); 
+        
+        if (closeButton != null) 
         {
-            displayText.color = new Color(displayText.color.r, displayText.color.g, displayText.color.b, 1f);
-            StartCoroutine(PlaySequence());
+            closeButton.gameObject.SetActive(true);
+            originalColor = closeButton.image.color;
         }
 
-        // 3. 自动绑定按钮点击事件（防止你在 Inspector 里填错）
-        if (closeButton != null)
+        // 核心修复：防止空物体下坠导致无法触发
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
         {
-            closeButton.onClick.RemoveAllListeners();
-            closeButton.onClick.AddListener(CloseUI);
+            rb.isKinematic = true; 
+            rb.useGravity = false;
         }
     }
 
-    IEnumerator PlaySequence()
+    private void OnTriggerEnter(Collider other)
     {
-        if (paragraphs == null || paragraphs.Length == 0) yield break;
+        // 如果已经触发过，或者进来的不是玩家，直接返回
+        if (hasBeenTriggered || !other.CompareTag("Player")) return;
 
-        for (int i = 0; i < paragraphs.Length; i++)
+        Debug.Log("[触发] 玩家进入，面板在原位启动。");
+        hasBeenTriggered = true; // 锁定状态，以后再进来也不会触发了
+
+        if (introPanel != null)
         {
-            displayText.text = ""; 
-            string targetText = paragraphs[i];
+            introPanel.SetActive(true);
+            if (typewriterCoroutine != null) StopCoroutine(typewriterCoroutine);
+            typewriterCoroutine = StartCoroutine(PlaySequenceAndAutoClose());
+        }
+    }
 
-            for (int j = 0; j <= targetText.Length; j++)
+    private void Update()
+    {
+        // 只有面板显示时，才处理准星检测
+        if (introPanel != null && introPanel.activeSelf)
+        {
+            CheckCrosshairHover();
+
+            if (isHovering && Input.GetMouseButtonDown(0))
             {
-                displayText.text = targetText.Substring(0, j);
-                displayText.ForceMeshUpdate(); 
+                CloseUI();
+            }
+        }
+    }
+
+    private void CheckCrosshairHover()
+    {
+        PointerEventData eventData = new PointerEventData(EventSystem.current);
+        eventData.position = new Vector2(Screen.width / 2f, Screen.height / 2f);
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        if (EventSystem.current != null)
+            EventSystem.current.RaycastAll(eventData, results);
+
+        bool found = false;
+        foreach (RaycastResult result in results)
+        {
+            if (result.gameObject == closeButton.gameObject || result.gameObject.transform.IsChildOf(closeButton.transform))
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (found && !isHovering)
+        {
+            isHovering = true;
+            closeButton.image.color = hoverColor;
+        }
+        else if (!found && isHovering)
+        {
+            isHovering = false;
+            closeButton.image.color = originalColor;
+        }
+    }
+
+    IEnumerator PlaySequenceAndAutoClose()
+    {
+        foreach (string text in paragraphs)
+        {
+            if (!introPanel.activeSelf) yield break;
+            displayText.text = "";
+            for (int j = 0; j <= text.Length; j++)
+            {
+                displayText.text = text.Substring(0, j);
                 yield return new WaitForSeconds(typingSpeed);
             }
-
             yield return new WaitForSeconds(displayDuration);
-
-            if (i < paragraphs.Length - 1)
-            {
-                // 段落切换动画
-                float t = 0;
-                while (t < 1f)
-                {
-                    t += Time.deltaTime * 2f;
-                    Color tempColor = displayText.color;
-                    tempColor.a = 1 - t;
-                    displayText.color = tempColor;
-                    yield return null;
-                }
-            }
         }
-
-        // 全部播完后，显示关闭按钮
-        if (closeButton != null) closeButton.gameObject.SetActive(true);
+        
+        yield return new WaitForSeconds(autoCloseDelay);
+        if (introPanel.activeSelf) CloseUI();
     }
 
-    // --- 核心方法：关闭 UI 并恢复游戏状态 ---
     public void CloseUI()
     {
-        // 隐藏面板
         if (introPanel != null) introPanel.SetActive(false);
-
-        // 重新锁定鼠标，让玩家可以旋转视角走动
-        UnlockCursor(false);
-
-        Debug.Log("UI 已关闭，玩家已解锁视角。");
-    }
-
-    private void UnlockCursor(bool show)
-    {
-        if (show)
-        {
-            Cursor.lockState = CursorLockMode.None; // 不锁定，允许点击按钮
-            Cursor.visible = true;
-        }
-        else
-        {
-            Cursor.lockState = CursorLockMode.Locked; // 锁定，用于第一人称操作
-            Cursor.visible = false;
-        }
+        isHovering = false;
+        if (closeButton != null) closeButton.image.color = originalColor;
     }
 }
