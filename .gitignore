@@ -1,0 +1,38 @@
+# Unity文件和目录
+Chinese Ancient/[Ll]ibrary/
+Chinese Ancient/[Tt]emp/
+Chinese Ancient/[Oo]bj/
+Chinese Ancient/[Bb]uild/
+Chinese Ancient/[Bb]uilds/
+Chinese Ancient/[Ll]ogs/
+Chinese Ancient/[Uu]ser[Ss]ettings/
+ 
+# 自动生成的文件
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+ 
+# Unity3D生成的文件
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+ 
+# OS生成的文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+ 
+# Visual Studio生成的文件
+.vs/
+*.apk
+*.unitypackage
