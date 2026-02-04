@@ -5,42 +5,77 @@ using UnityEngine.Video;
 [RequireComponent(typeof(VideoPlayer))]
 public class WallVideoTrigger : MonoBehaviour
 {
+    [Tooltip("ç©å®¶ Transformï¼Œä¸è®¾ç½®åˆ™æŒ‰ Tag æŸ¥æ‰¾")] public Transform player;
+    [Tooltip("ç©å®¶ Tagï¼ˆå¤‡ç”¨è‡ªåŠ¨æŸ¥æ‰¾ï¼‰")] public string playerTag = "Player";
+    [Tooltip("è§¦å‘æ’­æ”¾è·ç¦»ï¼ˆç±³ï¼‰")] public float triggerDistance = 4f;
+
     private VideoPlayer videoPlayer;
-    public string playerTag = "Player";
+    private ushort audioTrackCount;
+    private bool isInsideRange;
 
-    void Start()
+    private void Awake()
     {
-        // ×Ô¶¯»ñÈ¡ÊÓÆµ×é¼ş
         videoPlayer = GetComponent<VideoPlayer>();
-        // ³õÊ¼×´Ì¬Í£Ö¹²¥·Å
         if (videoPlayer != null)
-            videoPlayer.Stop();
-    }
-
-    // ½øÈë´¥·¢ÇøÓòÊ±²¥·Å
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag(playerTag))
         {
-            if (videoPlayer != null && !videoPlayer.isPlaying)
+            videoPlayer.playOnAwake = false;
+            audioTrackCount = videoPlayer.audioTrackCount;
+            MuteAll(true);
+            if (videoPlayer.isPlaying)
             {
-                videoPlayer.Play();
-                Debug.Log("¿¿½üÇ½Ãæ£¬ÊÓÆµ¿ªÊ¼²¥·Å");
+                videoPlayer.Stop();
             }
         }
     }
 
-    // Àë¿ª´¥·¢ÇøÓòÊ±ÔİÍ£/Í£Ö¹
-    void OnTriggerExit(Collider other)
+    private void Start()
     {
-        if (other.CompareTag(playerTag))
+        if (player == null && !string.IsNullOrEmpty(playerTag))
         {
-            if (videoPlayer != null && videoPlayer.isPlaying)
+            GameObject found = GameObject.FindGameObjectWithTag(playerTag);
+            if (found != null)
             {
-                // ÕâÀïÓÃStop()»á»Øµ½¿ªÍ·£¬ÓÃPause()»áÔİÍ£ÔÚµ±Ç°Ö¡
-                videoPlayer.Stop();
-                Debug.Log("Àë¿ªÇ½Ãæ£¬ÊÓÆµÍ£Ö¹²¥·Å");
+                player = found.transform;
             }
+        }
+    }
+
+    private void Update()
+    {
+        if (player == null || videoPlayer == null)
+            return;
+
+        float distance = Vector3.Distance(transform.position, player.position);
+        bool withinRange = distance <= triggerDistance;
+
+        if (withinRange && !isInsideRange)
+        {
+            isInsideRange = true;
+            if (!videoPlayer.isPlaying)
+            {
+                MuteAll(false);
+                videoPlayer.Play();
+            }
+        }
+        else if (!withinRange && isInsideRange)
+        {
+            isInsideRange = false;
+            if (videoPlayer.isPlaying)
+            {
+                videoPlayer.Stop();
+            }
+            MuteAll(true);
+        }
+    }
+
+    private void MuteAll(bool mute)
+    {
+        if (videoPlayer == null)
+            return;
+
+        for (ushort i = 0; i < audioTrackCount; i++)
+        {
+            videoPlayer.SetDirectAudioMute(i, mute);
         }
     }
 }
