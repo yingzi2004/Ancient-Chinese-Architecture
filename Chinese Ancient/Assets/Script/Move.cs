@@ -6,6 +6,10 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 5.0f;
     public float jumpHeight = 1.2f;
     public float gravity = -20f; 
+    
+    // 新增：检视状态控制
+    [HideInInspector]
+    public bool isInspecting = false;
 
     [Header("--- 视角设置 ---")]
     public Transform cameraTransform;
@@ -38,8 +42,8 @@ public class PlayerController : MonoBehaviour
     {
         HandleCursorToggle();
 
-        // 只有在光标锁定时才允许移动和旋转
-        if (isCursorLocked && controller != null) 
+        // 只有在光标锁定时且不在检视状态才允许移动
+        if (isCursorLocked && controller != null && !isInspecting) 
         {
             HandleMovement();
         }
@@ -53,7 +57,7 @@ public class PlayerController : MonoBehaviour
 
     void LateUpdate()
     {
-        if (isCursorLocked && cameraTransform != null)
+        if (isCursorLocked && cameraTransform != null && !isInspecting)
         {
             HandleRotation();
         }
