@@ -1,5 +1,7 @@
 using UnityEngine;
+using UnityEngine.EventSystems; // 用于检测是否点到了UI
 
+[RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
     [Header("--- 移动设置 ---")]
@@ -9,12 +11,12 @@ public class PlayerController : MonoBehaviour
 
     [Header("--- 视角设置 ---")]
     public Transform cameraTransform;
-    public float mouseSensitivity = 2.0f; 
+    public float mouseSensitivity = 0.2f; 
     public float rotationSharpness = 50f;
 
     [Header("--- 交互设置 ---")]
-    public float interactDistance = 10.0f; // 建议设为10，防止距离太短点不到按钮
-    public LayerMask interactableLayer;   // 确保面板里勾选了 "Interactable"
+    public float interactDistance = 5.0f;
+    public LayerMask interactableLayer;
 
     private CharacterController controller;
     private Vector3 velocity;
@@ -27,79 +29,54 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        if (cameraTransform == null && Camera.main != null) 
-            cameraTransform = Camera.main.transform;
-        
         yRotation = transform.localRotation.eulerAngles.y;
         SetCursorState(true);
+        Application.targetFrameRate = 60;
     }
 
     void Update()
     {
+        // 1. 处理鼠标锁定/解锁的切换逻辑
         HandleCursorToggle();
 
-        // 只有在光标锁定时才允许移动和旋转
-        if (isCursorLocked && controller != null) 
+        // 2. 只有锁定时才处理位移
+        if (isCursorLocked) 
         {
             HandleMovement();
         }
 
-        // 处理点击动作（准星交互核心）
+        // 3. 处理交互点击
         if (Input.GetMouseButtonDown(0))
         {
+            // 如果点到的是UI（如菜单按钮），则不触发3D世界的射线交互
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            
             HandleInteraction();
         }
     }
 
     void LateUpdate()
     {
-        if (isCursorLocked && cameraTransform != null)
+        // 4. 只有锁定鼠标时才旋转视角
+        if (isCursorLocked)
         {
             HandleRotation();
         }
     }
 
-    void HandleInteraction()
-    {
-        Debug.Log("<color=cyan>[交互系统]</color> 检测到点击动作！");
-
-        if (cameraTransform == null) return;
-
-        // 发射射线
-        Ray ray = new Ray(cameraTransform.position, cameraTransform.forward);
-        RaycastHit hit;
-
-        // 在 Scene 窗口画出红线，方便调试
-        Debug.DrawRay(ray.origin, ray.direction * interactDistance, Color.red, 2f);
-
-        if (Physics.Raycast(ray, out hit, interactDistance, interactableLayer))
-        {
-            Debug.Log($"<color=green>[命中信息]</color> 撞击物体: <b>{hit.collider.name}</b>");
-
-            // 优化后：通用接口交互
-            // 尝试获取可交互接口（先自身，后父级）
-            IInteractable interactable = hit.collider.GetComponent<IInteractable>();
-            if (interactable == null) interactable = hit.collider.GetComponentInParent<IInteractable>();
-            
-            if (interactable != null)
-            {
-                interactable.Interact();
-            }
-            else 
-            {
-                 Debug.Log("<color=yellow>[交互提示]</color> 该物体在 Interactable 层，但没有挂载实现 IInteractable 接口的脚本。");
-            }
-        }
-        else
-        {
-            Debug.Log("<color=gray>[系统结果]</color> 射线未命中任何 Interactable 图层的物体。");
-        }
-    }
-
+    // 修改后的切换逻辑：按Esc切换状态，或者在解锁时点击右键返回
     void HandleCursorToggle()
     {
-        if (Input.GetKeyDown(KeyCode.Escape)) SetCursorState(!isCursorLocked);
-        if (!isCursorLocked && Input.GetMouseButtonDown(1)) SetCursorState(true);
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SetCursorState(!isCursorLocked); // 直接取反：锁定时按Esc解锁，解锁时按Esc锁定
+        }
+
+        // 额外增加：指针模式下，点击鼠标右键可以快速回到游戏（锁定视角）
+        if (!isCursorLocked && Input.GetMouseButtonDown(1))
+        {
+            SetCursorState(true);
+        }
     }
 
     void SetCursorState(bool locked)
@@ -107,7 +84,16 @@ public class PlayerController : MonoBehaviour
         isCursorLocked = locked;
         Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
         Cursor.visible = !locked;
+        
+        // 当重新锁定时，重置旋转输入，防止镜头瞬间“跳弹”
+        if (locked)
+        {
+            // 保持当前角度，避免视觉冲击
+            currentMouseDelta = Vector2.zero; 
+        }
     }
+    
+    private Vector2 currentMouseDelta; // 用于平滑处理
 
     void HandleMovement()
     {
@@ -121,7 +107,9 @@ public class PlayerController : MonoBehaviour
         controller.Move(move * moveSpeed * Time.deltaTime);
 
         if (Input.GetButtonDown("Jump") && isGrounded)
+        {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        }
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
@@ -129,12 +117,32 @@ public class PlayerController : MonoBehaviour
 
     void HandleRotation()
     {
-        yRotation += Input.GetAxisRaw("Mouse X") * mouseSensitivity;
-        xRotation -= Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
+        float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
+        float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
+
+        yRotation += mouseX;
+        xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -85f, 85f);
 
-        transform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
-        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.Euler(0f, yRotation, 0f), Time.deltaTime * rotationSharpness);
+        cameraTransform.localRotation = Quaternion.Slerp(cameraTransform.localRotation, Quaternion.Euler(xRotation, 0f, 0f), Time.deltaTime * rotationSharpness);
+    }
+
+    void HandleInteraction()
+    {
+        Ray ray;
+        if (isCursorLocked)
+            ray = new Ray(cameraTransform.position, cameraTransform.forward);
+        else
+            ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, interactDistance, interactableLayer))
+        {
+            Debug.Log("交互成功！点击了物体：" + hit.collider.name);
+            
+            // --- 修复点：交互完之后，如果你希望立即回到第一人称视角，取消下面这行注释 ---
+            // SetCursorState(true); 
+        }
     }
 }
-
