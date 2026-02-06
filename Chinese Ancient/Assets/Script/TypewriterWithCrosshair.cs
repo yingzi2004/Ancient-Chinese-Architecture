@@ -49,6 +49,15 @@ public class TypewriterTrigger : MonoBehaviour
             rb.isKinematic = true; 
             rb.useGravity = false;
         }
+
+        // --- 修复：确保文本框能容纳超长文本 ---
+        if (displayText != null)
+        {
+            // 允许文字溢出边界显示，防止因为框太小而被截断
+            displayText.overflowMode = TextOverflowModes.Overflow;
+            // 开启自动换行
+            displayText.enableWordWrapping = true;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -117,12 +126,29 @@ public class TypewriterTrigger : MonoBehaviour
         foreach (string text in paragraphs)
         {
             if (!introPanel.activeSelf) yield break;
-            displayText.text = "";
-            for (int j = 0; j <= text.Length; j++)
+            
+            // 1. 先设置完整文本
+            displayText.text = text;
+            
+            // 2. 关键步骤：先让它全部显示，以便 TMP 计算正确的排版和字符数量
+            displayText.maxVisibleCharacters = 99999;
+            displayText.ForceMeshUpdate(true); 
+
+            // 3. 获取真实的字符数量（包含空格、换行等所有占位符，但不包含富文本标签字符）
+            int totalVisibleCharacters = displayText.textInfo.characterCount;
+
+            // 4. 重置为0，准备开始打字
+            displayText.maxVisibleCharacters = 0;
+
+            for (int j = 0; j <= totalVisibleCharacters; j++)
             {
-                displayText.text = text.Substring(0, j);
+                displayText.maxVisibleCharacters = j;
                 yield return new WaitForSeconds(typingSpeed);
             }
+            
+            // 5. 确保完全显示（防止 characterCount 计数偏差）
+            displayText.maxVisibleCharacters = 99999;
+
             yield return new WaitForSeconds(displayDuration);
         }
         

@@ -40,7 +40,21 @@ public class GardenManager : MonoBehaviour
        if (audioSource == null) audioSource = GetComponent<AudioSource>();
        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
 
-       if (statusText != null) statusText.text = ""; // 初始清空提示
+       if (statusText != null) 
+       {
+           statusText.text = ""; // 初始清空提示
+           // --- 修复：防止提示文字被框体截断 ---
+           statusText.overflowMode = TextOverflowModes.Overflow;
+           statusText.enableWordWrapping = true; 
+       }
+
+       if (infoText != null)
+       {
+           // --- 修复：防止Bio介绍文字被截断 ---
+           infoText.overflowMode = TextOverflowModes.Overflow;
+           infoText.enableWordWrapping = true;
+           infoText.maxVisibleCharacters = 99999; // 确保默认全显
+       }
 
        if (gardens != null && gardens.Count > 0)
        {
@@ -133,7 +147,11 @@ currentGarden.savedRotations[i];
         StopAllCoroutines();
 
         // 1. 显示介绍面板 (直接渐渐显示原设定好的 bio 内容，不需要打字机)
-        infoText.text = gardens[currentIndex].bio;
+        if (infoText != null)
+        {
+            infoText.text = gardens[currentIndex].bio;
+            infoText.maxVisibleCharacters = 99999; // 双重保险：确保不是0
+        }
         StartCoroutine(FadeInInfoPanel());
 
         // 2. 检查全通关，播放音效并显示打字提示
@@ -178,11 +196,26 @@ currentGarden.savedRotations[i];
        infoPanelGroup.blocksRaycasts = true;
     }
 
-    // 【新】专门给 StatusText 用的打字机逻辑
+    // 【新】专门给 StatusText 用的打字机逻辑 (已升级防截断版)
     System.Collections.IEnumerator TypewriterStatusText(string fullText) {
        statusText.gameObject.SetActive(true);
-       statusText.text = "";
        
+       // 1. 先设置内容并强制刷新排版
+       statusText.text = fullText;
+       statusText.maxVisibleCharacters = 0;
+       statusText.ForceMeshUpdate(true);
+
+       // 2. 获取真实排版字符数
+       int totalChars = statusText.textInfo.characterCount;
+
+       // 3. 逐字显示
+       for (int i = 0; i <= totalChars; i++) {
+           statusText.maxVisibleCharacters = i;
+           yield return new WaitForSeconds(typingSpeed);
+       }
+       
+       // 4. 确保显示完整
+       statusText.maxVisibleCharacters = 99999;
        foreach (char c in fullText) {
            statusText.text += c;
            yield return new WaitForSeconds(typingSpeed);
