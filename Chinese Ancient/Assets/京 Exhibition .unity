@@ -505,6 +505,8 @@ PrefabInstance:
     - {fileID: 2935133778441927662, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
     - {fileID: 4828709618113890570, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
     - {fileID: -311778143162622512, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
+    - {fileID: -7875771597700709968, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
+    - {fileID: -6176932971480645300, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       insertIndex: 39
@@ -784,8 +786,8 @@ MonoBehaviour:
     28 \u4E2A\u8C61\u5F81\u5468\u5929\u4E8C\u5341\u516B\u661F\u5BBF\u3002\u7948\u5E74\u6BBF\u67F1\u5B50\u7684\u8FD9\u79CD\u6570\u7406\u8BBE\u8BA1\uFF0C\u53CD\u6620\u4E86\u4E2D\u56FD\u53E4\u4EBA
     \u201C\u91CD\u519C\u201D \u7684\u601D\u60F3\uFF0C\u6070\u5F53\u5730\u8868\u8FBE\u4E86\u7948\u5E74\u6BBF\u7528\u4E8E\u7948\u7977\u519C\u4E1A\u4E30\u6536\u7684\u542B\u4E49\u3002"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: e3641a4e54191bf47b1ab01bbcc02d2d, type: 2}
-  m_sharedMaterial: {fileID: -3232881488772099042, guid: e3641a4e54191bf47b1ab01bbcc02d2d, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 32d84e3d35100134eae37362e180a6c4, type: 2}
+  m_sharedMaterial: {fileID: -9065289997172757175, guid: 32d84e3d35100134eae37362e180a6c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -874,7 +876,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -3232881488772099042, guid: e3641a4e54191bf47b1ab01bbcc02d2d, type: 2}
+  - {fileID: -9065289997172757175, guid: 32d84e3d35100134eae37362e180a6c4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6151,6 +6153,7 @@ MonoBehaviour:
   moveSpeed: 4
   jumpHeight: 1.5
   gravity: -19.62
+  isInspecting: 0
   cameraTransform: {fileID: 1193753712}
   mouseSensitivity: 2
   rotationSharpness: 50
@@ -8135,8 +8138,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u5B9D\u9876"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: e3641a4e54191bf47b1ab01bbcc02d2d, type: 2}
-  m_sharedMaterial: {fileID: -3232881488772099042, guid: e3641a4e54191bf47b1ab01bbcc02d2d, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 75fbe92f7109c72428cb60580dc8437f, type: 2}
+  m_sharedMaterial: {fileID: -7836237983866716847, guid: 75fbe92f7109c72428cb60580dc8437f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8225,7 +8228,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -3232881488772099042, guid: e3641a4e54191bf47b1ab01bbcc02d2d, type: 2}
+  - {fileID: -7836237983866716847, guid: 75fbe92f7109c72428cb60580dc8437f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
