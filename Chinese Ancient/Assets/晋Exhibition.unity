@@ -242,6 +242,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 79111bd29a0871b4785e0c0f134871e6, type: 2}
+    - target: {fileID: -1512582472209490136, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 3c747245af3e2f74fabce65930a73f69, type: 2}
     - target: {fileID: -1235962549351839897, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -306,6 +310,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[1]
       value: 
       objectReference: {fileID: 2100000, guid: 3c747245af3e2f74fabce65930a73f69, type: 2}
+    - target: {fileID: 3690225979241984561, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: f61fa2a17d5ac9f44ad145da3ddadad9, type: 2}
     - target: {fileID: 3917939690847842096, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -2085,6 +2093,7 @@ MonoBehaviour:
   moveSpeed: 4
   jumpHeight: 1.5
   gravity: -19.62
+  isInspecting: 0
   cameraTransform: {fileID: 1193753712}
   mouseSensitivity: 2
   rotationSharpness: 50
@@ -2451,7 +2460,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1bf169faf008b9b48a179c045b53d9bd, type: 2}
+  - {fileID: 2100000, guid: f61fa2a17d5ac9f44ad145da3ddadad9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
