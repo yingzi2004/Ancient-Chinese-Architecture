@@ -10,12 +10,13 @@ Material:
   m_Name: "\u5899\u664B"
   m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
   m_Parent: {fileID: 2100000, guid: fc0b28d2a1ed121489da902d0ad80029, type: 2}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ModifiedSerializedProperties: 8
+  m_ValidKeywords:
+  - _NORMALMAP
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
+  m_DoubleSidedGI: 1
   m_CustomRenderQueue: -1
   stringTagMap:
     RenderType: Opaque
@@ -23,12 +24,28 @@ Material:
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
-    m_TexEnvs: []
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 2800000, guid: e79a2a9e89eab2b419aaf2fe9374e34b, type: 3}
+        m_Scale: {x: 4, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 2800000, guid: e79a2a9e89eab2b419aaf2fe9374e34b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: e79a2a9e89eab2b419aaf2fe9374e34b, type: 3}
+        m_Scale: {x: 4, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
-    m_Floats: []
+    m_Floats:
+    - _BumpScale: 1
+    - _Cull: 0
+    - _Metallic: 0
+    - _Smoothness: 0.24
     m_Colors:
-    - _BaseColor: {r: 0.3254902, g: 0.34901962, b: 0.33594218, a: 1}
-    - _Color: {r: 0.32549015, g: 0.3490196, b: 0.33594215, a: 1}
+    - _BaseColor: {r: 0.44313726, g: 0.47058824, b: 0.44705883, a: 1}
+    - _Color: {r: 0.44313723, g: 0.47058815, b: 0.4470588, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &7402590960247184387
 MonoBehaviour:
