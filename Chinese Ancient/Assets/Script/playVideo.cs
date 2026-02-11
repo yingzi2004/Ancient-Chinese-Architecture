@@ -12,20 +12,32 @@ public class WallVideoTrigger : MonoBehaviour
     private VideoPlayer videoPlayer;
     private ushort audioTrackCount;
     private bool isInsideRange;
+    private bool audioTrackCountInitialized = false;
 
     private void Awake()
     {
         videoPlayer = GetComponent<VideoPlayer>();
         if (videoPlayer != null)
         {
+            // 强制禁用自动播放
             videoPlayer.playOnAwake = false;
-            audioTrackCount = videoPlayer.audioTrackCount;
-            MuteAll(true);
+            videoPlayer.prepareCompleted += OnVideoPrepared;
+            
+            // 停止任何正在播放的视频
             if (videoPlayer.isPlaying)
             {
                 videoPlayer.Stop();
             }
+            
+            Debug.Log($"<color=cyan>[视频触发器]</color> 已初始化: {gameObject.name}, 距离触发: {triggerDistance}米");
         }
+    }
+
+    private void OnVideoPrepared(VideoPlayer source)
+    {
+        audioTrackCount = videoPlayer.audioTrackCount;
+        audioTrackCountInitialized = true;
+        MuteAll(true);
     }
 
     private void Start()
@@ -53,6 +65,11 @@ public class WallVideoTrigger : MonoBehaviour
             isInsideRange = true;
             if (!videoPlayer.isPlaying)
             {
+                // 确保视频已准备好再播放
+                if (!audioTrackCountInitialized)
+                {
+                    videoPlayer.Prepare();
+                }
                 MuteAll(false);
                 videoPlayer.Play();
             }
@@ -70,7 +87,7 @@ public class WallVideoTrigger : MonoBehaviour
 
     private void MuteAll(bool mute)
     {
-        if (videoPlayer == null)
+        if (videoPlayer == null || !audioTrackCountInitialized)
             return;
 
         for (ushort i = 0; i < audioTrackCount; i++)
