@@ -39,11 +39,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: 88e20ecd268496641a7b6a3256e61f7f, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: ce0e6b458635b1a4fbaea46ad29b2ccf, type: 3}
+        m_Scale: {x: 0.7, y: 0.7}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: ed6980e08d5ada9459931ec46885e9a6, type: 3}
+        m_Texture: {fileID: 2800000, guid: 88e20ecd268496641a7b6a3256e61f7f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -51,13 +51,13 @@ Material:
         m_Scale: {x: 2, y: 2}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 88e20ecd268496641a7b6a3256e61f7f, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: ce0e6b458635b1a4fbaea46ad29b2ccf, type: 3}
+        m_Scale: {x: 0.7, y: 0.7}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BumpScale: 0
+    - _BumpScale: 0.3
     m_Colors:
-    - _BaseColor: {r: 0.745283, g: 0.6750208, b: 0.43943575, a: 1}
-    - _Color: {r: 0.745283, g: 0.6750208, b: 0.43943572, a: 1}
+    - _BaseColor: {r: 1, g: 0.9858491, b: 0.9386792, a: 1}
+    - _Color: {r: 1, g: 0.9858491, b: 0.9386792, a: 1}
   m_BuildTextureStacks: []
