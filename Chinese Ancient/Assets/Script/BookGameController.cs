@@ -1,233 +1,195 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class BookGameController : MonoBehaviour, IInteractable
+/// <summary>
+/// 书本翻页控制器 - 适用于 World Space Canvas 中的 BookPro
+/// 玩家用准星对准书本上的"上一页/下一页"按钮，点击即可翻页
+/// 不需要"打开/关闭"步骤，书本始终在场景中可交互
+/// </summary>
+public class BookGameController : MonoBehaviour
 {
-    [Header("Book UI")]
-    [SerializeField] private CanvasGroup bookCanvas;
+    [Header("Book 引用")]
     [SerializeField] private BookPro book;
-    [SerializeField] private float canvasFadeDuration = 0.25f;
-    [SerializeField] private bool useCanvasOverlay = false;
 
-    [Header("Start Page")]
-    [SerializeField] private Button startButton;
-    [SerializeField] private Animator startButtonAnimator;
-    [SerializeField] private string startButtonTrigger = "Pressed";
+    [Header("翻页按钮 (放在书本 World Space Canvas 上的 UI Button)")]
+    [Tooltip("下一页按钮 - 放在书本右侧")]
+    public Button nextPageButton;
+    [Tooltip("上一页按钮 - 放在书本左侧")]
+    public Button previousPageButton;
+
+    [Header("准星悬停反馈")]
+    [Tooltip("准星悬停时按钮高亮颜色")]
+    public Color hoverColor = Color.yellow;
 
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip openClip;
-    [SerializeField] private AudioClip startClip;
+    [SerializeField] private AudioClip pageFlipClip;
 
-    [Header("Mini Game")]
-    [SerializeField] private BookPuzzleManager puzzleManager;
-    [SerializeField] private float flipDuration = 0.6f;
-    [SerializeField] private float puzzleFlipDelay = 0.2f;
-    [SerializeField] private int startPageIndex = 0;
-    [SerializeField] private int puzzlePageIndex = 1;
+    [Header("Settings")]
+    [SerializeField] private float flipDuration = 0.5f;
 
-    private bool isOpen;
-    private bool startRequested;
-    private Coroutine fadeRoutine;
+    private bool isFlipping = false;
+
+    // --- 准星交互内部状态 ---
+    private Button currentHoveredButton = null;
+    private Color hoveredOriginalColor;
 
     private void Awake()
     {
         if (!book)
             book = GetComponentInChildren<BookPro>(true);
-
-        if (useCanvasOverlay)
-            HideInstant();
-
-        if (startButton)
-            startButton.onClick.AddListener(RequestStartGame);
-
-        if (puzzleManager)
-            puzzleManager.Initialize(this, book);
     }
 
-    private void OnDestroy()
+    private void Start()
     {
-        if (startButton)
-            startButton.onClick.RemoveListener(RequestStartGame);
-    }
-
-    public void Interact()
-    {
-        if (isOpen)
-            return;
-
-        OpenBook();
-    }
-
-    public bool IsOpen => isOpen;
-
-    private void OpenBook()
-    {
-        isOpen = true;
-        ToggleCanvas(true);
-        ResetStartPrompt();
-
+        // 禁用 BookPro 自带的鼠标拖拽交互，完全使用准星 + 按钮
         if (book)
+            book.interactable = false;
+
+        UpdateButtonsState();
+    }
+
+    // ========================
+    //  准星交互核心 (每帧检测)
+    // ========================
+
+    private void Update()
+    {
+        // 1. 准星悬停检测：从屏幕正中心发出 UI 射线
+        Button hitButton = GetButtonUnderCrosshair();
+
+        // 2. 更新悬停高亮状态
+        UpdateHoverState(hitButton);
+
+        // 3. 准星点击：左键按下时，如果悬停在某个按钮上就执行对应操作
+        if (Input.GetMouseButtonDown(0) && currentHoveredButton != null)
         {
-            SetCurrentPage(startPageIndex);
-            book.interactable = true;
+            if (currentHoveredButton == nextPageButton)
+                FlipNext();
+            else if (currentHoveredButton == previousPageButton)
+                FlipPrevious();
         }
 
-        puzzleManager?.PreparePuzzle();
-        if (audioSource && openClip)
-            audioSource.PlayOneShot(openClip);
-    }
-
-    public void CloseBook()
-    {
-        if (!isOpen)
-            return;
-
-        isOpen = false;
-        ToggleCanvas(false);
-        ResetStartPrompt();
-    }
-
-    private void ToggleCanvas(bool show)
-    {
-        if (!useCanvasOverlay || !bookCanvas)
-            return;
-
-        if (fadeRoutine != null)
-            StopCoroutine(fadeRoutine);
-
-        fadeRoutine = StartCoroutine(FadeCanvas(show ? 1f : 0f));
-        bookCanvas.blocksRaycasts = show;
-        bookCanvas.interactable = show;
-    }
-
-    private IEnumerator FadeCanvas(float target)
-    {
-        float start = bookCanvas.alpha;
-        float elapsed = 0f;
-
-        while (elapsed < canvasFadeDuration)
+        // 4. 按 F 键翻到下一页
+        if (Input.GetKeyDown(KeyCode.F))
         {
-            elapsed += Time.deltaTime;
-            bookCanvas.alpha = Mathf.Lerp(start, target, elapsed / canvasFadeDuration);
-            yield return null;
-        }
-
-        bookCanvas.alpha = target;
-    }
-
-    private void HideInstant()
-    {
-        if (!bookCanvas || !useCanvasOverlay)
-            return;
-
-        bookCanvas.alpha = 0f;
-        bookCanvas.blocksRaycasts = false;
-        bookCanvas.interactable = false;
-    }
-
-    public void RequestStartGame()
-    {
-        TryRequestStartGame();
-    }
-
-    public bool TryRequestStartGame()
-    {
-        if (!TryStartGame())
-            return false;
-
-        if (startButtonAnimator && !string.IsNullOrEmpty(startButtonTrigger))
-            startButtonAnimator.SetTrigger(startButtonTrigger);
-
-        if (audioSource && startClip)
-            audioSource.PlayOneShot(startClip);
-
-        SetStartButtonVisible(false);
-
-        return true;
-    }
-
-    private bool TryStartGame()
-    {
-        if (!isOpen || startRequested)
-            return false;
-
-        startRequested = true;
-        if (startButton)
-            startButton.interactable = false;
-
-        StartCoroutine(FlipToPuzzle());
-        return true;
-    }
-
-    private IEnumerator FlipToPuzzle()
-    {
-        if (puzzleFlipDelay > 0f)
-            yield return new WaitForSeconds(puzzleFlipDelay);
-
-        yield return FlipToPage(puzzlePageIndex);
-
-        puzzleManager?.BeginPuzzle();
-    }
-
-    public void OnPuzzleFinished()
-    {
-        StartCoroutine(CloseAfterDelay(0.5f));
-    }
-
-    private IEnumerator CloseAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        CloseBook();
-    }
-
-    private void ResetStartPrompt()
-    {
-        startRequested = false;
-        SetStartButtonVisible(true);
-    }
-
-    private IEnumerator FlipToPage(int targetPaperIndex)
-    {
-        if (!book)
-            yield break;
-
-        int clampedTarget = Mathf.Clamp(targetPaperIndex, book.StartFlippingPaper, book.EndFlippingPaper + 1);
-        int steps = clampedTarget - book.CurrentPaper;
-        if (steps == 0)
-            yield break;
-
-        FlipMode mode = steps > 0 ? FlipMode.RightToLeft : FlipMode.LeftToRight;
-        steps = Mathf.Abs(steps);
-
-        for (int i = 0; i < steps; i++)
-        {
-            bool finished = false;
-            PageFlipper.FlipPage(book, flipDuration, mode, () => finished = true);
-            while (!finished)
-                yield return null;
+            FlipNext();
         }
     }
 
-    private void SetCurrentPage(int pageIndex)
+    /// <summary>
+    /// 用 EventSystem 从屏幕正中心（准星位置）做 UI Raycast，
+    /// 检测准星下方是否有我们的翻页按钮。
+    /// 对于 World Space Canvas，需要确保 Canvas 上有 GraphicRaycaster，
+    /// 并且 Canvas 的 Event Camera 设置为主摄像机。
+    /// </summary>
+    private Button GetButtonUnderCrosshair()
     {
-        if (!book)
-            return;
+        if (EventSystem.current == null) return null;
 
-        int clamped = Mathf.Clamp(pageIndex, book.StartFlippingPaper, book.EndFlippingPaper + 1);
-        book.CurrentPaper = clamped;
+        PointerEventData eventData = new PointerEventData(EventSystem.current);
+        eventData.position = new Vector2(Screen.width / 2f, Screen.height / 2f);
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+
+        foreach (RaycastResult result in results)
+        {
+            Button btn = FindMatchingButton(result.gameObject);
+            if (btn != null) return btn;
+        }
+        return null;
     }
 
-    private void SetStartButtonVisible(bool visible)
+    /// <summary>
+    /// 判断 UI Raycast 命中的 GameObject 是否属于我们的翻页按钮之一
+    /// </summary>
+    private Button FindMatchingButton(GameObject hitObject)
     {
-        if (!startButton)
-            return;
+        Button[] buttons = { nextPageButton, previousPageButton };
+        foreach (Button btn in buttons)
+        {
+            if (btn == null) continue;
+            if (hitObject == btn.gameObject || hitObject.transform.IsChildOf(btn.transform))
+                return btn;
+        }
+        return null;
+    }
 
-        if (startButton.gameObject.activeSelf != visible)
-            startButton.gameObject.SetActive(visible);
+    /// <summary>
+    /// 更新准星悬停高亮效果：进入时变色，离开时恢复
+    /// </summary>
+    private void UpdateHoverState(Button newHovered)
+    {
+        if (newHovered == currentHoveredButton) return;
 
-        if (visible)
-            startButton.interactable = true;
+        // 离开上一个按钮 → 恢复原色
+        if (currentHoveredButton != null && currentHoveredButton.image != null)
+        {
+            currentHoveredButton.image.color = hoveredOriginalColor;
+        }
+
+        // 进入新按钮 → 记录原色 & 高亮
+        currentHoveredButton = newHovered;
+        if (currentHoveredButton != null && currentHoveredButton.image != null)
+        {
+            hoveredOriginalColor = currentHoveredButton.image.color;
+            currentHoveredButton.image.color = hoverColor;
+        }
+    }
+
+    // ========================
+    //  翻页逻辑
+    // ========================
+
+    public void FlipNext()
+    {
+        if (!book || isFlipping) return;
+        if (book.CurrentPaper > book.EndFlippingPaper) return;
+
+        Debug.Log("<color=green>[书本]</color> 翻到下一页");
+        StartCoroutine(FlipRoutine(FlipMode.RightToLeft));
+    }
+
+    public void FlipPrevious()
+    {
+        if (!book || isFlipping) return;
+        if (book.CurrentPaper <= book.StartFlippingPaper) return;
+
+        Debug.Log("<color=green>[书本]</color> 翻到上一页");
+        StartCoroutine(FlipRoutine(FlipMode.LeftToRight));
+    }
+
+    private IEnumerator FlipRoutine(FlipMode mode)
+    {
+        isFlipping = true;
+
+        if (audioSource && pageFlipClip)
+            audioSource.PlayOneShot(pageFlipClip);
+
+        PageFlipper.FlipPage(book, flipDuration, mode, () =>
+        {
+            isFlipping = false;
+            UpdateButtonsState();
+        });
+
+        yield return null;
+    }
+
+    /// <summary>
+    /// 到了首/尾页时禁用对应按钮，防止无效翻页
+    /// </summary>
+    private void UpdateButtonsState()
+    {
+        if (!book) return;
+
+        if (nextPageButton)
+            nextPageButton.interactable = (book.CurrentPaper <= book.EndFlippingPaper);
+
+        if (previousPageButton)
+            previousPageButton.interactable = (book.CurrentPaper > book.StartFlippingPaper);
     }
 }
