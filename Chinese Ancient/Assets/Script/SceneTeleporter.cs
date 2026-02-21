@@ -15,6 +15,8 @@ public class SceneTeleporter : MonoBehaviour
     [Header("传送设置")]
     [Tooltip("目标场景名称（必须已添加到 Build Settings）")]
     [SerializeField] private string targetSceneName;
+    [Tooltip("是否启用后台预加载（若传送后发黑，建议关闭）")]
+    [SerializeField] private bool usePreload = false;
 
     [Header("常驻标记 UI（World Space Canvas，标识传送点位置）")]
     [Tooltip("常驻标记根 Transform（控制位置和朝向）")]
@@ -117,7 +119,8 @@ public class SceneTeleporter : MonoBehaviour
         {
             playerInZone = true;
             // 玩家踏入时开始预加载场景
-            PreloadScene();
+            if (usePreload)
+                PreloadScene();
         }
     }
 
@@ -211,15 +214,15 @@ public class SceneTeleporter : MonoBehaviour
         if (confirmText != null)
             confirmText.text = loadingMessage;
 
-        if (asyncLoad != null)
+        if (usePreload && asyncLoad != null)
         {
             // 预加载已完成或进行中，直接激活
             asyncLoad.allowSceneActivation = true;
         }
         else
         {
-            // 备用：直接加载
-            SceneManager.LoadScene(targetSceneName);
+            // 默认：直接单场景切换，保证光照/后处理按目标场景完整初始化
+            SceneManager.LoadScene(targetSceneName, LoadSceneMode.Single);
         }
     }
 
