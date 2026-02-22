@@ -131,7 +131,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 17071307}
-  m_Layer: 0
+  - component: {fileID: 17071309}
+  - component: {fileID: 17071308}
+  m_Layer: 6
   m_Name: qiniandian
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -146,9 +148,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 17071306}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
+  m_LocalPosition: {x: -15.171, y: 1.248, z: 6.444}
+  m_LocalScale: {x: 0.02, y: 0.02, z: 0.02}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1202880940}
@@ -191,8 +193,46 @@ Transform:
   - {fileID: 1179349368}
   - {fileID: 730470342}
   - {fileID: 289674980}
-  m_Father: {fileID: 1032799690}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &17071308
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 17071306}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 33.693504, y: 29.16752, z: 37.778698}
+  m_Center: {x: -22.679567, y: 14.083761, z: -31.859308}
+--- !u!114 &17071309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 17071306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 128990b4c9d4f114a9a0513b9c05cd9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fixedSpawnPosition: {x: -14, y: 1.6, z: 10.5}
+  inspectModelPrefab: {fileID: 17071306}
+  manualRotationSpeed: 200
+  autoRotationSpeed: 30
+  inspectScale: 1
 --- !u!1 &26687305
 GameObject:
   m_ObjectHideFlags: 0
@@ -2875,7 +2915,7 @@ GameObject:
   - component: {fileID: 127118840}
   - component: {fileID: 127118839}
   - component: {fileID: 127118838}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle7462 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3499,7 +3539,7 @@ GameObject:
   - component: {fileID: 191403151}
   - component: {fileID: 191403150}
   - component: {fileID: 191403149}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle966 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4167,7 +4207,7 @@ GameObject:
   - component: {fileID: 289674980}
   - component: {fileID: 289674982}
   - component: {fileID: 289674981}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Circle52 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4251,7 +4291,7 @@ GameObject:
   - component: {fileID: 296166598}
   - component: {fileID: 296166597}
   - component: {fileID: 296166596}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle1019 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5380,7 +5420,7 @@ GameObject:
   - component: {fileID: 389384699}
   - component: {fileID: 389384698}
   - component: {fileID: 389384697}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle7785 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5646,7 +5686,7 @@ GameObject:
   - component: {fileID: 426846438}
   - component: {fileID: 426846440}
   - component: {fileID: 426846439}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Circle101 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5730,7 +5770,7 @@ GameObject:
   - component: {fileID: 436755585}
   - component: {fileID: 436755584}
   - component: {fileID: 436755583}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle2216 (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5835,7 +5875,7 @@ GameObject:
   - component: {fileID: 495310160}
   - component: {fileID: 495310162}
   - component: {fileID: 495310161}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Circle15 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6285,7 +6325,7 @@ GameObject:
   - component: {fileID: 571777292}
   - component: {fileID: 571777294}
   - component: {fileID: 571777293}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Circle24 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6369,7 +6409,7 @@ GameObject:
   - component: {fileID: 576492950}
   - component: {fileID: 576492949}
   - component: {fileID: 576492948}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle413 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7401,7 +7441,7 @@ GameObject:
   - component: {fileID: 730470342}
   - component: {fileID: 730470344}
   - component: {fileID: 730470343}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Line07 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7485,7 +7525,7 @@ GameObject:
   - component: {fileID: 735997372}
   - component: {fileID: 735997371}
   - component: {fileID: 735997370}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle2205 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7590,7 +7630,7 @@ GameObject:
   - component: {fileID: 751254291}
   - component: {fileID: 751254293}
   - component: {fileID: 751254292}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Circle13 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7845,7 +7885,7 @@ GameObject:
   - component: {fileID: 761306074}
   - component: {fileID: 761306076}
   - component: {fileID: 761306075}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Circle09 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8034,7 +8074,7 @@ GameObject:
   - component: {fileID: 772030608}
   - component: {fileID: 772030607}
   - component: {fileID: 772030606}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle7452 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8998,7 +9038,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33ec486381dac2f4692355420900ee99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetSceneName: "\u664B\u6D3E"
+  targetSceneName: "\u4EAC\u6D3E"
   usePreload: 0
   markerRoot: {fileID: 0}
   markerGroup: {fileID: 1097124248}
@@ -9050,7 +9090,7 @@ GameObject:
   - component: {fileID: 945435656}
   - component: {fileID: 945435655}
   - component: {fileID: 945435654}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle5407 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9551,9 +9591,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6233843035408781106, guid: 642ffdfbf05cba74ea9e44da7cfc7406, type: 3}
       insertIndex: -1
       addedObject: {fileID: 352790603}
-    - targetCorrespondingSourceObject: {fileID: 6233843035408781106, guid: 642ffdfbf05cba74ea9e44da7cfc7406, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 17071307}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 642ffdfbf05cba74ea9e44da7cfc7406, type: 3}
 --- !u!4 &1032799690 stripped
@@ -10420,7 +10457,7 @@ GameObject:
   - component: {fileID: 1112382437}
   - component: {fileID: 1112382436}
   - component: {fileID: 1112382435}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle2214 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10778,7 +10815,7 @@ GameObject:
   - component: {fileID: 1165374762}
   - component: {fileID: 1165374761}
   - component: {fileID: 1165374760}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle963 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10883,7 +10920,7 @@ GameObject:
   - component: {fileID: 1179349368}
   - component: {fileID: 1179349370}
   - component: {fileID: 1179349369}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Line222 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11585,7 +11622,7 @@ GameObject:
   - component: {fileID: 1202880940}
   - component: {fileID: 1202880942}
   - component: {fileID: 1202880941}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Bian06 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11705,7 +11742,7 @@ GameObject:
   - component: {fileID: 1229726722}
   - component: {fileID: 1229726721}
   - component: {fileID: 1229726720}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle1690 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11917,7 +11954,7 @@ GameObject:
   - component: {fileID: 1234837287}
   - component: {fileID: 1234837286}
   - component: {fileID: 1234837285}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle7119 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12393,7 +12430,7 @@ GameObject:
   - component: {fileID: 1255487040}
   - component: {fileID: 1255487042}
   - component: {fileID: 1255487041}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Circle01 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12715,7 +12752,7 @@ GameObject:
   - component: {fileID: 1350403623}
   - component: {fileID: 1350403622}
   - component: {fileID: 1350403621}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle5932 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13042,7 +13079,7 @@ GameObject:
   - component: {fileID: 1440100595}
   - component: {fileID: 1440100594}
   - component: {fileID: 1440100593}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle5933 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13259,7 +13296,7 @@ GameObject:
   - component: {fileID: 1455386475}
   - component: {fileID: 1455386477}
   - component: {fileID: 1455386476}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Bian09 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13514,7 +13551,7 @@ GameObject:
   - component: {fileID: 1468544369}
   - component: {fileID: 1468544371}
   - component: {fileID: 1468544370}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Circle206 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13773,7 +13810,7 @@ GameObject:
   - component: {fileID: 1508361168}
   - component: {fileID: 1508361167}
   - component: {fileID: 1508361166}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle8282 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14923,7 +14960,7 @@ GameObject:
   - component: {fileID: 1689362387}
   - component: {fileID: 1689362386}
   - component: {fileID: 1689362385}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle6170 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15546,7 +15583,7 @@ GameObject:
   - component: {fileID: 1735405158}
   - component: {fileID: 1735405157}
   - component: {fileID: 1735405156}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle1947 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15833,7 +15870,7 @@ GameObject:
   - component: {fileID: 1757258360}
   - component: {fileID: 1757258359}
   - component: {fileID: 1757258358}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle6574 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16305,7 +16342,7 @@ GameObject:
   - component: {fileID: 1816335896}
   - component: {fileID: 1816335898}
   - component: {fileID: 1816335897}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Line223 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16547,7 +16584,7 @@ GameObject:
   - component: {fileID: 1834981506}
   - component: {fileID: 1834981505}
   - component: {fileID: 1834981504}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle583 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16653,7 +16690,7 @@ GameObject:
   - component: {fileID: 1838004414}
   - component: {fileID: 1838004413}
   - component: {fileID: 1838004412}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle965 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17349,7 +17386,7 @@ GameObject:
   - component: {fileID: 1926979034}
   - component: {fileID: 1926979033}
   - component: {fileID: 1926979032}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle7077 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17539,7 +17576,7 @@ GameObject:
   - component: {fileID: 1944921870}
   - component: {fileID: 1944921869}
   - component: {fileID: 1944921868}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle1948 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18579,7 +18616,7 @@ GameObject:
   - component: {fileID: 2034871691}
   - component: {fileID: 2034871690}
   - component: {fileID: 2034871689}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Shape91 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18787,7 +18824,7 @@ GameObject:
   - component: {fileID: 2054589787}
   - component: {fileID: 2054589789}
   - component: {fileID: 2054589788}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Circle202 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19158,7 +19195,7 @@ GameObject:
   - component: {fileID: 2102126465}
   - component: {fileID: 2102126464}
   - component: {fileID: 2102126463}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle6169 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19264,7 +19301,7 @@ GameObject:
   - component: {fileID: 2117949087}
   - component: {fileID: 2117949086}
   - component: {fileID: 2117949085}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rectangle2216 (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19674,6 +19711,7 @@ SceneRoots:
   - {fileID: 961739753}
   - {fileID: 203844589}
   - {fileID: 1160234427}
+  - {fileID: 17071307}
   - {fileID: 69259911}
   - {fileID: 1190152916}
   - {fileID: 1133343898}

@@ -81,23 +81,49 @@ public class PlayerController : MonoBehaviour
             Debug.Log($"<color=green>[命中信息]</color> 撞击物体: <b>{hit.collider.name}</b>");
 
             // 优化后：通用接口交互
-            // 尝试获取可交互接口（先自身，后父级）
+            // 尝试获取可交互接口（循环向上查找，直到根节点）
             IInteractable interactable = hit.collider.GetComponent<IInteractable>();
-            if (interactable == null) interactable = hit.collider.GetComponentInParent<IInteractable>();
             
+            // 如果自身没有，向上寻找
+            if (interactable == null)
+            {
+                interactable = hit.collider.GetComponentInParent<IInteractable>();
+            }
+
             if (interactable != null)
             {
+                // 打印成功找到的信息，方便调试
+                MonoBehaviour script = interactable as MonoBehaviour;
+                string scriptName = script != null ? script.gameObject.name : "Unknown";
+                Debug.Log($"<color=green>[交互成功]</color> 点击了 {hit.collider.name}，触发了父级 {scriptName} 上的交互脚本。");
+
                 interactable.Interact();
             }
             else 
             {
-                 Debug.Log("<color=yellow>[交互提示]</color> 该物体在 Interactable 层，但没有挂载实现 IInteractable 接口的脚本。");
+                 // 打印失败的详细路径，帮助排查
+                 string path = GetHierarchyPath(hit.collider.transform);
+                 Debug.Log($"<color=yellow>[交互提示]</color> 击中物体: <b>{hit.collider.name}</b> (Layer: {LayerMask.LayerToName(hit.collider.gameObject.layer)})\n" +
+                           $"完整路径: {path}\n" +
+                           $"原因: 该物体或其父级链上没有任何挂载 IInteractable 接口的脚本。请检查 inspectableItem 脚本是否挂在了正确的父物体上。");
             }
         }
         else
         {
             Debug.Log("<color=gray>[系统结果]</color> 射线未命中任何 Interactable 图层的物体。");
         }
+    }
+
+    // 用于打印层级路径的辅助方法
+    string GetHierarchyPath(Transform transform)
+    {
+        string path = transform.name;
+        while (transform.parent != null)
+        {
+            transform = transform.parent;
+            path = transform.name + "/" + path;
+        }
+        return path;
     }
 
     void HandleCursorToggle()

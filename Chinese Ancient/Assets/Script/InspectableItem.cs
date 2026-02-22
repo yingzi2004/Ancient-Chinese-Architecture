@@ -42,6 +42,12 @@ public class InspectableItem : MonoBehaviour, IInteractable
         {
             playerController = FindObjectOfType<PlayerController>();
         }
+
+        // 自动修复1：确保所有子物体都在同一个层级（解决射线检测不到子物体的问题）
+        SetLayerRecursively(this.gameObject, this.gameObject.layer);
+
+        // 自动修复2：确保模型有碰撞体（解决完全没有碰撞体导致射线穿透的问题）
+        EnsureColliders(this.gameObject);
     }
 
     // 实现 IInteractable 接口
@@ -101,22 +107,29 @@ public class InspectableItem : MonoBehaviour, IInteractable
         // 重要：固定模式下，不设置为摄像机的子物体
         currentInspectObject.transform.SetParent(null); 
         
-        Debug.Log($"<color=green>[检视系统]</color> 在固定位置生成: {fixedSpawnPosition}");
+        Debug.Log($"<color=green>[检视系统]</color> 已生成检视物体: <b>{currentInspectObject.name}</b>\n" +
+                  $"├── 世界坐标: {currentInspectObject.transform.position}\n" +
+                  $"├── 源物体: {(inspectModelPrefab != null ? inspectModelPrefab.name : this.name)}\n" +
+                  $"└── 缩放: {currentInspectObject.transform.localScale}");
 
         // 4. 处理组件
-        // 移除或禁用新物体上不必要的脚本，防止逻辑冲突
-        InspectableItem oldScript = currentInspectObject.GetComponent<InspectableItem>();
-        if (oldScript != null) Destroy(oldScript);
+        // 递归移除克隆体及其所有子物体上的 InspectableItem，防止大模型内部嵌套触发
+        InspectableItem[] oldScripts = currentInspectObject.GetComponentsInChildren<InspectableItem>(true);
+        foreach (var script in oldScripts) Destroy(script);
 
-        Rigidbody newRb = currentInspectObject.GetComponent<Rigidbody>();
-        if (newRb != null) Destroy(newRb);
+        // 递归移除 Rigidbody，防止物理掉落
+        Rigidbody[] rbs = currentInspectObject.GetComponentsInChildren<Rigidbody>(true);
+        foreach (var rb in rbs) Destroy(rb);
 
-        // 添加关闭触发器
+        // 添加关闭触发器到根节点
         InspectionView trigger = currentInspectObject.AddComponent<InspectionView>();
         trigger.parentItem = this;
 
-        // 确保层级正确
-        currentInspectObject.layer = this.gameObject.layer;
+        // 确保克隆体的所有子物体层级正确，以便射线能点到它们来关闭检视
+        SetLayerRecursively(currentInspectObject, this.gameObject.layer);
+        
+        // 确保克隆体有碰撞体
+        EnsureColliders(currentInspectObject);
     }
 
     void StopInspection()
@@ -161,6 +174,50 @@ public class InspectableItem : MonoBehaviour, IInteractable
             }
         }
     }
+
+    // ───────────────────── 辅助方法 ─────────────────────
+
+    // 递归设置层级，确保大模型的所有子物体都能被射线检测到
+    private void SetLayerRecursively(GameObject obj, int newLayer)
+    {
+        if (obj == null) return;
+        obj.layer = newLayer;
+        foreach (Transform child in obj.transform)
+        {
+            if (child != null)
+                SetLayerRecursively(child.gameObject, newLayer);
+        }
+    }
+
+    // 确保物体或其子物体有碰撞体，如果没有则在根节点加一个 BoxCollider
+    private void EnsureColliders(GameObject obj)
+    {
+        Collider[] colliders = obj.GetComponentsInChildren<Collider>(true);
+        if (colliders.Length == 0)
+        {
+            // 如果整个大模型连一个碰撞体都没有，射线绝对点不到，自动加一个包围盒
+            BoxCollider box = obj.AddComponent<BoxCollider>();
+            
+            // 尝试根据 MeshRenderer 计算包围盒大小
+            Renderer[] renderers = obj.GetComponentsInChildren<Renderer>(true);
+            if (renderers.Length > 0)
+            {
+                Bounds bounds = renderers[0].bounds;
+                for (int i = 1; i < renderers.Length; i++)
+                {
+                    bounds.Encapsulate(renderers[i].bounds);
+                }
+                // 将世界坐标的 bounds 转换回本地坐标
+                box.center = obj.transform.InverseTransformPoint(bounds.center);
+                box.size = new Vector3(
+                    bounds.size.x / obj.transform.lossyScale.x,
+                    bounds.size.y / obj.transform.lossyScale.y,
+                    bounds.size.z / obj.transform.lossyScale.z
+                );
+            }
+            Debug.Log($"<color=yellow>[检视系统]</color> 物体 {obj.name} 没有碰撞体，已自动添加 BoxCollider。");
+        }
+    }
 }
 
 // 辅助类：挂在生成的物体上，用于接收点击并通知父物体关闭
@@ -175,4 +232,7 @@ public class InspectionView : MonoBehaviour, IInteractable
             parentItem.CloseInspection();
         }
     }
+
+    // 关键：如果射线点到了子物体，子物体没有 IInteractable，
+    // PlayerController 会往上找父级，所以只要根节点有这个脚本就行。
 }
