@@ -14,22 +14,47 @@ public class WallVideoTrigger : MonoBehaviour
     private bool isInsideRange;
     private bool audioTrackCountInitialized = false;
 
+    // 添加封面图片支持
+    private Renderer targetRenderer;
+    private Texture initialTexture;
+
     private void Awake()
     {
         videoPlayer = GetComponent<VideoPlayer>();
+        targetRenderer = GetComponent<Renderer>();
+
+        if (targetRenderer != null)
+        {
+            // 保存初始纹理作为封面
+            initialTexture = targetRenderer.material.mainTexture;
+        }
+
         if (videoPlayer != null)
         {
             // 强制禁用自动播放
             videoPlayer.playOnAwake = false;
+            videoPlayer.renderMode = VideoRenderMode.MaterialOverride; // 确保是材质覆盖模式
+            videoPlayer.targetMaterialRenderer = targetRenderer; // 确保指向正确的渲染器
             videoPlayer.prepareCompleted += OnVideoPrepared;
             
-            // 停止任何正在播放的视频
-            if (videoPlayer.isPlaying)
-            {
-                videoPlayer.Stop();
-            }
+            // 停止任何正在播放的视频并显示封面
+            StopVideoAndShowCover();
             
             Debug.Log($"<color=cyan>[视频触发器]</color> 已初始化: {gameObject.name}, 距离触发: {triggerDistance}米");
+        }
+    }
+
+    private void StopVideoAndShowCover()
+    {
+        if (videoPlayer.isPlaying)
+        {
+            videoPlayer.Stop();
+        }
+
+        // 恢复封面纹理
+        if (targetRenderer != null && initialTexture != null)
+        {
+            targetRenderer.material.mainTexture = initialTexture;
         }
     }
 
@@ -77,10 +102,7 @@ public class WallVideoTrigger : MonoBehaviour
         else if (!withinRange && isInsideRange)
         {
             isInsideRange = false;
-            if (videoPlayer.isPlaying)
-            {
-                videoPlayer.Stop();
-            }
+            StopVideoAndShowCover();
             MuteAll(true);
         }
     }
