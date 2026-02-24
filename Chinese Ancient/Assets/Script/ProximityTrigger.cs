@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Video;
 
 /// <summary>
-/// 近距离触发系统 - 支持视频封面功能
+/// 近距离触发系统 - 当玩家靠近时触发事件
+/// 可用于：视频播放、音效播放、特效显示、对话触发等
 /// </summary>
 public class ProximityTrigger : MonoBehaviour
 {
@@ -19,14 +19,6 @@ public class ProximityTrigger : MonoBehaviour
     [Tooltip("是否只触发一次")]
     public bool triggerOnce = false;
 
-    [Header("视频封面设置")]
-    [Tooltip("视频封面纹理（不设置则自动使用当前材质的主纹理）")]
-    public Texture coverTexture;
-    [Tooltip("视频播放器（可选，自动获取）")]
-    public VideoPlayer videoPlayer;
-    [Tooltip("目标渲染器（可选，自动获取）")]
-    public Renderer targetRenderer;
-
     [Header("事件回调")]
     [Tooltip("进入范围时调用")]
     public UnityEvent onEnterRange;
@@ -35,105 +27,61 @@ public class ProximityTrigger : MonoBehaviour
 
     private bool isInsideRange = false;
     private bool hasTriggeredOnce = false;
-    private bool isVideoPlaying = false;
-    private Texture savedCoverTexture;
-    private RenderTexture videoRenderTexture;
-
-    private void Awake()
-    {
-        if (videoPlayer == null) videoPlayer = GetComponent<VideoPlayer>();
-        if (targetRenderer == null) targetRenderer = GetComponent<Renderer>();
-
-        // 保存封面纹理
-        savedCoverTexture = coverTexture != null ? coverTexture : targetRenderer?.material?.mainTexture;
-
-        // 保存视频 RenderTexture
-        if (videoPlayer != null && videoPlayer.targetTexture != null)
-            videoRenderTexture = videoPlayer.targetTexture;
-
-        // 初始化视频播放器
-        if (videoPlayer != null)
-        {
-            videoPlayer.playOnAwake = false;
-            videoPlayer.isLooping = false;
-            videoPlayer.Stop();
-            videoPlayer.enabled = false;
-            videoPlayer.loopPointReached += OnVideoFinished;
-        }
-
-        ShowCover();
-    }
 
     private void Start()
     {
+        // 自动查找玩家
         if (player == null && !string.IsNullOrEmpty(playerTag))
         {
-            var found = GameObject.FindGameObjectWithTag(playerTag);
-            if (found != null) player = found.transform;
+            GameObject found = GameObject.FindGameObjectWithTag(playerTag);
+            if (found != null)
+            {
+                player = found.transform;
+            }
         }
-        ShowCover();
-    }
-
-    private void OnDestroy()
-    {
-        if (videoPlayer != null)
-            videoPlayer.loopPointReached -= OnVideoFinished;
-    }
-
-    private void OnVideoFinished(VideoPlayer vp)
-    {
-        isVideoPlaying = false;
-        videoPlayer.Stop();
-        videoPlayer.enabled = false;
-        ShowCover();
     }
 
     private void Update()
     {
-        if (player == null) return;
+        if (player == null)
+            return;
 
         float distance = Vector3.Distance(transform.position, player.position);
         bool withinRange = distance <= triggerDistance;
 
+        // 进入范围
         if (withinRange && !isInsideRange)
         {
             isInsideRange = true;
+
             if (!triggerOnce || !hasTriggeredOnce)
             {
-                if (!isVideoPlaying) PlayVideo();
                 onEnterRange?.Invoke();
                 hasTriggeredOnce = true;
+                Debug.Log($"<color=green>[近距离触发]</color> 玩家进入范围: {gameObject.name}");
             }
         }
+        // 离开范围
         else if (!withinRange && isInsideRange)
         {
             isInsideRange = false;
-            onExitRange?.Invoke();
+
+            if (!triggerOnce || !hasTriggeredOnce)
+            {
+                onExitRange?.Invoke();
+                Debug.Log($"<color=yellow>[近距离触发]</color> 玩家离开范围: {gameObject.name}");
+            }
         }
     }
 
-    private void PlayVideo()
-    {
-        if (videoPlayer == null) return;
-        isVideoPlaying = true;
-        videoPlayer.enabled = true;
-        if (videoRenderTexture != null && targetRenderer != null)
-            targetRenderer.material.mainTexture = videoRenderTexture;
-        videoPlayer.Play();
-    }
-
-    public void ShowCover()
-    {
-        if (targetRenderer != null && savedCoverTexture != null)
-            targetRenderer.material.mainTexture = savedCoverTexture;
-    }
-
+    // 重置触发状态（用于 triggerOnce = true 时）
     public void ResetTrigger()
     {
         hasTriggeredOnce = false;
         isInsideRange = false;
     }
 
+    // 在 Scene 里可视化触发范围
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;

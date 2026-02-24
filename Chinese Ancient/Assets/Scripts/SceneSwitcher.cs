@@ -1,0 +1,115 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+/// <summary>
+/// 场景切换器：玩家靠近物体自动跳转到目标场景，并保存当前场景和玩家位置
+/// 使用方法：将此脚本挂载到物体上（如小正方体），添加Box Collider并勾选Is Trigger
+/// </summary>
+public class SceneSwitcher : MonoBehaviour
+{
+    [Header("目标场景设置")]
+    [Tooltip("要跳转到的场景名称")]
+    public string targetSceneName = "2";
+
+    [Header("玩家设置")]
+    [Tooltip("玩家对象（用于获取位置），如果为空则自动查找")]
+    public GameObject player;
+
+    private bool playerInZone = false;
+
+    void Start()
+    {
+        // 如果没有设置玩家对象，自动查找
+        if (player == null)
+        {
+            PlayerController playerController = FindObjectOfType<PlayerController>();
+            if (playerController != null)
+            {
+                player = playerController.gameObject;
+            }
+        }
+
+        // 检查是否有Trigger Collider
+        Collider col = GetComponent<Collider>();
+        if (col == null)
+        {
+            Debug.LogWarning("SceneSwitcher: 未找到Collider！请添加Box Collider并勾选Is Trigger。");
+        }
+        else if (!col.isTrigger)
+        {
+            Debug.LogWarning("SceneSwitcher: Collider未勾选Is Trigger！请勾选Is Trigger。");
+        }
+    }
+
+    void Update()
+    {
+        // 防止重复触发
+        if (playerInZone)
+        {
+            return;
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        // 检查进入的是否是玩家
+        if (IsPlayer(other))
+        {
+            Debug.Log("玩家进入区域，准备跳转...");
+            playerInZone = true;
+            SwitchScene();
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (IsPlayer(other))
+        {
+            playerInZone = false;
+        }
+    }
+
+    bool IsPlayer(Collider col)
+    {
+        // 检查碰撞体是否属于玩家
+        if (col.GetComponent<PlayerController>() != null)
+            return true;
+        if (col.GetComponentInParent<PlayerController>() != null)
+            return true;
+        return false;
+    }
+
+    void SwitchScene()
+    {
+        // 保存当前场景名称
+        string currentScene = SceneManager.GetActiveScene().name;
+        PlayerPrefs.SetString("PreviousScene", currentScene);
+        Debug.Log($"保存来源场景: {currentScene}");
+
+        // 保存玩家位置
+        if (player != null)
+        {
+            Vector3 pos = player.transform.position;
+            PlayerPrefs.SetFloat("PlayerPosX", pos.x);
+            PlayerPrefs.SetFloat("PlayerPosY", pos.y);
+            PlayerPrefs.SetFloat("PlayerPosZ", pos.z);
+
+            // 保存玩家旋转
+            Vector3 rot = player.transform.rotation.eulerAngles;
+            PlayerPrefs.SetFloat("PlayerRotX", rot.x);
+            PlayerPrefs.SetFloat("PlayerRotY", rot.y);
+            PlayerPrefs.SetFloat("PlayerRotZ", rot.z);
+
+            PlayerPrefs.Save();
+            Debug.Log($"保存玩家位置: {pos}");
+        }
+        else
+        {
+            Debug.LogWarning("SceneSwitcher: 未找到玩家对象，无法保存位置！");
+        }
+
+        // 跳转到目标场景
+        Debug.Log($"跳转到场景: {targetSceneName}");
+        SceneManager.LoadScene(targetSceneName);
+    }
+}
