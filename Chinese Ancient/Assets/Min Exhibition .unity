@@ -1096,7 +1096,7 @@ PrefabInstance:
       addedObject: {fileID: 69259916}
     - targetCorrespondingSourceObject: {fileID: 1798112504672404704, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 69259920}
+      addedObject: {fileID: 69259918}
     - targetCorrespondingSourceObject: {fileID: 863912987228375009, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       insertIndex: -1
       addedObject: {fileID: 634068932}
@@ -1159,7 +1159,7 @@ VideoPlayer:
   m_WaitForFirstFrame: 1
   m_FrameReadyEventEnabled: 0
   m_VideoShaders: []
---- !u!114 &69259920
+--- !u!114 &69259918
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1168,12 +1168,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 69259914}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d68bd3bb714ebc44e83bcfcc0f07f41d, type: 3}
+  m_Script: {fileID: 11500000, guid: 791cc11b1107ecc4f993748f4475a0cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1190152916}
   playerTag: Player
-  triggerDistance: 4
+  triggerDistance: 3
+  triggerOnce: 0
+  coverTexture: {fileID: 0}
+  videoPlayer: {fileID: 69259916}
+  targetRenderer: {fileID: 69259919}
+  onEnterRange:
+    m_PersistentCalls:
+      m_Calls: []
+  onExitRange:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!23 &69259919 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -2475240543810581834, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
+  m_PrefabInstance: {fileID: 69259911}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &76975951
 GameObject:
   m_ObjectHideFlags: 0
