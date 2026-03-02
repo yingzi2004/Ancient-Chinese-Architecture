@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // 点击物体时抬起并做出倒东西的动作。将此脚本挂到每个碗物体上。
-public class leicha : MonoBehaviour
+public class LeichaDao : MonoBehaviour
 {
     [Tooltip("抬起的高度（本地坐标，单位为米）")]
     public float liftHeight = 0.2f;
