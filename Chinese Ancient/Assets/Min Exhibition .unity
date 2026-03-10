@@ -5328,6 +5328,38 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 7705150530635884046, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
+--- !u!1 &552414869
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 552414870}
+  m_Layer: 0
+  m_Name: AI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &552414870
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552414869}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1535863325}
+  m_Father: {fileID: 1193753712}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &575758437
 GameObject:
   m_ObjectHideFlags: 0
@@ -21980,7 +22012,8 @@ Transform:
   m_LocalPosition: {x: 0.08500004, y: 0.80700004, z: -0.203}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 552414870}
   m_Father: {fileID: 1190152916}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1193753713
@@ -22086,6 +22119,222 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!1 &1210241252
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1210241253}
+  - component: {fileID: 1210241257}
+  - component: {fileID: 1210241256}
+  - component: {fileID: 1210241255}
+  - component: {fileID: 1210241254}
+  m_Layer: 0
+  m_Name: AIChatSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1210241253
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210241252}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1535863325}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1210241254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210241252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6c369be72c93dd4c97cb2b1adab9fc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  accessKeyId: LTAI5tNA974HwbCV1jNptzRh
+  accessKeySecret: DoPVgICDOLNFbuPYGQ34an2zR2BUZ9
+  appKey: 2F0J0YNVEI9FDBvi
+  manualToken: 
+  voice: 6
+  volume: 50
+  speechRate: 0
+  pitchRate: 0
+  format: 0
+  audioSource: {fileID: 1210241255}
+--- !u!82 &1210241255
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210241252}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 9d233b585150a5b4b8c9199aaabcc8ae, type: 2}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &1210241256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210241252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58a049ff66184e34f87c1b85c82b61a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settings: {fileID: 0}
+  endpointDirect: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+  apiKeyDirect: sk-da4bf830827d41cdaf3a6c4983a9577e
+  modelDirect: qwen-plus
+  systemPromptDirect: "\u4F60\u662F\u4E00\u4E2A\u53CB\u597D\u7684\u53E4\u5EFA\u7B51\u5BFC\u89C8\u52A9\u624B\uFF0C\u56DE\u7B54\u7B80\u6D01\u3001\u51C6\u786E\uFF0C\u4E14\u56DE\u7B54\u9700\u8981\u4EBA\u6027\u5316\uFF0C\u4E0D\u8981\u51FA\u73B0\u4E00\u6BB5\u6BB5\u8FD8\u5E26\u7740\u6807\u9898\u7684\u56DE\u7B54\uFF0C\u8981\u6C42\u4E00\u6BB5\u6BB5\u7684\u8BF4\u660E\uFF0C\u53E3\u8BED\u611F\u5F3A\uFF0C\u4F18\u5148\u7ED3\u5408\u4E2D\u56FD\u53E4\u5EFA\u7B51\u80CC\u666F\u3002"
+  temperatureDirect: 0.7
+  maxTokensDirect: 512
+  requestTimeoutSecondsDirect: 60
+  endpointOverride: 
+  modelOverride: 
+  systemPromptOverride: 
+--- !u!114 &1210241257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210241252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aac17c26fbaecea439c78d8b52f1ef92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chatClient: {fileID: 1210241256}
+  toggleKey: 283
+  defaultOpen: 0
+  windowRect:
+    serializedVersion: 2
+    x: 30
+    y: 30
+    width: 620
+    height: 520
+  fontSize: 18
+  textColor: {r: 1, g: 1, b: 1, a: 1}
+  windowTitle: "AI \u5BF9\u8BDD\uFF08\u5343\u95EE\uFF09"
+  backgroundTexture: {fileID: 0}
+  backgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.95}
+  contentBackgroundColor: {r: 0.1, g: 0.1, b: 0.1, a: 0.8}
+  titleBarColor: {r: 0.15, g: 0.15, b: 0.15, a: 1}
+  titleTextColor: {r: 1, g: 1, b: 1, a: 1}
+  titleFontSize: 16
+  buttonNormalColor: {r: 0.3, g: 0.3, b: 0.3, a: 1}
+  buttonHoverColor: {r: 0.4, g: 0.4, b: 0.4, a: 1}
+  buttonActiveColor: {r: 0.2, g: 0.5, b: 0.8, a: 1}
+  buttonTextColor: {r: 1, g: 1, b: 1, a: 1}
+  inputBackgroundColor: {r: 0.15, g: 0.15, b: 0.15, a: 0.9}
+  inputTextColor: {r: 1, g: 1, b: 1, a: 1}
+  controlCursor: 1
+  lockModeWhenClosed: 1
+  enableVoice: 1
+  ttsClient: {fileID: 1210241254}
 --- !u!1 &1217308633
 GameObject:
   m_ObjectHideFlags: 0
@@ -25192,6 +25441,38 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c2014f901c22bc94da2d880757de78b9, type: 3}
+--- !u!1 &1535863324
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1535863325}
+  m_Layer: 0
+  m_Name: Qwen Chat Settings
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1535863325
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1535863324}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1210241253}
+  m_Father: {fileID: 552414870}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1549681630
 GameObject:
   m_ObjectHideFlags: 0
