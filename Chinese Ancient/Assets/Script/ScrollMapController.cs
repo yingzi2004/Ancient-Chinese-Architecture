@@ -242,21 +242,18 @@ public class ScrollMapController : MonoBehaviour
         }
 
         // ★ 左遮挡板向左移（也就是底图展现）
-        // 核心修复：遮挡板需要额外多移动自身宽度的距离，才能完全离开屏幕！
         if (coverLeft != null)
         {
-            float coverLeftExtra = coverLeft.rect.width;
             mainSequence.Join(
-                coverLeft.DOAnchorPosX(scrollLeftTargetX - coverLeftExtra, baseMapRevealDuration)
+                coverLeft.DOAnchorPosX(scrollLeftTargetX, baseMapRevealDuration)
                     .SetEase(Ease.Linear)
             );
         }
         // ★ 右遮挡板向右移（也就是底图展现）
         if (coverRight != null)
         {
-            float coverRightExtra = coverRight.rect.width;
             mainSequence.Join(
-                coverRight.DOAnchorPosX(scrollRightTargetX + coverRightExtra, baseMapRevealDuration)
+                coverRight.DOAnchorPosX(scrollRightTargetX, baseMapRevealDuration)
                     .SetEase(Ease.Linear)
             );
         }
@@ -332,10 +329,6 @@ public class ScrollMapController : MonoBehaviour
 
         mainSequence.AppendCallback(() =>
         {
-            // ★ 保底：动画结束后直接隐藏遮挡板，确保它们不会残留在画面上
-            if (coverLeft != null) coverLeft.gameObject.SetActive(false);
-            if (coverRight != null) coverRight.gameObject.SetActive(false);
-
             Debug.Log("【动画结束】开场动画播完，准备镜头引导...");
             
             if (enableGuide)
