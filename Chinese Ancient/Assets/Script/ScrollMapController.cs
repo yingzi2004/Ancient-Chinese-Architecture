@@ -135,6 +135,17 @@ public class ScrollMapController : MonoBehaviour
 
     private void InitializeUI()
     {
+        // 音频兜底：如果配置了音效但未手动拖 AudioSource，则自动补一个
+        if (audioSource == null && (scrollOpenClip != null || buildingAppearClip != null))
+        {
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null)
+            {
+                audioSource = gameObject.AddComponent<AudioSource>();
+            }
+            audioSource.playOnAwake = false;
+        }
+
         // 卷轴两端从中间开始，并强制设为最后渲染（即最上层，防止被遮挡）
         if (scrollLeft != null)
         {
@@ -242,18 +253,21 @@ public class ScrollMapController : MonoBehaviour
         }
 
         // ★ 左遮挡板向左移（也就是底图展现）
+        // 核心修复：遮挡板需要额外多移动自身宽度的距离，才能完全离开屏幕！
         if (coverLeft != null)
         {
+            float coverLeftExtra = coverLeft.rect.width;
             mainSequence.Join(
-                coverLeft.DOAnchorPosX(scrollLeftTargetX, baseMapRevealDuration)
+                coverLeft.DOAnchorPosX(scrollLeftTargetX - coverLeftExtra, baseMapRevealDuration)
                     .SetEase(Ease.Linear)
             );
         }
         // ★ 右遮挡板向右移（也就是底图展现）
         if (coverRight != null)
         {
+            float coverRightExtra = coverRight.rect.width;
             mainSequence.Join(
-                coverRight.DOAnchorPosX(scrollRightTargetX, baseMapRevealDuration)
+                coverRight.DOAnchorPosX(scrollRightTargetX + coverRightExtra, baseMapRevealDuration)
                     .SetEase(Ease.Linear)
             );
         }
@@ -329,6 +343,10 @@ public class ScrollMapController : MonoBehaviour
 
         mainSequence.AppendCallback(() =>
         {
+            // ★ 保底：动画结束后直接隐藏遮挡板，确保它们不会残留在画面上
+            if (coverLeft != null) coverLeft.gameObject.SetActive(false);
+            if (coverRight != null) coverRight.gameObject.SetActive(false);
+
             Debug.Log("【动画结束】开场动画播完，准备镜头引导...");
             
             if (enableGuide)
