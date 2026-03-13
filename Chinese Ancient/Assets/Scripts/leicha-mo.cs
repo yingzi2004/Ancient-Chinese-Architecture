@@ -34,7 +34,15 @@ public class leicha_mo : MonoBehaviour
     [Tooltip("�������ĸ����Ƿ��ȣ��ȣ������� tiltDuringGrinding Ϊ true ��Ч��")]
     public float tiltAngle = 10f;
 
+    [Tooltip("�ﵽָ���������ĥ�������ʱ����ʾ�ĳ������� leicha ģ��")]
+    public GameObject leichaModel;
+
+    [Tooltip("�ﵽ�������Ч��ĥ�������ʱ��ʾ leicha ģ��")]
+    public int revealClickCount = 3;
+
     bool isGrinding = false;
+    int grindClickCount = 0;
+    bool hasRevealedModel = false;
 
     void Reset()
     {
@@ -50,7 +58,21 @@ public class leicha_mo : MonoBehaviour
         if (!enabled) return;
         if (isGrinding) return;
 
+        grindClickCount++;
+        TryRevealLeichaModel();
+
         StartCoroutine(GrindingRoutine());
+    }
+
+    void TryRevealLeichaModel()
+    {
+        if (hasRevealedModel) return;
+        if (leichaModel == null) return;
+        if (grindClickCount < Mathf.Max(1, revealClickCount)) return;
+
+        leichaModel.SetActive(true);
+        hasRevealedModel = true;
+        Debug.Log("Leicha model revealed after grind clicks: " + grindClickCount);
     }
 
     IEnumerator GrindingRoutine()
