@@ -1,44 +1,44 @@
 using System.Collections;
 using UnityEngine;
 
-// µã»÷Ò»´ÎÎ§ÈÆÖ¸¶¨µã×öÑÐÄ¥£¨ÈÆÈ¦£©¶¯×÷£¨ÀýÈçèÆÈÆ²§ÑÐÄ¥£©
-// ×¢Òâ£ºÀàÃû²»º¬·Ç·¨×Ö·û£¬½Å±¾¹ÒÔÚèÆ£¨Pestle£©ÎïÌåÉÏ£¬ÍÏÈë Pivot£¨²§ÖÐÐÄ£©¼´¿É¡£
+// ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Î§ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¥ï¿½ï¿½ï¿½ï¿½È¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ²ï¿½ï¿½ï¿½Ä¥ï¿½ï¿½
+// ×¢ï¿½â£ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½Å±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ£ï¿½Pestleï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï£ï¿½ï¿½ï¿½ï¿½ï¿½ Pivotï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½É¡ï¿½
 public class leicha_mo : MonoBehaviour
 {
-    [Tooltip("ÑÐÄ¥ÖÐÐÄ£¨ÈÆ¸Ãµã×öÔ²ÖÜÔË¶¯£©¡£Îª¿ÕÔòÊ¹ÓÃ¸¸ÎïÌå»òÊÀ½çÔ­µã¡£")]
+    [Tooltip("ï¿½ï¿½Ä¥ï¿½ï¿½ï¿½Ä£ï¿½ï¿½Æ¸Ãµï¿½ï¿½ï¿½Ô²ï¿½ï¿½ï¿½Ë¶ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ã¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ã¡£")]
     public Transform pivot;
 
-    [Tooltip("Ã¿´Îµã»÷ÈÆ¶àÉÙÈ¦£¨Í¨³£2 »ò3£©")]
+    [Tooltip("Ã¿ï¿½Îµï¿½ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½È¦ï¿½ï¿½Í¨ï¿½ï¿½2 ï¿½ï¿½3ï¿½ï¿½")]
     [Range(1, 10)]
     public int rotations = 3;
 
-    [Tooltip("Ã¿È¦ËùÓÃÊ±¼ä£¨Ãë£©¡£×ÜÊ±³¤ = rotations * rotationDuration")]
+    [Tooltip("Ã¿È¦ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä£¨ï¿½ë£©ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ = rotations * rotationDuration")]
     public float rotationDuration = 0.4f;
 
-    [Tooltip("ÈÆÄÄ¸öÖáÐý×ª£¨ÔÚÊÀ½ç¿Õ¼ä£©¡ª¡ªÀýÈç Y ÎªË®Æ½ÃæÄÚÈÆÈ¦")]
+    [Tooltip("ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ä£©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Y ÎªË®Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¦")]
     public Vector3 axis = Vector3.up;
 
-    [Tooltip("Î§ÈÆ pivot µÄÔ²ÖÜ°ë¾¶£¨ÈôÎª0 ÔòÊ¹ÓÃµ±Ç°ÎïÌåÓë pivot µÄ¾àÀë£©")]
+    [Tooltip("Î§ï¿½ï¿½ pivot ï¿½ï¿½Ô²ï¿½Ü°ë¾¶ï¿½ï¿½ï¿½ï¿½Îª0 ï¿½ï¿½Ê¹ï¿½Ãµï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ pivot ï¿½Ä¾ï¿½ï¿½ë£©")]
     public float radius = 0f;
 
-    [Tooltip("Ëõ·Å°ë¾¶µÄ±ÈÀý£¨0-1£©£¬ÓÃÓÚ°Ñ°ë¾¶±äÐ¡£»Ä¬ÈÏ0.5 ±íÊ¾ÓÃÒ»°ë¾àÀë")]
+    [Tooltip("ï¿½ï¿½ï¿½Å°ë¾¶ï¿½Ä±ï¿½ï¿½ï¿½ï¿½ï¿½0-1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú°Ñ°ë¾¶ï¿½ï¿½Ð¡ï¿½ï¿½Ä¬ï¿½ï¿½0.5 ï¿½ï¿½Ê¾ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½")]
     [Range(0f, 1f)]
     public float radiusScale = 0.5f;
 
-    [Tooltip("×î´óÔÊÐí°ë¾¶£¨0 ±íÊ¾²»ÏÞÖÆ£©")]
+    [Tooltip("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë¾¶ï¿½ï¿½0 ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½Æ£ï¿½")]
     public float maxRadius = 0f;
 
-    [Tooltip("ÊÇ·ñÔÚÑÐÄ¥Ê±Í¬Ê±Ê¹èÆ×ÔÉí×öÐ¡·ùÐý×ª£¨ÊÓ¾õÐ§¹û£©")]
+    [Tooltip("ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Ä¥Ê±Í¬Ê±Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½Ó¾ï¿½Ð§ï¿½ï¿½ï¿½ï¿½")]
     public bool tiltDuringGrinding = true;
 
-    [Tooltip("èÆ×ÔÉíµÄ¸©Ñö½Ç·ù¶È£¨¶È£©£¬½öµ± tiltDuringGrinding Îª true ÓÐÐ§£©")]
+    [Tooltip("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½È£ï¿½ï¿½È£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ tiltDuringGrinding Îª true ï¿½ï¿½Ð§ï¿½ï¿½")]
     public float tiltAngle = 10f;
 
     bool isGrinding = false;
 
     void Reset()
     {
-        // È·±£ ÓÐÅö×²Ìå ÒÔ½ÓÊÕ OnMouseDown µã»÷
+        // È·ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½×²ï¿½ï¿½ ï¿½Ô½ï¿½ï¿½ï¿½ OnMouseDown ï¿½ï¿½ï¿½
         if (GetComponent<Collider>() == null)
         {
             gameObject.AddComponent<BoxCollider>();
@@ -57,32 +57,34 @@ public class leicha_mo : MonoBehaviour
     {
         isGrinding = true;
 
-        //±¸·ÝÔ­Î»ÖÃÓëÐý×ª
+        //ï¿½ï¿½ï¿½ï¿½Ô­Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ª
         Vector3 startPos = transform.position;
         Quaternion startRot = transform.rotation;
 
-        // È·¶¨ pivot Ê¹ÓÃÓÅÏÈ¼¶£º×Ö¶Î > ¸¸Îï > ÊÀ½çÔ­µã
+        // È·ï¿½ï¿½ pivot Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½ > ï¿½ï¿½ï¿½ï¿½ > ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½
         Transform effectivePivot = pivot;
         if (effectivePivot == null)
             effectivePivot = transform.parent != null ? transform.parent : null;
 
-        Vector3 pivotPos = effectivePivot != null ? effectivePivot.position : Vector3.zero;
+        // If no pivot is assigned, use the current object center as pivot.
+        Vector3 pivotPos = effectivePivot != null ? effectivePivot.position : transform.position;
 
-        //¼ÆËã³õÊ¼Æ«ÒÆÓë°ë¾¶
+        //ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼Æ«ï¿½ï¿½ï¿½ï¿½ë¾¶
         Vector3 offset = transform.position - pivotPos;
         float baseRadius = radius > 0f ? radius : offset.magnitude;
-        // Apply scale to make radius smaller
+        // Apply scale to make radius smaller.
         float usedRadius = Mathf.Max(0f, baseRadius * Mathf.Clamp01(radiusScale));
-        // Fallback tiny radius if zero
-        if (usedRadius <= 0.0001f)
+        if (usedRadius > 0.0001f)
         {
-            offset = transform.TransformDirection(Vector3.forward) * 0.1f;
-            usedRadius = offset.magnitude;
+            //ï¿½æ·¶ï¿½ï¿½Æ«ï¿½Æµï¿½Ö¸ï¿½ï¿½ï¿½ë¾¶ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
+            offset = (offset.sqrMagnitude > 0.0001f)
+                ? offset.normalized * usedRadius
+                : transform.TransformDirection(Vector3.forward) * usedRadius;
         }
         else
         {
-            //¹æ·¶»¯Æ«ÒÆµ½Ö¸¶¨°ë¾¶£¨±£³Ö·½Ïò£©
-            offset = (offset.sqrMagnitude > 0.0001f) ? offset.normalized * usedRadius : transform.TransformDirection(Vector3.forward) * usedRadius;
+            // Keep zero radius so rotation happens around the rod's own center.
+            offset = Vector3.zero;
         }
 
         // Apply maximum cap if set
@@ -92,31 +94,40 @@ public class leicha_mo : MonoBehaviour
             offset = offset.normalized * usedRadius;
         }
 
-        //Ðý×ªÖá£¨ÊÀ½ç¿Õ¼äµ¥Î»ÏòÁ¿£©
+        //ï¿½ï¿½×ªï¿½á£¨ï¿½ï¿½ï¿½ï¿½Õ¼äµ¥Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         Vector3 worldAxis = axis.sqrMagnitude > 0.0001f ? axis.normalized : Vector3.up;
 
-        // ×Ü½Ç¶È£¨¶È£©
+        // ï¿½Ü½Ç¶È£ï¿½ï¿½È£ï¿½
         float totalAngle = 360f * rotations;
         float elapsed = 0f;
         float totalDuration = Mathf.Max(0.01f, rotations * rotationDuration);
 
-        // ÔÚ¶¯»­¹ý³ÌÖÐÍ¬Ê±¿ÉÊ¹èÆ×ÔÉí×öÐ¡·ù¸©ÑöÒÔÔöÇ¿ÑÐÄ¥¸Ð
+        // ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¬Ê±ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¿ï¿½ï¿½Ä¥ï¿½ï¿½
         while (elapsed < totalDuration)
         {
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / totalDuration);
             float angleDeg = Mathf.Lerp(0f, totalAngle, t);
 
-            //¼ÆËãµ±Ç°Î»ÖÃ£ºÈÆ pivotPosÐý×ª offset
             Quaternion rot = Quaternion.AngleAxis(angleDeg, worldAxis);
-            Vector3 newPos = pivotPos + rot * offset;
-            transform.position = newPos;
+
+            // Radius == 0 means self-centered rotation (no orbital movement).
+            if (usedRadius <= 0.0001f)
+            {
+                transform.position = startPos;
+            }
+            else
+            {
+                //ï¿½ï¿½ï¿½ãµ±Ç°Î»ï¿½Ã£ï¿½ï¿½ï¿½ pivotPosï¿½ï¿½×ª offset
+                Vector3 newPos = pivotPos + rot * offset;
+                transform.position = newPos;
+            }
 
             if (tiltDuringGrinding)
             {
-                //ÈÃèÆÔÚÐý×ª¹ý³ÌÖÐ×öÐ¡·ù¸©Ñö£¨sin ÇúÏß£©
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sin ï¿½ï¿½ï¿½ß£ï¿½
                 float tilt = Mathf.Sin(t * Mathf.PI * rotations * 2f) * tiltAngle;
-                //ÒÔÐý×ªÖáµÄÕý½»·½Ïò×ö¸©Ñö£¨³¢ÊÔÑØ worldAxis µÄÄ³¸öºáÏò·½Ïò£©
+                //ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ worldAxis ï¿½ï¿½Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 Vector3 tiltAxis = Vector3.Cross(worldAxis, (transform.position - pivotPos)).normalized;
                 if (tiltAxis.sqrMagnitude < 0.0001f) tiltAxis = transform.right;
                 transform.rotation = Quaternion.AngleAxis(tilt, tiltAxis) * startRot;
@@ -129,7 +140,7 @@ public class leicha_mo : MonoBehaviour
             yield return null;
         }
 
-        //½áÊøÊ±»Ö¸´µ½ÆðÊ¼×ËÌ¬£¨±ÜÃâÊýÖµÆ¯ÒÆ£©
+        //ï¿½ï¿½ï¿½ï¿½Ê±ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÖµÆ¯ï¿½Æ£ï¿½
         transform.position = startPos;
         transform.rotation = startRot;
 
