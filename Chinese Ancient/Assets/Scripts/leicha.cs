@@ -2,32 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// ³¡¾°¼¶µã»÷¿ØÖÆÆ÷£¨»ùÓÚÖ¸¶¨µÄÈý¸ö²ÛÎ»£©£º
-//1) ÔÚ Inspector ÖÐÖ¸¶¨ Slot1¡¢Slot2 ºÍ SpawnPrefab£¨Slot3£©¡£
-//2) µ±ÓÃ»§ÏÈµã»÷ Slot1£¬È»ºóÔÚ³¬Ê±Ê±¼äÄÚµã»÷ Slot2 Ê±£¬»áÔÚÉãÏñ»úÇ°Éú³É SpawnPrefab»ò¼¤»î³¡¾°ÖÐµÄ¶ÔÏó¡£
-// ½«´Ë½Å±¾¹Òµ½³¡¾°ÖÐµÄÒ»¸ö¿Õ¶ÔÏó£¨ÀýÈç GameManager£©¡£
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½
+//1) ï¿½ï¿½ Inspector ï¿½ï¿½Ö¸ï¿½ï¿½ Slot1ï¿½ï¿½Slot2 ï¿½ï¿½ SpawnPrefabï¿½ï¿½Slot3ï¿½ï¿½ï¿½ï¿½
+//2) ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Èµï¿½ï¿½ Slot1ï¿½ï¿½È»ï¿½ï¿½ï¿½Ú³ï¿½Ê±Ê±ï¿½ï¿½ï¿½Úµï¿½ï¿½ Slot2 Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ SpawnPrefabï¿½ò¼¤»î³¡ï¿½ï¿½ï¿½ÐµÄ¶ï¿½ï¿½ï¿½
+// ï¿½ï¿½ï¿½Ë½Å±ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Ò»ï¿½ï¿½ï¿½Õ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ GameManagerï¿½ï¿½ï¿½ï¿½
 public class LeichaController : MonoBehaviour
 {
-    [Header("Ö¸¶¨Èý¸ö²ÛÎ»£¨ÔÚ Inspector ÖÐÍÏÈë¶ÔÓ¦ÎïÌå£©")]
-    [Tooltip("ÏÈµã»÷µÄÎïÌå£¨Slot1£©")]
+    [Header("Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ Inspector ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½å£©")]
+    [Tooltip("ï¿½Èµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½å£¨Slot1ï¿½ï¿½")]
     public GameObject slot1;
 
-    [Tooltip("ºóµã»÷µÄÎïÌå£¨Slot2£©")]
+    [Tooltip("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½å£¨Slot2ï¿½ï¿½")]
     public GameObject slot2;
 
-    [Tooltip("Âú×ã Slot1->Slot2 Ë³ÐòºóÉú³É»ò¼¤»îµÄ¶ÔÏó£¨Èç¹ûÕâÊÇ³¡¾°ÖÐµÄ¶ÔÏóÇÒ³õÊ¼ÎªÒþ²Ø£¬Ôò»á±» SetActive(true)£©")]
+    [Tooltip("ï¿½ï¿½ï¿½ï¿½ Slot1->Slot2 Ë³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É»ò¼¤»ï¿½Ä¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç³ï¿½ï¿½ï¿½ï¿½ÐµÄ¶ï¿½ï¿½ï¿½ï¿½Ò³ï¿½Ê¼Îªï¿½ï¿½ï¿½Ø£ï¿½ï¿½ï¿½á±» SetActive(true)ï¿½ï¿½")]
     public GameObject spawnPrefab;
 
-    [Tooltip("Éú³ÉÎïÌå¾àÀëÉãÏñ»úµÄ¾àÀë£¨½öµ± spawnPrefab ÎªÔ¤ÖÆÌåÊµÀý»¯Ê±ÓÐÐ§£¬µ¥Î»£ºÃ×£©")]
+    [Tooltip("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ë£¨ï¿½ï¿½ï¿½ï¿½ spawnPrefab ÎªÔ¤ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½×£ï¿½")]
     public float spawnDistance =1.2f;
 
-    [Tooltip("Éú³ÉÎïÌåÏà¶ÔÓÚÉãÏñ»úµÄ¶îÍâÆ«ÒÆ£¨½öµ±ÊµÀý»¯Ê±ÓÐÐ§£©")]
+    [Tooltip("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¶ï¿½ï¿½ï¿½Æ«ï¿½Æ£ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ð§ï¿½ï¿½")]
     public Vector3 spawnOffset = Vector3.zero;
 
-    [Tooltip("µã»÷ Slot1 ºó£¬ÔÚ¸ÃÃëÊýÄÚµã»÷ Slot2 ²ÅÓÐÐ§£¨Ãë£©")]
+    [Tooltip("ï¿½ï¿½ï¿½ Slot1 ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ Slot2 ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ë£©")]
     public float selectionTimeout =5f;
 
-    [Tooltip("Ê¹ÓÃµÄÉäÏß¼ì²â²ã£¬Ä¬ÈÏËùÓÐ²ã")]
+    [Tooltip("Ê¹ï¿½Ãµï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ã£¬Ä¬ï¿½ï¿½ï¿½ï¿½ï¿½Ð²ï¿½")]
     public LayerMask clickableLayers = ~0;
 
     bool slot1Selected = false;
@@ -35,7 +35,7 @@ public class LeichaController : MonoBehaviour
 
     void Update()
     {
-        // ³¬Ê±ÇåÀí Slot1 ×´Ì¬
+        // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ Slot1 ×´Ì¬
         if (slot1Selected && Time.time - slot1SelectTime > selectionTimeout)
         {
             slot1Selected = false;
@@ -55,7 +55,7 @@ public class LeichaController : MonoBehaviour
                 GameObject hitObj = hit.collider.gameObject;
                 Debug.Log($"Raycast hit: {hitObj.name}");
 
-                // Èç¹ûµ±Ç°Ã»ÓÐÑ¡ÖÐ Slot1£¬¼ì²éÊÇ·ñµãÖÐÁË slot1 »òÆä×Ó¶ÔÏó
+                // ï¿½ï¿½ï¿½ï¿½ï¿½Ç°Ã»ï¿½ï¿½Ñ¡ï¿½ï¿½ Slot1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ slot1 ï¿½ï¿½ï¿½ï¿½ï¿½Ó¶ï¿½ï¿½ï¿½
                 if (!slot1Selected)
                 {
                     if (IsMatch(hitObj, slot1))
@@ -66,23 +66,23 @@ public class LeichaController : MonoBehaviour
                     }
                     else
                     {
-                        // µã»÷ÁËÆäËûÎïÌå£¬ºöÂÔ
+                        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½å£¬ï¿½ï¿½ï¿½ï¿½
                         Debug.Log("Clicked other object while waiting for Slot1: " + hitObj.name);
                     }
                 }
                 else
                 {
-                    // ÒÑÑ¡ÖÐ Slot1£¬¼ì²éÊÇ·ñµã»÷ÁË Slot2 »òÆä×Ó¶ÔÏó
+                    // ï¿½ï¿½Ñ¡ï¿½ï¿½ Slot1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ Slot2 ï¿½ï¿½ï¿½ï¿½ï¿½Ó¶ï¿½ï¿½ï¿½
                     if (IsMatch(hitObj, slot2))
                     {
-                        //´¥·¢Éú³É»ò¼¤»î
+                        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É»ò¼¤»ï¿½
                         Debug.Log("Slot2 clicked after Slot1. Triggering spawn/activate.");
                         SpawnOrActivate();
                         slot1Selected = false;
                     }
                     else
                     {
-                        // µã»÷ÁË·Ç Slot2£¬ÖØÖÃÑ¡Ôñ£¨»ò¿É¸ÄÎª±£³Ö Slot1 ×´Ì¬£©
+                        // ï¿½ï¿½ï¿½ï¿½Ë·ï¿½ Slot2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ñ£¨»ï¿½É¸ï¿½Îªï¿½ï¿½ï¿½ï¿½ Slot1 ×´Ì¬ï¿½ï¿½
                         slot1Selected = false;
                         Debug.Log("Slot1 selection cancelled by clicking other object: " + hitObj.name);
                     }
@@ -110,13 +110,13 @@ public class LeichaController : MonoBehaviour
     {
         if (spawnPrefab == null)
         {
-            Debug.LogWarning("spawnPrefab Î´ÉèÖÃ£¬ÎÞ·¨Éú³É»ò¼¤»î¡£");
+            Debug.LogWarning("spawnPrefab Î´ï¿½ï¿½ï¿½Ã£ï¿½ï¿½Þ·ï¿½ï¿½ï¿½ï¿½É»ò¼¤»î¡£");
             return;
         }
 
         Debug.Log($"SpawnOrActivate called. spawnPrefab reference: {spawnPrefab.name}, scene valid: {spawnPrefab.scene.IsValid()}, activeInHierarchy: {spawnPrefab.activeInHierarchy}");
 
-        // Èç¹û spawnPrefab Ö¸Ïò³¡¾°ÖÐµÄ¶ÔÏó£¨ÒÑ·ÅºÃÎ»ÖÃºÍ½Ç¶È£©£¬Ôò¼¤»îËü
+        // ï¿½ï¿½ï¿½ spawnPrefab Ö¸ï¿½ò³¡¾ï¿½ï¿½ÐµÄ¶ï¿½ï¿½ï¿½ï¿½Ñ·Åºï¿½Î»ï¿½ÃºÍ½Ç¶È£ï¿½ï¿½ï¿½ï¿½ò¼¤»ï¿½ï¿½ï¿½
         if (spawnPrefab.scene.IsValid())
         {
             if (!spawnPrefab.activeInHierarchy)
@@ -132,7 +132,7 @@ public class LeichaController : MonoBehaviour
             return;
         }
 
-        // ·ñÔò¼Ù¶¨ÊÇÔ¤ÖÆÌå×ÊÔ´ -> ÔÚÉãÏñ»úÇ°ÊµÀý»¯
+        // ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½ï¿½ï¿½Ô¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ -> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°Êµï¿½ï¿½ï¿½ï¿½
         Camera cam = Camera.main;
         if (cam == null) return;
 
