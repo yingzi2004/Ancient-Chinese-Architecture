@@ -44,8 +44,15 @@ public class ProximityTrigger : MonoBehaviour
         if (videoPlayer == null) videoPlayer = GetComponent<VideoPlayer>();
         if (targetRenderer == null) targetRenderer = GetComponent<Renderer>();
 
-        // 保存封面纹理
-        savedCoverTexture = coverTexture != null ? coverTexture : targetRenderer?.material?.mainTexture;
+        // 核心修复：只有当 targetRenderer 存在，并且它身上有 material 时才获取主纹理
+        if (targetRenderer != null && targetRenderer.sharedMaterial != null)
+        {
+            savedCoverTexture = coverTexture != null ? coverTexture : targetRenderer.sharedMaterial.mainTexture;
+        }
+        else
+        {
+            savedCoverTexture = coverTexture; // 如果没有渲染器，就直接用面板配的图片
+        }
 
         // 保存视频 RenderTexture
         if (videoPlayer != null && videoPlayer.targetTexture != null)

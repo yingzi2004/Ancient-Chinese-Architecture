@@ -54,6 +54,14 @@ public class ScrollMapController : MonoBehaviour
         public RectTransform buildingRect;
         public string targetSceneName;
         public float appearDelay = 0f;
+
+        [Header("黑白差分图(可选)")]
+        [Tooltip("【如果有黑白图，拖到这里。未解锁时会丝滑渐现它】")]
+        public Sprite bwSprite;
+
+        // 运行时动态创建的黑白图层CanvasGroup
+        [HideInInspector]
+        public CanvasGroup runtimeBWGroup;
     }
 
     [Header("══ 卷轴轴心 ══")]
@@ -89,6 +97,12 @@ public class ScrollMapController : MonoBehaviour
     [SerializeField] private float buildingFadeDuration = 0.4f;
     [Tooltip("每个建筑依次先后出现的间隔时间（秒）")]
     [SerializeField] private float buildingInterval = 0.3f;
+    
+    [Header("══ 解锁设置 ══")]
+    [Tooltip("未解锁建筑等待动画播完后，变灰的颜色（请在面板里调成灰色，默认带透明度）")]
+    [SerializeField] private Color lockedBuildingColor = new Color(0.6f, 0.6f, 0.6f, 1f);
+    [Tooltip("变灰过渡动画的持续时间")]
+    [SerializeField] private float lockedColorFadeDuration = 1.0f;
 
     [Header("══ 标题（可选）══")]
     [SerializeField] private CanvasGroup titleGroup;
@@ -120,6 +134,17 @@ public class ScrollMapController : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip scrollOpenClip;
     [SerializeField] private AudioClip buildingAppearClip;
+
+    [Header("══ 动画控制 ══")]
+    [Tooltip("是否强制在唤出时播放卷轴打开动画？")]
+    public bool playOpenAnimation = true;
+
+    [Header("══ 进度控制 ══")]
+    [Tooltip("【核心设置】主场景独立测试用。只在运行主场景时把【显示效果】控制在初始关卡，但不覆盖玩家真实的过关存档！")]
+    public bool overrideAsFirstLevel = true;
+
+    // 全局静态变量：标记本游戏运行期间，是否已经播放过一次主场景的打开动画
+    public static bool hasPlayedGlobalMapAnimation = false;
 
     private Sequence mainSequence;
     private DG.Tweening.Tweener guidePulseTween;
@@ -164,7 +189,120 @@ public class ScrollMapController : MonoBehaviour
     private void Start()
     {
         InitializeUI();
+<<<<<<< Updated upstream
         StartCoroutine(PlayOpeningSequence());
+=======
+
+        // 如果强制播放，或者全局还没有播放过，就播放打开动画
+        if (playOpenAnimation && !hasPlayedGlobalMapAnimation)
+        {
+            PlayOpenSequence();
+            hasPlayedGlobalMapAnimation = true; // 记录：已经播过啦，下次再回来就不播了
+        }
+        else
+        {
+            // 否则（比如从其他场景按M回来，或者手动关闭了动画），就瞬间开启
+            InstantOpenMap();
+        }
+    }
+
+    /// <summary>
+    /// 瞬间完全打开地图（取消动画）
+    /// </summary>
+    private void InstantOpenMap()
+    {
+        isAnimating = false; // 解除防误触锁
+
+        // 瞬间将卷轴移开
+        if (scrollLeft != null) scrollLeft.anchoredPosition = new Vector2(scrollLeftTargetX, scrollLeft.anchoredPosition.y);
+        if (scrollRight != null) scrollRight.anchoredPosition = new Vector2(scrollRightTargetX, scrollRight.anchoredPosition.y);
+
+        // 瞬间将遮挡板移开
+        if (coverLeft != null)
+        {
+            float coverLeftExtra = coverLeft.rect.width;
+            coverLeft.anchoredPosition = new Vector2(scrollLeftTargetX - coverLeftExtra, coverLeft.anchoredPosition.y);
+        }
+        if (coverRight != null)
+        {
+            float coverRightExtra = coverRight.rect.width;
+            coverRight.anchoredPosition = new Vector2(scrollRightTargetX + coverRightExtra, coverRight.anchoredPosition.y);
+        }
+
+        if (terrainGroup != null) terrainGroup.alpha = 1f;
+        if (titleGroup != null) titleGroup.alpha = 1f;
+
+        // 如果勾选了主场景覆盖表现，这里读取时强行只认 0 
+        int unlockedLevel = overrideAsFirstLevel ? 0 : PlayerPrefs.GetInt("UnlockedBuildingIndex", 0);
+
+        for (int i = 0; i < buildings.Count; i++)
+        {
+            var b = buildings[i];
+            if (b.buildingRect != null)
+            {
+                b.buildingRect.localScale = Vector3.one;
+                CanvasGroup cg = GetOrAddCanvasGroup(b.buildingRect);
+                cg.alpha = 1f;
+
+                EnsureBWOverlay(b);
+
+                bool isUnlocked = (i <= unlockedLevel);
+                Image img = b.buildingRect.GetComponent<Image>();
+
+                if (b.runtimeBWGroup != null)
+                {
+                    // 如果有黑白贴图，瞬间显示/隐藏黑白贴图层，底图保持原生颜色
+                    b.runtimeBWGroup.alpha = isUnlocked ? 0f : 1f;
+                    if (img != null) 
+                    {
+                        // 【修复重影】如果未解锁，这里瞬间把底层的彩图完全透明化隐藏
+                        img.color = isUnlocked ? Color.white : new Color(1, 1, 1, 0f);
+                    }
+                }
+                else if (img != null)
+                {
+                    // 没有配置黑白贴图的话，退回到老版本的“染色变灰”
+                    img.color = isUnlocked ? Color.white : lockedBuildingColor;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 动态生成一个专门的黑白图片涂层，覆盖在原来的建筑图片上面，方便实现“丝滑渐变”
+    /// </summary>
+    private void EnsureBWOverlay(BuildingEntry b)
+    {
+        if (b.bwSprite == null || b.runtimeBWGroup != null) return;
+
+        GameObject bwObj = new GameObject("BW_Overlay");
+        RectTransform rect = bwObj.AddComponent<RectTransform>();
+        rect.SetParent(b.buildingRect, false);
+        
+        // 自动铺满父物体的全部空间
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+        rect.localScale = Vector3.one;
+
+        Image bwImg = bwObj.AddComponent<Image>();
+        bwImg.sprite = b.bwSprite;
+        bwImg.raycastTarget = false; // 不要拦截鼠标点击！
+
+        // 尝试继承父节点 Image 的拉伸属性（可选，大部分情况下不需要）
+        Image parentImg = b.buildingRect.GetComponent<Image>();
+        if (parentImg != null)
+        {
+            bwImg.preserveAspect = parentImg.preserveAspect;
+            bwImg.type = parentImg.type;
+        }
+
+        b.runtimeBWGroup = bwObj.AddComponent<CanvasGroup>();
+        b.runtimeBWGroup.alpha = 0f;
+        b.runtimeBWGroup.interactable = false;
+        b.runtimeBWGroup.blocksRaycasts = false;
+>>>>>>> Stashed changes
     }
 
     private void OnDestroy()
@@ -225,32 +363,45 @@ public class ScrollMapController : MonoBehaviour
         if (coverRight != null && coverRight.GetComponent<Image>() != null) coverRight.GetComponent<Image>().raycastTarget = false;
 
         // 建筑初始隐藏 & 自动挂载点击脚本
+        // 【核心修改】：主场景永远假装当前只解锁了 0 级（土楼），不读真实存档，也不覆写真首档。
+        int unlockedLevel = 0;
+
         for (int i = 0; i < buildings.Count; i++)
         {
             var b = buildings[i];
             if (b.buildingRect == null) continue;
             
-            // ★ 修改：不要因为任何原因导致物体本身没激活，强行在初始化时激活，只用 scale 和 alpha 隐藏
+            // 确保提前生成一次黑白贴图图层（如果有的话）
+            EnsureBWOverlay(b);
+
+            // 当前这个建筑是否已经解锁？
+            bool isUnlocked = (i <= unlockedLevel);
+
             b.buildingRect.gameObject.SetActive(true);
             b.buildingRect.localScale = Vector3.zero;
             
             CanvasGroup cg = GetOrAddCanvasGroup(b.buildingRect);
             cg.alpha = 0f;
-            
-            // ★ 修改：原来这里设置 false 会导致原有的 Button 直接进入 DisabledColor 变成灰色！
-            // 现在我们一开始就允许它 interactable，用代码里的 isAnimating 锁去防误触
             cg.interactable = true;
             cg.blocksRaycasts = true;
             
-            // 确保图片自身的点击检测是开着的
             Image img = b.buildingRect.GetComponent<Image>();
-            if (img != null) img.raycastTarget = true;
+            if (img != null) 
+            {
+                img.raycastTarget = true;
+                // 保证所有建筑初始弹出时，都是正常的颜色！如果带了真正的黑白图层也先让它以 0 alpha(纯透明) 弹出
+                img.color = Color.white; 
+            }
+            if (b.runtimeBWGroup != null)
+            {
+                b.runtimeBWGroup.alpha = 0f; // 开场先全是彩色的！
+            }
 
-            // ★ 核心修复：把 Unity 原生的 Button 组件干掉，它不仅会导致变灰，还经常失灵
+            // 把 Unity 原生的 Button 组件干掉
             Button oldBtn = b.buildingRect.GetComponent<Button>();
             if (oldBtn != null) Destroy(oldBtn);
 
-            // 挂载我们自己定义的，绝不改变颜色的纯洁点击组件
+            // 挂载我们自己定义的纯洁点击组件
             SimpleClickListener listener = b.buildingRect.GetComponent<SimpleClickListener>();
             if (listener == null)
             {
@@ -258,10 +409,20 @@ public class ScrollMapController : MonoBehaviour
             }
             
             // 绑定点击事件
-            int index = i; // 捕获局部变量
+            int index = i; 
             listener.onClick = () => 
             {
-                Debug.Log($"【点击检测】物理点击成功！你点到了建筑: {b.buildingName}");
+                // 【核心修改】：主场景永远只允许点击 0 级（土楼）
+                int currentUnlocked = 0;
+
+                // 如果没有解锁，阻止点击跳转
+                if (index > currentUnlocked)
+                {
+                    Debug.Log($"【系统拦截】这是主场景，强制限制只允许点击土楼（序号0）！试图点击更高级场景被拦截。");
+                    return; 
+                }
+
+                Debug.Log($"【点击检测】物理点击成功！你点到了已解锁的建筑: {b.buildingName}");
                 OnBuildingClicked(index);
             };
         }
@@ -419,14 +580,64 @@ public class ScrollMapController : MonoBehaviour
 
         mainSequence.AppendCallback(() =>
         {
-            // ★ 保底：动画结束后直接隐藏遮挡板，确保它们不会残留在画面上
+            // ★ 保底：动画结束后直接隐藏遮挡板
             if (coverLeft != null) coverLeft.gameObject.SetActive(false);
             if (coverRight != null) coverRight.gameObject.SetActive(false);
 
+<<<<<<< Updated upstream
             Debug.Log("【动画结束】开场动画播完，准备播放地图对话...");
 
             // 动画完成后播放地图对话
             StartCoroutine(PlayMapOpenDialogue());
+=======
+            Debug.Log("【动画结束】开场动画播完，所有建筑已弹出，现在开始将未解锁场景褪色变灰...");
+            
+            // 此时全部正常颜色显示完毕了，然后再把未解锁的慢慢变灰
+            // 【核心修改】：主场景强制认定当前解锁进度为0，永远只把1/2/3级变黑白
+            int unlockedLevel = 0;
+            for (int i = 0; i < buildings.Count; i++)
+            {
+                var entry = buildings[i];
+                if (i > unlockedLevel && entry.buildingRect != null)
+                {
+                    if (entry.runtimeBWGroup != null)
+                    {
+                        // 最完美！如果配置了真实的黑白图，我们直接“丝滑淡入”覆盖上去
+                        entry.runtimeBWGroup.DOFade(1f, lockedColorFadeDuration).SetEase(Ease.InOutQuad);
+
+                        // 【修复重影】：同时把底部的彩色原图逐渐透明化隐藏掉，两者发生“交叉淡入淡出(Crossfade)”，完美解决两张图叠在一起产生重黑边或发暗的问题
+                        Image img = entry.buildingRect.GetComponent<Image>();
+                        if (img != null)
+                        {
+                            img.DOFade(0f, lockedColorFadeDuration).SetEase(Ease.InOutQuad);
+                        }
+                    }
+                    else
+                    {
+                        // 后备方案：如果没有拖黑白图，就用老方法，把它本身缓慢染成灰色
+                        Image img = entry.buildingRect.GetComponent<Image>();
+                        if (img != null)
+                        {
+                            img.DOColor(lockedBuildingColor, lockedColorFadeDuration).SetEase(Ease.InOutQuad);
+                        }
+                    }
+                }
+            }
+            
+            if (enableGuide)
+            {
+                PlayGuideAnimation(() =>
+                {
+                    isAnimating = false;
+                    Debug.Log("【引导完成】此时可以开始点击建筑了！");
+                });
+            }
+            else
+            {
+                isAnimating = false;
+                Debug.Log("【动画结束】镜头引导已关闭，直接允许点击。");
+            }
+>>>>>>> Stashed changes
         });
 
         mainSequence.SetAutoKill(false);
@@ -438,29 +649,33 @@ public class ScrollMapController : MonoBehaviour
     /// </summary>
     private void PlayGuideAnimation(System.Action onComplete)
     {
-        if (guideTargetIndex < 0 || guideTargetIndex >= buildings.Count)
+        // 【核心修改】：主场景的强制动画引导：永远只引导 0 级（土楼），无视其他进度
+        int unlockedMax = 0;
+        int target = Mathf.Min(unlockedMax, buildings.Count - 1); // 保证不越界
+
+        if (target < 0 || target >= buildings.Count)
         {
             Debug.LogWarning("【引导跳过】guideTargetIndex 超出范围");
             onComplete?.Invoke();
             return;
         }
 
-        BuildingEntry target = buildings[guideTargetIndex];
-        if (target.buildingRect == null)
+        BuildingEntry entry = buildings[target];
+        if (entry.buildingRect == null)
         {
             onComplete?.Invoke();
             return;
         }
 
-        Debug.Log($"【镜头引导】开始引导建筑 '{target.buildingName}' 呼吸脉冲");
+        Debug.Log($"【镜头引导】开始引导当前最新解锁的建筑 '{entry.buildingName}' 呼吸脉冲");
 
         // 直接给目标建筑加上呼吸脉冲（循环闪烁，引导玩家去点击）
-        guidePulseTween = target.buildingRect
+        guidePulseTween = entry.buildingRect
             .DOScale(Vector3.one * guidePulseScale, 0.6f)
             .SetEase(Ease.InOutSine)
             .SetLoops(-1, LoopType.Yoyo);
 
-        Debug.Log($"【镜头引导】建筑 '{target.buildingName}' 呼吸脉冲开始！");
+        Debug.Log($"【镜头引导】建筑 '{entry.buildingName}' 呼吸脉冲开始！");
         onComplete?.Invoke();
     }
 
@@ -471,8 +686,13 @@ public class ScrollMapController : MonoBehaviour
 
         // 点击了任何建筑后，停止呼吸脉冲动画
         guidePulseTween?.Kill();
-        if (guideTargetIndex >= 0 && guideTargetIndex < buildings.Count && buildings[guideTargetIndex].buildingRect != null)
-            buildings[guideTargetIndex].buildingRect.localScale = Vector3.one;
+        
+        // 主场景写死 0 级放大恢复
+        int currentUnlockedMax = 0;
+        int throbbingTargetIndex = Mathf.Min(currentUnlockedMax, buildings.Count - 1);
+
+        if (throbbingTargetIndex >= 0 && throbbingTargetIndex < buildings.Count && buildings[throbbingTargetIndex].buildingRect != null)
+            buildings[throbbingTargetIndex].buildingRect.localScale = Vector3.one;
         
         if (index < 0 || index >= buildings.Count) return;
         
