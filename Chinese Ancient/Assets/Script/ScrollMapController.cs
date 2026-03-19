@@ -189,19 +189,25 @@ public class ScrollMapController : MonoBehaviour
     private void Start()
     {
         InitializeUI();
-<<<<<<< Updated upstream
-        StartCoroutine(PlayOpeningSequence());
-=======
 
-        // 如果强制播放，或者全局还没有播放过，就播放打开动画
+        // 如果强制播放，或者全局还没有播放过开场对话和动画
         if (playOpenAnimation && !hasPlayedGlobalMapAnimation)
         {
-            PlayOpenSequence();
+            StartCoroutine(PlayOpeningSequence()); // 原本直接调用 PlayOpenSequence()，现在改为带有对话的完整序列
             hasPlayedGlobalMapAnimation = true; // 记录：已经播过啦，下次再回来就不播了
         }
         else
         {
-            // 否则（比如从其他场景按M回来，或者手动关闭了动画），就瞬间开启
+            // 否则（比如从其他场景按M回来，或者手动关闭了动画），就把黑屏等隐藏，瞬间开启地图！
+            if (fadeOverlay != null)
+            {
+                fadeOverlay.alpha = 0f;
+                fadeOverlay.blocksRaycasts = false;
+            }
+            if (dialoguePanel != null)
+            {
+                dialoguePanel.SetActive(false);
+            }
             InstantOpenMap();
         }
     }
@@ -213,27 +219,39 @@ public class ScrollMapController : MonoBehaviour
     {
         isAnimating = false; // 解除防误触锁
 
-        // 瞬间将卷轴移开
-        if (scrollLeft != null) scrollLeft.anchoredPosition = new Vector2(scrollLeftTargetX, scrollLeft.anchoredPosition.y);
-        if (scrollRight != null) scrollRight.anchoredPosition = new Vector2(scrollRightTargetX, scrollRight.anchoredPosition.y);
+        // 显示卷轴轴心
+        if (scrollLeft != null)
+        {
+            CanvasGroup leftGroup = scrollLeft.GetComponent<CanvasGroup>();
+            if (leftGroup != null) leftGroup.alpha = 1f;
+            scrollLeft.anchoredPosition = new Vector2(scrollLeftTargetX, scrollLeft.anchoredPosition.y);
+        }
+        if (scrollRight != null)
+        {
+            CanvasGroup rightGroup = scrollRight.GetComponent<CanvasGroup>();
+            if (rightGroup != null) rightGroup.alpha = 1f;
+            scrollRight.anchoredPosition = new Vector2(scrollRightTargetX, scrollRight.anchoredPosition.y);
+        }
 
         // 瞬间将遮挡板移开
         if (coverLeft != null)
         {
             float coverLeftExtra = coverLeft.rect.width;
             coverLeft.anchoredPosition = new Vector2(scrollLeftTargetX - coverLeftExtra, coverLeft.anchoredPosition.y);
+            coverLeft.gameObject.SetActive(false); // 并且隐藏
         }
         if (coverRight != null)
         {
             float coverRightExtra = coverRight.rect.width;
             coverRight.anchoredPosition = new Vector2(scrollRightTargetX + coverRightExtra, coverRight.anchoredPosition.y);
+            coverRight.gameObject.SetActive(false); // 并且隐藏
         }
 
         if (terrainGroup != null) terrainGroup.alpha = 1f;
         if (titleGroup != null) titleGroup.alpha = 1f;
 
-        // 如果勾选了主场景覆盖表现，这里读取时强行只认 0 
-        int unlockedLevel = overrideAsFirstLevel ? 0 : PlayerPrefs.GetInt("UnlockedBuildingIndex", 0);
+        // 因为不再使用电脑本地存档，这里根据 overrideAsFirstLevel 直接计算 (主界面通常只开第一个)
+        int unlockedLevel = overrideAsFirstLevel ? 0 : 0; // 可以随时扩展为从其他系统读取
 
         for (int i = 0; i < buildings.Count; i++)
         {
@@ -302,7 +320,6 @@ public class ScrollMapController : MonoBehaviour
         b.runtimeBWGroup.alpha = 0f;
         b.runtimeBWGroup.interactable = false;
         b.runtimeBWGroup.blocksRaycasts = false;
->>>>>>> Stashed changes
     }
 
     private void OnDestroy()
@@ -584,13 +601,10 @@ public class ScrollMapController : MonoBehaviour
             if (coverLeft != null) coverLeft.gameObject.SetActive(false);
             if (coverRight != null) coverRight.gameObject.SetActive(false);
 
-<<<<<<< Updated upstream
-            Debug.Log("【动画结束】开场动画播完，准备播放地图对话...");
+            Debug.Log("【动画结束】开场动画播完，所有建筑已弹出，现在开始将未解锁场景褪色变灰，并准备播放对话...");
 
             // 动画完成后播放地图对话
             StartCoroutine(PlayMapOpenDialogue());
-=======
-            Debug.Log("【动画结束】开场动画播完，所有建筑已弹出，现在开始将未解锁场景褪色变灰...");
             
             // 此时全部正常颜色显示完毕了，然后再把未解锁的慢慢变灰
             // 【核心修改】：主场景强制认定当前解锁进度为0，永远只把1/2/3级变黑白
@@ -637,7 +651,6 @@ public class ScrollMapController : MonoBehaviour
                 isAnimating = false;
                 Debug.Log("【动画结束】镜头引导已关闭，直接允许点击。");
             }
->>>>>>> Stashed changes
         });
 
         mainSequence.SetAutoKill(false);

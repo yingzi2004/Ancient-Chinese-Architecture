@@ -87,28 +87,40 @@ public class LevelUnlocker : MonoBehaviour
     /// </summary>
     public void UnlockNextLevel()
     {
-        // 获取当前的解锁进度
-        int currentLevel = PlayerPrefs.GetInt("UnlockedBuildingIndex", 0);
-        
-        Debug.Log($"<color=orange>[LevelUnlocker - 调试]</color> 正在检查解锁条件。当前身上挂着的解锁目标序号是：{unlockIndexToLog}，玩家目前的真实进度是：{currentLevel}");
+        Debug.Log($"<color=orange>[LevelUnlocker - 调试]</color> 触发了解锁！目标要把序号 {unlockIndexToLog} 的场馆亮起！");
 
-        // 如果要解锁的关卡比当前的大，就更新覆盖
-        if (unlockIndexToLog > currentLevel)
-        {
-            PlayerPrefs.SetInt("UnlockedBuildingIndex", unlockIndexToLog);
-            PlayerPrefs.Save(); // 强制存盘，防止中途退出丢失
-            Debug.Log($"<color=green>【进度更新】恭喜！条件满足！已成功把进度推到了第 {unlockIndexToLog} 个场景！</color>");
+        // 寻找场景中【所有】的 PopupMapController，防止场景里隐藏着多个导致改错人
+        PopupMapController[] allMapControllers = Resources.FindObjectsOfTypeAll<PopupMapController>();
+        bool foundAny = false;
 
-            // 弹出屏幕文字提示
-            ShowHintMessage();
-        }
-        else
+        foreach (var mapController in allMapControllers)
         {
-            Debug.Log($"<color=yellow>[LevelUnlocker - 调试]</color> 拦截：玩家当前的进度（{currentLevel}）已经 >= 目标进度（{unlockIndexToLog}）了。无需重复解锁，但为了测试，依然弹出文字！");
-            
-            // 【如果你希望玩家重玩这一关时依然弹出文字，就把下面这行注释取消】
-            ShowHintMessage(); 
+            if (mapController.gameObject.scene.isLoaded) // 只修改当前真正场景里的，排除项目里的预制体文件
+            {
+                foundAny = true;
+                if (unlockIndexToLog >= 0 && unlockIndexToLog < mapController.unlockedArray.Length)
+                {
+                    // 🔥 核心：直接强行把数组里这个位置的勾打上 🔥
+                    mapController.unlockedArray[unlockIndexToLog] = true;
+                    Debug.Log($"<color=green>【动态解锁成功】已成功将 '{mapController.gameObject.name}' 上的数组第 {unlockIndexToLog} 项设为 true！</color>");
+
+                    // 强行刷新画面，并且告诉地图我刚解锁的是这一个，你必须让它给我跳起来！
+                    mapController.RefreshMapVisuals(unlockIndexToLog);
+                }
+                else
+                {
+                    Debug.LogWarning($"<color=red>【警告】你设置的解锁序号 {unlockIndexToLog} 超出了地图数组的范围！</color>");
+                }
+            }
         }
+
+        if (!foundAny)
+        {
+            Debug.LogWarning("<color=red>【警告】在这个场景里根本没有找到任何 PopupMapController 脚本，所以地图数据无法写入！</color>");
+        }
+
+        // 无论如何，弹出屏幕文字提示
+        ShowHintMessage();
     }
 
     /// <summary>
@@ -187,8 +199,7 @@ public class LevelUnlocker : MonoBehaviour
     [ContextMenu("一键清除所有进度 (测试用)")]
     public void ResetAllProgress()
     {
-        PlayerPrefs.SetInt("UnlockedBuildingIndex", 0);
-        PlayerPrefs.Save();
-        Debug.Log("【进度重置】已退回最初状态，当前只有土楼可交互。");
+        PlayerPrefs.DeleteKey("UnlockedBuildingIndex");
+        Debug.Log("已删除旧的 PlayerPrefs 存档记录！（现在游戏已全面改用面板控制）");
     }
 }

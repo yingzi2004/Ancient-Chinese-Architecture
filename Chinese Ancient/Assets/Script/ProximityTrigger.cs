@@ -109,6 +109,15 @@ public class ProximityTrigger : MonoBehaviour
             {
                 if (!isVideoPlaying) PlayVideo();
                 onEnterRange?.Invoke();
+
+                // 自动尝试解锁功能：如果同一物体上挂载了LevelUnlocker，自动调用它，省去每次在面板连线的麻烦！
+                LevelUnlocker unlocker = GetComponent<LevelUnlocker>();
+                if (unlocker != null)
+                {
+                    Debug.Log("<color=green>[ProximityTrigger] 玩家进入范围，自动触发解锁代码！</color>");
+                    unlocker.UnlockNextLevel();
+                }
+
                 hasTriggeredOnce = true;
             }
         }

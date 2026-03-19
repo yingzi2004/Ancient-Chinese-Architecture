@@ -199,7 +199,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: f02bd18586611d84ba306dcbe005fb69, type: 3}
+  m_Sprite: {fileID: 21300000, guid: fc2f928a62b4c6a4d835c21f9ec3c09d, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -542,7 +542,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5edf09eff3268ca4d91d8a0fe7820dcf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ceac342af150c5e45b4dbd0d47657b68, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -686,17 +686,27 @@ MonoBehaviour:
   - buildingName: "\u571F\u697C\u573A\u9986"
     buildingRect: {fileID: 3070616729555281606}
     targetSceneName: Min Exhibition
+    bwSprite: {fileID: 21300000, guid: cf554c2905139704e8ce7378d061abcc, type: 3}
+    runtimeBWGroup: {fileID: 0}
   - buildingName: "\u82CF\u5DDE\u573A\u9986"
     buildingRect: {fileID: 5933475970242023528}
     targetSceneName: Su Exhibition
+    bwSprite: {fileID: 21300000, guid: abebefb1da1ebad4aa48aa590ce619c4, type: 3}
+    runtimeBWGroup: {fileID: 0}
   - buildingName: "\u4EAC\u573A\u9986"
     buildingRect: {fileID: 547792669264519764}
     targetSceneName: "\u4EAC Exhibition "
+    bwSprite: {fileID: 21300000, guid: b975e00f6994c014ba44f3715efb787c, type: 3}
+    runtimeBWGroup: {fileID: 0}
   - buildingName: "\u664B\u573A\u9986"
     buildingRect: {fileID: 1101731770189422927}
     targetSceneName: "\u664BExhibition"
+    bwSprite: {fileID: 21300000, guid: c68887d53b3cf824ea22c26d093e3530, type: 3}
+    runtimeBWGroup: {fileID: 0}
+  unlockedArray: 01000000
   pulseScale: 1.05
   pulseDuration: 0.6
+  lockedBuildingColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
 --- !u!1 &6867563641864057991
 GameObject:
   m_ObjectHideFlags: 0
@@ -865,7 +875,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 8d71459a416ec834c8b7ac4ef2584e1a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6a9bdbce300ede941af9d9b2f54337f6, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
