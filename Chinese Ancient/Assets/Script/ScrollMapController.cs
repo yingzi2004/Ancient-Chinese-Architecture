@@ -103,8 +103,18 @@ public class ScrollMapController : MonoBehaviour
     [SerializeField] private bool enableGuide = true;
 
     [Header("══ 过渡遮罩（可选）══")]
-    [SerializeField] private CanvasGroup fadeOverlay;
+    [SerializeField] private Image fadeOverlayImage;
     [SerializeField] private float sceneFadeDuration = 0.5f;
+
+    [Header("══ 开场对话（新增）══")]
+    [SerializeField] private GameObject dialoguePanel;
+    [SerializeField] private TextMeshProUGUI dialogueText;
+    [SerializeField] private float dialogueTypingSpeed = 0.08f;
+    [SerializeField] private float dialoguePauseDuration = 1.5f;
+
+    [Header("══ 地图打开后对话（新增）══")]
+    [SerializeField] private GameObject mapDialoguePanel;
+    [SerializeField] private TextMeshProUGUI mapDialogueText;
 
     [Header("══ 音效（可选）══")]
     [SerializeField] private AudioSource audioSource;
@@ -115,16 +125,46 @@ public class ScrollMapController : MonoBehaviour
     private DG.Tweening.Tweener guidePulseTween;
     private bool isAnimating = true;
     private bool isTransitioning = false;
+    private CanvasGroup fadeOverlay;
+
+    // 开场对话文本
+    private string[] openingDialogue = new string[]
+    {
+        "咦…… 这是哪里？头有点晕……",
+        "我记得我是跟着古建筑考察队，去寻访苏州园林、北京天坛这些经典建筑的，怎么突然到了这个地方？",
+        "一阵风吹过，一张泛黄的古地图飘到你面前……"
+    };
+
+    // 地图打开后的对话文本
+    private string[] mapOpenDialogue = new string[]
+    {
+        "哇塞！这原来是汇集了各地经典的古建筑地图啊！也太酷了吧～",
+        "苏州园林、北京天坛、晋江大院、福建土楼都在上面，每一个都是我超想打卡的地方！",
+        "地图上的每个标记都闪着微光，仿佛在邀请你走进这些千年建筑的故事里～",
+        "好期待呀！真想马上走进这些古建筑，看看它们藏着的小细节～"
+    };
 
     private void Awake()
     {
         DOTween.Init();
+
+        // 立即设置黑屏，确保游戏一开始就是全黑
+        if (fadeOverlayImage != null)
+        {
+            fadeOverlay = fadeOverlayImage.GetComponent<CanvasGroup>();
+            if (fadeOverlay == null)
+            {
+                fadeOverlay = fadeOverlayImage.gameObject.AddComponent<CanvasGroup>();
+            }
+            fadeOverlay.alpha = 1f;
+            fadeOverlay.blocksRaycasts = true;
+        }
     }
 
     private void Start()
     {
         InitializeUI();
-        PlayOpenSequence();
+        StartCoroutine(PlayOpeningSequence());
     }
 
     private void OnDestroy()
@@ -147,15 +187,22 @@ public class ScrollMapController : MonoBehaviour
         }
 
         // 卷轴两端从中间开始，并强制设为最后渲染（即最上层，防止被遮挡）
+        // 同时隐藏它们，确保开场黑屏期间看不到
         if (scrollLeft != null)
         {
             scrollLeft.anchoredPosition = new Vector2(0, scrollLeft.anchoredPosition.y);
             scrollLeft.SetAsLastSibling();
+            CanvasGroup leftGroup = scrollLeft.GetComponent<CanvasGroup>();
+            if (leftGroup == null) leftGroup = scrollLeft.gameObject.AddComponent<CanvasGroup>();
+            leftGroup.alpha = 0f;
         }
         if (scrollRight != null)
         {
             scrollRight.anchoredPosition = new Vector2(0, scrollRight.anchoredPosition.y);
             scrollRight.SetAsLastSibling();
+            CanvasGroup rightGroup = scrollRight.GetComponent<CanvasGroup>();
+            if (rightGroup == null) rightGroup = scrollRight.gameObject.AddComponent<CanvasGroup>();
+            rightGroup.alpha = 0f;
         }
 
         // 遮挡板初始位置：完全覆盖画面
@@ -220,10 +267,39 @@ public class ScrollMapController : MonoBehaviour
         }
 
         if (titleGroup != null) titleGroup.alpha = 0f;
-        if (fadeOverlay != null)
+
+        // 初始化黑屏遮罩的 CanvasGroup
+        if (fadeOverlayImage != null)
         {
-            fadeOverlay.alpha = 0f;
-            fadeOverlay.blocksRaycasts = false;
+            fadeOverlay = fadeOverlayImage.GetComponent<CanvasGroup>();
+            if (fadeOverlay == null)
+            {
+                fadeOverlay = fadeOverlayImage.gameObject.AddComponent<CanvasGroup>();
+            }
+        }
+        // 注意：不在初始化时重置 fadeOverlay，因为开场序列需要从黑屏开始
+        // fadeOverlay 的初始状态由 PlayOpeningSequence() 控制
+
+        // 初始化对话面板
+        if (dialoguePanel != null)
+        {
+            dialoguePanel.SetActive(false);
+        }
+        if (dialogueText != null)
+        {
+            dialogueText.overflowMode = TextOverflowModes.Overflow;
+            dialogueText.enableWordWrapping = true;
+        }
+
+        // 初始化地图对话面板
+        if (mapDialoguePanel != null)
+        {
+            mapDialoguePanel.SetActive(false);
+        }
+        if (mapDialogueText != null)
+        {
+            mapDialogueText.overflowMode = TextOverflowModes.Overflow;
+            mapDialogueText.enableWordWrapping = true;
         }
     }
 
@@ -347,21 +423,10 @@ public class ScrollMapController : MonoBehaviour
             if (coverLeft != null) coverLeft.gameObject.SetActive(false);
             if (coverRight != null) coverRight.gameObject.SetActive(false);
 
-            Debug.Log("【动画结束】开场动画播完，准备镜头引导...");
-            
-            if (enableGuide)
-            {
-                PlayGuideAnimation(() =>
-                {
-                    isAnimating = false;
-                    Debug.Log("【引导完成】此时可以开始点击建筑了！");
-                });
-            }
-            else
-            {
-                isAnimating = false;
-                Debug.Log("【动画结束】镜头引导已关闭，直接允许点击。");
-            }
+            Debug.Log("【动画结束】开场动画播完，准备播放地图对话...");
+
+            // 动画完成后播放地图对话
+            StartCoroutine(PlayMapOpenDialogue());
         });
 
         mainSequence.SetAutoKill(false);
@@ -501,5 +566,190 @@ public class ScrollMapController : MonoBehaviour
         CanvasGroup cg = rect.GetComponent<CanvasGroup>();
         if (cg == null) cg = rect.gameObject.AddComponent<CanvasGroup>();
         return cg;
+    }
+
+    /// <summary>
+    /// 播放开场对话序列：黑屏 -> 对话1 -> 对话2 -> 黑屏淡出 -> 进入主场景
+    /// </summary>
+    private System.Collections.IEnumerator PlayOpeningSequence()
+    {
+        // 1. 确保黑屏（再次确认）
+        if (fadeOverlay != null)
+        {
+            fadeOverlay.alpha = 1f;
+            fadeOverlay.blocksRaycasts = true;
+        }
+
+        // 2. 强制隐藏所有地图内容，确保黑屏期间看不到任何东西
+        if (terrainGroup != null) terrainGroup.alpha = 0f;
+        if (titleGroup != null) titleGroup.alpha = 0f;
+
+        // 隐藏所有建筑
+        for (int i = 0; i < buildings.Count; i++)
+        {
+            if (buildings[i].buildingRect != null)
+            {
+                buildings[i].buildingRect.localScale = Vector3.zero;
+                CanvasGroup cg = buildings[i].buildingRect.GetComponent<CanvasGroup>();
+                if (cg != null) cg.alpha = 0f;
+            }
+        }
+
+        // 3. 隐藏卷轴轴心
+        if (scrollLeft != null)
+        {
+            CanvasGroup leftGroup = scrollLeft.GetComponent<CanvasGroup>();
+            if (leftGroup != null) leftGroup.alpha = 0f;
+        }
+        if (scrollRight != null)
+        {
+            CanvasGroup rightGroup = scrollRight.GetComponent<CanvasGroup>();
+            if (rightGroup != null) rightGroup.alpha = 0f;
+        }
+
+        // 4. 显示对话面板
+        if (dialoguePanel != null)
+        {
+            dialoguePanel.SetActive(true);
+        }
+
+        // 5. 依次播放对话
+        for (int i = 0; i < openingDialogue.Length; i++)
+        {
+            if (dialogueText != null)
+            {
+                yield return StartCoroutine(TypewriterEffect(openingDialogue[i]));
+                yield return new WaitForSeconds(dialoguePauseDuration);
+            }
+        }
+
+        // 6. 隐藏对话面板
+        if (dialoguePanel != null)
+        {
+            dialoguePanel.SetActive(false);
+        }
+
+        // 7. 等待一小段时间
+        yield return new WaitForSeconds(0.5f);
+
+        // 8. 显示卷轴轴心（准备展开）
+        if (scrollLeft != null)
+        {
+            CanvasGroup leftGroup = scrollLeft.GetComponent<CanvasGroup>();
+            if (leftGroup != null) leftGroup.alpha = 1f;
+        }
+        if (scrollRight != null)
+        {
+            CanvasGroup rightGroup = scrollRight.GetComponent<CanvasGroup>();
+            if (rightGroup != null) rightGroup.alpha = 1f;
+        }
+
+        // 9. 黑屏淡出，同时开始卷轴展开动画（两者同步进行，更流畅）
+        if (fadeOverlay != null)
+        {
+            fadeOverlay.DOFade(0f, 2f).SetEase(Ease.InOutSine).OnComplete(() =>
+            {
+                fadeOverlay.blocksRaycasts = false;
+            });
+        }
+
+        // 10. 延迟一小段时间后开始播放卷轴展开动画（让黑屏稍微先淡出一点）
+        yield return new WaitForSeconds(0.3f);
+
+        // 11. 开始播放卷轴展开动画
+        PlayOpenSequence();
+    }
+
+    /// <summary>
+    /// 打字机效果：逐字显示文本
+    /// </summary>
+    private System.Collections.IEnumerator TypewriterEffect(string text)
+    {
+        if (dialogueText == null) yield break;
+
+        dialogueText.text = text;
+        dialogueText.maxVisibleCharacters = 99999;
+        dialogueText.ForceMeshUpdate(true);
+
+        int totalCharacters = dialogueText.textInfo.characterCount;
+        dialogueText.maxVisibleCharacters = 0;
+
+        for (int i = 0; i <= totalCharacters; i++)
+        {
+            dialogueText.maxVisibleCharacters = i;
+            yield return new WaitForSeconds(dialogueTypingSpeed);
+        }
+
+        dialogueText.maxVisibleCharacters = 99999;
+    }
+
+    /// <summary>
+    /// 地图打开后的对话序列
+    /// </summary>
+    private System.Collections.IEnumerator PlayMapOpenDialogue()
+    {
+        // 等待一小段时间，让玩家先看清楚地图
+        yield return new WaitForSeconds(0.5f);
+
+        // 显示地图对话面板
+        if (mapDialoguePanel != null)
+        {
+            mapDialoguePanel.SetActive(true);
+        }
+
+        // 依次播放对话
+        for (int i = 0; i < mapOpenDialogue.Length; i++)
+        {
+            if (mapDialogueText != null)
+            {
+                yield return StartCoroutine(TypewriterEffectForMap(mapOpenDialogue[i]));
+                yield return new WaitForSeconds(dialoguePauseDuration);
+            }
+        }
+
+        // 所有对话播放完毕，隐藏对话面板并开始镜头引导
+        if (mapDialoguePanel != null)
+        {
+            mapDialoguePanel.SetActive(false);
+        }
+
+        Debug.Log("【地图对话结束】准备镜头引导...");
+
+        if (enableGuide)
+        {
+            PlayGuideAnimation(() =>
+            {
+                isAnimating = false;
+                Debug.Log("【引导完成】此时可以开始点击建筑了！");
+            });
+        }
+        else
+        {
+            isAnimating = false;
+            Debug.Log("【动画结束】镜头引导已关闭，直接允许点击。");
+        }
+    }
+
+    /// <summary>
+    /// 打字机效果：逐字显示文本（地图对话框专用）
+    /// </summary>
+    private System.Collections.IEnumerator TypewriterEffectForMap(string text)
+    {
+        if (mapDialogueText == null) yield break;
+
+        mapDialogueText.text = text;
+        mapDialogueText.maxVisibleCharacters = 99999;
+        mapDialogueText.ForceMeshUpdate(true);
+
+        int totalCharacters = mapDialogueText.textInfo.characterCount;
+        mapDialogueText.maxVisibleCharacters = 0;
+
+        for (int i = 0; i <= totalCharacters; i++)
+        {
+            mapDialogueText.maxVisibleCharacters = i;
+            yield return new WaitForSeconds(dialogueTypingSpeed);
+        }
+
+        mapDialogueText.maxVisibleCharacters = 99999;
     }
 }

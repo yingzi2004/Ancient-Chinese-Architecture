@@ -12,25 +12,28 @@ public class WenziCotrol : MonoBehaviour
     public Transform triggerAnchor;
 
     [Tooltip("触发距离（米）")]
-    public float triggerDistance = 1f;
+    public float triggerDistance = 2f;
 
     [Tooltip("仅计算水平距离（忽略高度差）")]
     public bool horizontalDistanceOnly = true;
 
     [Tooltip("按键强制触发（调试）")]
-    public bool allowManualTrigger = true;
+    public bool allowManualTrigger = false;
 
     [Tooltip("强制触发按键")]
     public KeyCode manualTriggerKey = KeyCode.T;
 
     [Tooltip("打印调试日志")]
-    public bool debugLog = true;
+    public bool debugLog = false;
 
     [Header("文字组件")]
     [Tooltip("目标 TextMeshPro 文本；不填时自动在当前物体查找")]
     public TMP_Text targetText;
 
     [Header("动画参数")]
+    [Tooltip("触发时先把整段文字全部隐藏，再进行逐字出现")]
+    public bool hideAllBeforeReveal = true;
+
     [Tooltip("每个字初始向外偏移距离")]
     public float outwardDistance = 0.35f;
 
@@ -43,7 +46,7 @@ public class WenziCotrol : MonoBehaviour
     [Tooltip("向外方向，默认使用当前物体 forward")]
     public Vector3 customOutwardDirection = Vector3.zero;
 
-    [Tooltip("勾选后，字会停在向外偏移的位置；不勾选则回到原排版位置")]
+    [Tooltip("勾选后，字会停在向外偏移的位置；不勾选则回到墙面原排版位置")]
     public bool keepOutsideAfterReveal = false;
 
     private bool triggered;
@@ -160,7 +163,10 @@ public class WenziCotrol : MonoBehaviour
         }
 
         cachedMeshInfo = targetText.textInfo.CopyMeshInfoVertexData();
-        targetText.maxVisibleCharacters = 0;
+        if (hideAllBeforeReveal)
+        {
+            targetText.maxVisibleCharacters = 0;
+        }
 
         Vector3 worldOutward = customOutwardDirection.sqrMagnitude > 0.0001f
             ? customOutwardDirection.normalized
@@ -187,6 +193,10 @@ public class WenziCotrol : MonoBehaviour
 
             yield return new WaitForSeconds(interval);
         }
+
+        // 防御性设置：确保最终全量可见并保持在墙面排版。
+        targetText.maxVisibleCharacters = int.MaxValue;
+        targetText.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices);
 
         finished = true;
         if (debugLog)
