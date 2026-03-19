@@ -9026,6 +9026,7 @@ GameObject:
   - component: {fileID: 755494628}
   - component: {fileID: 755494630}
   - component: {fileID: 755494629}
+  - component: {fileID: 755494631}
   m_Layer: 5
   m_Name: Text (TMP) (13)
   m_TagString: Untagged
@@ -9187,6 +9188,32 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &755494631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755494627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b36b3a02f3b72548b33a49926141407, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  triggerAnchor: {fileID: 0}
+  triggerDistance: 4
+  horizontalDistanceOnly: 1
+  allowManualTrigger: 0
+  manualTriggerKey: 116
+  debugLog: 0
+  targetText: {fileID: 755494629}
+  hideAllBeforeReveal: 1
+  outwardDistance: 0.05
+  interval: 0.08
+  moveDuration: 0.1
+  customOutwardDirection: {x: 0, y: 0, z: 0}
+  keepOutsideAfterReveal: 0
 --- !u!1 &758553926
 GameObject:
   m_ObjectHideFlags: 0
@@ -11997,6 +12024,7 @@ GameObject:
   - component: {fileID: 1104791848}
   - component: {fileID: 1104791850}
   - component: {fileID: 1104791849}
+  - component: {fileID: 1104791851}
   m_Layer: 5
   m_Name: Text (TMP) (14)
   m_TagString: Untagged
@@ -12158,6 +12186,32 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1104791851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1104791847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b36b3a02f3b72548b33a49926141407, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  triggerAnchor: {fileID: 0}
+  triggerDistance: 4
+  horizontalDistanceOnly: 1
+  allowManualTrigger: 0
+  manualTriggerKey: 116
+  debugLog: 0
+  targetText: {fileID: 1104791849}
+  hideAllBeforeReveal: 1
+  outwardDistance: 0.05
+  interval: 0.08
+  moveDuration: 0.1
+  customOutwardDirection: {x: 0, y: 0, z: 0}
+  keepOutsideAfterReveal: 0
 --- !u!1 &1112382433
 GameObject:
   m_ObjectHideFlags: 0
@@ -15691,6 +15745,7 @@ GameObject:
   - component: {fileID: 1457344130}
   - component: {fileID: 1457344132}
   - component: {fileID: 1457344131}
+  - component: {fileID: 1457344133}
   m_Layer: 5
   m_Name: Text (TMP) (11)
   m_TagString: Untagged
@@ -15852,6 +15907,32 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1457344133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457344129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b36b3a02f3b72548b33a49926141407, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  triggerAnchor: {fileID: 0}
+  triggerDistance: 4
+  horizontalDistanceOnly: 1
+  allowManualTrigger: 0
+  manualTriggerKey: 116
+  debugLog: 0
+  targetText: {fileID: 1457344131}
+  hideAllBeforeReveal: 1
+  outwardDistance: 0.05
+  interval: 0.08
+  moveDuration: 0.1
+  customOutwardDirection: {x: 0, y: 0, z: 0}
+  keepOutsideAfterReveal: 0
 --- !u!1 &1468544368
 GameObject:
   m_ObjectHideFlags: 0
@@ -16351,6 +16432,7 @@ GameObject:
   - component: {fileID: 1500874235}
   - component: {fileID: 1500874237}
   - component: {fileID: 1500874236}
+  - component: {fileID: 1500874238}
   m_Layer: 5
   m_Name: Text (TMP) (7)
   m_TagString: Untagged
@@ -16515,6 +16597,32 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1500874238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1500874234}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b36b3a02f3b72548b33a49926141407, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  triggerAnchor: {fileID: 0}
+  triggerDistance: 4
+  horizontalDistanceOnly: 1
+  allowManualTrigger: 0
+  manualTriggerKey: 116
+  debugLog: 0
+  targetText: {fileID: 1500874236}
+  hideAllBeforeReveal: 1
+  outwardDistance: 0.05
+  interval: 0.08
+  moveDuration: 0.1
+  customOutwardDirection: {x: 0, y: 0, z: 0}
+  keepOutsideAfterReveal: 0
 --- !u!1 &1508361164
 GameObject:
   m_ObjectHideFlags: 0
