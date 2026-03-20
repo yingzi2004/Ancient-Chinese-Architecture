@@ -16503,6 +16503,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 1190152910}
   cardGameSceneName: 2
+  enableReturnOffset: 1
+  returnPositionOffset: {x: 0, y: 0, z: -5}
+  useFixedReturnPosition: 0
+  fixedReturnPosition: {x: -11.81, y: 0.557, z: 16.752}
+  fixedReturnRotation: {x: 0, y: 0, z: 0}
 --- !u!114 &1482217752
 MonoBehaviour:
   m_ObjectHideFlags: 0
