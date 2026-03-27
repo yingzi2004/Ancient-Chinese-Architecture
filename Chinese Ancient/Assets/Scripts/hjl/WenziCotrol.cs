@@ -183,7 +183,6 @@ public class WenziCotrol : MonoBehaviour
         for (int i = 0; i < totalCharCount; i++)
         {
             targetText.maxVisibleCharacters = i + 1;
-            targetText.ForceMeshUpdate();
 
             TMP_CharacterInfo charInfo = targetText.textInfo.characterInfo[i];
             if (charInfo.isVisible)
