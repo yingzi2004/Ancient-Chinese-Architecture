@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Reflection;
 
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Renderer))]
@@ -12,22 +11,6 @@ public class jianzhi : MonoBehaviour
     [Header("剪刀/画笔的粗细")]
     public int brushSize = 10;
 
-    [Header("交互设置")]
-    [Tooltip("如果使用准心交互（第一人称视角），请勾选此项。射线将始终从屏幕正中心发射。")]
-    public bool useCrosshair = false;
-    [Tooltip("准心模式下：当准心接近fanwei时，自动释放鼠标改为左键绘制；离开后恢复准心锁定")]
-    public bool autoSwitchToMouseNearFanwei = true;
-    [Tooltip("判定准心接近fanwei的检测距离")]
-    public float crosshairDetectDistance = 5f;
-    [Tooltip("启用平面命中兜底，避免碰撞体异常时无法绘制")]
-    public bool enablePlaneFallback = true;
-    [Tooltip("进入绘制区时临时禁用这些控制脚本（例如 PlayerController），离开时自动恢复")]
-    public MonoBehaviour[] pauseWhenDrawing;
-    [Tooltip("未手动指定时，自动在场景中查找 PlayerController 脚本")]
-    public bool autoFindPlayerController = true;
-    [Tooltip("按下该按键可切换到鼠标绘制模式（显示鼠标并允许左键绘制）")]
-    public KeyCode toggleMouseDrawKey = KeyCode.I;
-
     [Header("拖动轨迹显示")]
     public Color trailColor = new Color(1f, 0.95f, 0.55f, 1f);
     public float trailWidth = 0.03f;
@@ -37,24 +20,6 @@ public class jianzhi : MonoBehaviour
     public bool clearTrailOnRelease = false;
     public bool clearTrailOnNewStroke = true;
 
-    [Header("评判设置")]
-    [Tooltip("指定fanwei对象（需要其带有碰撞体Collider）")]
-    public Transform fanweiObject;
-    [Tooltip("允许偏离fanwei轮廓的最大距离")]
-    public float toleranceRadius = 0.1f;
-    [Tooltip("评判成功的达标百分比(0~1)")]
-    public float successThreshold = 0.7f;
-    
-    [Header("成功后的对象控制")]
-    [Tooltip("对应“1”这个图片的物体，成功后将被隐藏")]
-    public GameObject obj1;
-    [Tooltip("对应“掉1”这个物体，成功后会掉落")]
-    public GameObject objDrop1;
-
-    // 评判统计
-    private int totalDragFrameCount = 0;
-    private int validDragFrameCount = 0;
-
     private Texture2D editableTexture;
     private Material mat;
     private Collider col;
@@ -63,10 +28,6 @@ public class jianzhi : MonoBehaviour
     private LineRenderer trailRenderer;
     private Material trailMaterial;
     private readonly List<Vector3> trailPoints = new List<Vector3>();
-    private bool isInDrawZone = false;
-    private bool cursorWasAutoUnlocked = false;
-    private bool forceMouseDrawMode = false;
-    private readonly List<MonoBehaviour> pausedBehaviours = new List<MonoBehaviour>();
 
     void Start()
     {
@@ -113,14 +74,9 @@ public class jianzhi : MonoBehaviour
 
     void Update()
     {
-        HandleToggleMouseDrawMode();
-        UpdateInteractionZone();
-
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && clearTrailOnNewStroke)
         {
-            if (clearTrailOnNewStroke) ClearTrail();
-            totalDragFrameCount = 0;
-            validDragFrameCount = 0;
+            ClearTrail();
         }
 
         // 按住鼠标左键时进行剪纸
@@ -129,12 +85,9 @@ public class jianzhi : MonoBehaviour
             CutPaper();
         }
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) && clearTrailOnRelease)
         {
-            if (clearTrailOnRelease) ClearTrail();
-            
-            // 笔划结束时进行评判
-            EvaluateStrokeComplete();
+            ClearTrail();
         }
     }
 
@@ -142,300 +95,17 @@ public class jianzhi : MonoBehaviour
     {
         if (Camera.main == null) return;
 
-        if (!forceMouseDrawMode && useCrosshair && autoSwitchToMouseNearFanwei && !isInDrawZone)
-        {
-            return;
-        }
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
 
-        // 如果是准心交互，永远取屏幕正中心的点；否则取鼠标当前的实际位置
-        bool shouldUseCenterRay = useCrosshair && !forceMouseDrawMode && !(autoSwitchToMouseNearFanwei && isInDrawZone);
-        Vector3 pointToRay = shouldUseCenterRay ? new Vector3(Screen.width / 2f, Screen.height / 2f, 0f) : Input.mousePosition;
-        Ray ray = Camera.main.ScreenPointToRay(pointToRay);
-        
-        // 使用 RaycastAll 穿透检测，防止前面有 fanwei 的碰撞体挡住鼠标点击
-        RaycastHit[] hits = Physics.RaycastAll(ray);
-        bool hasDrawn = false;
-
-        foreach (RaycastHit hit in hits)
+        // 进行射线检测
+        if (Physics.Raycast(ray, out hit))
         {
-            // 如果某一层点中了当前纸张
+            // 如果点中了当前纸张
             if (hit.collider == col)
             {
                 EraseAtUV(hit.textureCoord);
                 AddTrailPoint(hit.point + hit.normal * trailSurfaceOffset);
-                
-                // 执行评判逻辑：检查是否在fanwei附近
-                EvaluateDragPoint(hit.point);
-                hasDrawn = true;
-                break; // 画到了就跳出循环，避免重复画
-            }
-        }
-
-        if (!hasDrawn && enablePlaneFallback)
-        {
-            TryDrawWithPlaneFallback(ray);
-        }
-    }
-
-    void UpdateInteractionZone()
-    {
-        if (forceMouseDrawMode)
-        {
-            return;
-        }
-
-        if (!useCrosshair || !autoSwitchToMouseNearFanwei || Camera.main == null || fanweiObject == null)
-        {
-            return;
-        }
-
-        Ray centerRay = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
-        RaycastHit[] hits = Physics.RaycastAll(centerRay, crosshairDetectDistance);
-
-        bool nearFanwei = false;
-        foreach (RaycastHit hit in hits)
-        {
-            Transform t = hit.collider.transform;
-            if (t == fanweiObject || t.IsChildOf(fanweiObject))
-            {
-                nearFanwei = true;
-                break;
-            }
-        }
-
-        if (nearFanwei && !isInDrawZone)
-        {
-            isInDrawZone = true;
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-            cursorWasAutoUnlocked = true;
-            SetPauseBehaviours(true);
-        }
-        else if (!nearFanwei && isInDrawZone)
-        {
-            isInDrawZone = false;
-            SetPauseBehaviours(false);
-            if (cursorWasAutoUnlocked)
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-                cursorWasAutoUnlocked = false;
-            }
-        }
-    }
-
-    void HandleToggleMouseDrawMode()
-    {
-        if (!Input.GetKeyDown(toggleMouseDrawKey))
-        {
-            return;
-        }
-
-        forceMouseDrawMode = !forceMouseDrawMode;
-
-        if (forceMouseDrawMode)
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-            SetPauseBehaviours(true);
-            Debug.Log("<color=cyan>已进入鼠标绘制模式：</color>可直接按住鼠标左键沿 fanwei 进行绘制。");
-        }
-        else
-        {
-            SetPauseBehaviours(false);
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-            Debug.Log("<color=cyan>已退出鼠标绘制模式：</color>恢复准心交互。");
-        }
-    }
-
-    void SetPauseBehaviours(bool pause)
-    {
-        List<MonoBehaviour> targets = GetPauseTargets();
-        if (targets.Count == 0) return;
-
-        if (pause)
-        {
-            pausedBehaviours.Clear();
-            for (int i = 0; i < targets.Count; i++)
-            {
-                MonoBehaviour mb = targets[i];
-                if (mb == null || !mb.enabled) continue;
-                mb.enabled = false;
-                pausedBehaviours.Add(mb);
-            }
-            ForcePlayerControllerCursorState(false);
-        }
-        else
-        {
-            for (int i = 0; i < pausedBehaviours.Count; i++)
-            {
-                if (pausedBehaviours[i] != null)
-                {
-                    pausedBehaviours[i].enabled = true;
-                }
-            }
-            pausedBehaviours.Clear();
-            ForcePlayerControllerCursorState(true);
-        }
-    }
-
-    void ForcePlayerControllerCursorState(bool locked)
-    {
-        List<MonoBehaviour> targets = GetPauseTargets();
-        if (targets.Count == 0) return;
-
-        for (int i = 0; i < targets.Count; i++)
-        {
-            MonoBehaviour mb = targets[i];
-            if (mb == null) continue;
-
-            System.Type t = mb.GetType();
-            FieldInfo field = t.GetField("isCursorLocked", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (field != null && field.FieldType == typeof(bool))
-            {
-                field.SetValue(mb, locked);
-            }
-        }
-    }
-
-    List<MonoBehaviour> GetPauseTargets()
-    {
-        List<MonoBehaviour> result = new List<MonoBehaviour>();
-
-        if (pauseWhenDrawing != null)
-        {
-            for (int i = 0; i < pauseWhenDrawing.Length; i++)
-            {
-                if (pauseWhenDrawing[i] != null)
-                {
-                    result.Add(pauseWhenDrawing[i]);
-                }
-            }
-        }
-
-        if (result.Count == 0 && autoFindPlayerController)
-        {
-            MonoBehaviour[] allBehaviours = FindObjectsOfType<MonoBehaviour>();
-            for (int i = 0; i < allBehaviours.Length; i++)
-            {
-                MonoBehaviour mb = allBehaviours[i];
-                if (mb == null) continue;
-                if (mb.GetType().Name == "PlayerController")
-                {
-                    result.Add(mb);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    void OnDisable()
-    {
-        SetPauseBehaviours(false);
-    }
-
-    void TryDrawWithPlaneFallback(Ray ray)
-    {
-        Plane plane = new Plane(transform.forward, transform.position);
-        float distance;
-
-        if (!plane.Raycast(ray, out distance))
-        {
-            plane = new Plane(-transform.forward, transform.position);
-            if (!plane.Raycast(ray, out distance))
-            {
-                return;
-            }
-        }
-
-        Vector3 worldPoint = ray.GetPoint(distance);
-        Vector3 local = transform.InverseTransformPoint(worldPoint);
-
-        float uvX = local.x + 0.5f;
-        float uvY = local.y + 0.5f;
-        if (uvX < 0f || uvX > 1f || uvY < 0f || uvY > 1f)
-        {
-            return;
-        }
-
-        Vector2 uv = new Vector2(uvX, uvY);
-        EraseAtUV(uv);
-        AddTrailPoint(worldPoint + transform.forward * trailSurfaceOffset);
-        EvaluateDragPoint(worldPoint);
-    }
-
-    void EvaluateDragPoint(Vector3 dragPoint)
-    {
-        totalDragFrameCount++;
-
-        if (fanweiObject == null)
-        {
-            return; // 没有指定fanwei对象，直接跳过评判
-        }
-
-        // 使用球形碰撞检测，松弛一点的评判范围
-        Collider[] hits = Physics.OverlapSphere(dragPoint, toleranceRadius);
-        bool isNearFanwei = false;
-        foreach (Collider hitCollider in hits)
-        {
-            // 如果碰到的物体的Transform是fanwei或者属于fanwei的子物体
-            if (hitCollider.transform == fanweiObject || hitCollider.transform.IsChildOf(fanweiObject))
-            {
-                isNearFanwei = true;
-                break;
-            }
-        }
-
-        if (isNearFanwei)
-        {
-            validDragFrameCount++;
-        }
-    }
-
-    void EvaluateStrokeComplete()
-    {
-        if (totalDragFrameCount > 0 && fanweiObject != null)
-        {
-            float accuracy = (float)validDragFrameCount / totalDragFrameCount;
-            int percentage = Mathf.RoundToInt(accuracy * 100);
-            
-            if (accuracy >= successThreshold) // 达到设定的吻合度算成功
-            {
-                Debug.Log($"<color=green>评判成功！</color> 你很好地沿着范围画了。吻合度: {percentage}%");
-                
-                // 成功后的行为：
-                // 1. 掩藏 1 这个图片
-                if (obj1 != null)
-                {
-                    obj1.SetActive(false);
-                }
-
-                // 2. 掩藏 fanwei 这个物体
-                if (fanweiObject != null)
-                {
-                    fanweiObject.gameObject.SetActive(false);
-                }
-
-                // 3. 让掉1从上往下掉
-                if (objDrop1 != null)
-                {
-                    objDrop1.SetActive(true); // 确保掉落物是激活的
-                    
-                    // 获取或添加刚体以此实现受重力影响掉落
-                    Rigidbody rb = objDrop1.GetComponent<Rigidbody>();
-                    if (rb == null)
-                    {
-                        rb = objDrop1.AddComponent<Rigidbody>();
-                    }
-                    rb.isKinematic = false; // 取消运动学模式
-                    rb.useGravity = true;   // 开启重力
-                }
-            }
-            else
-            {
-                Debug.Log($"<color=orange>评判失败。</color> 偏离了规定的范围！吻合度: {percentage}%");
             }
         }
     }
