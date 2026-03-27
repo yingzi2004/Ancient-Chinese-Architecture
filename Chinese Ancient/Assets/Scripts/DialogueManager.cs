@@ -213,6 +213,8 @@ public class DialogueManager : MonoBehaviour
     /// </summary>
     private void ShowDialogue(string text, DialogueOption[] options)
     {
+        Debug.Log($"DialogueManager: ShowDialogue 被调用，文本: '{text}'，选项数量: {(options != null ? options.Length : 0)}");
+
         // 清除之前的自动关闭
         if (autoCloseCoroutine != null)
         {
@@ -227,6 +229,8 @@ public class DialogueManager : MonoBehaviour
 
         // 开始新的打字机效果
         typingCoroutine = StartCoroutine(TypeText(text, options));
+
+        Debug.Log("DialogueManager: 打字机协程已启动");
     }
 
     /// <summary>
@@ -234,16 +238,33 @@ public class DialogueManager : MonoBehaviour
     /// </summary>
     private IEnumerator TypeText(string text, DialogueOption[] options)
     {
-        if (dialogueText == null) yield break;
+        Debug.Log($"DialogueManager: TypeText 开始，文本长度: {text?.Length ?? 0}，选项数量: {(options != null ? options.Length : 0)}");
+
+        if (dialogueText == null)
+        {
+            Debug.LogError("DialogueManager: dialogueText 为空，无法显示打字机效果！");
+            yield break;
+        }
 
         dialogueText.text = "";
+        int charCount = 0;
 
         // 逐字显示文本
         foreach (char c in text)
         {
             dialogueText.text += c;
+            charCount++;
+
+            // 每10个字符输出一次进度
+            if (charCount % 10 == 0)
+            {
+                Debug.Log($"DialogueManager: 打字进度 {charCount}/{text.Length}");
+            }
+
             yield return new WaitForSeconds(typingSpeed);
         }
+
+        Debug.Log("DialogueManager: 打字机效果完成，准备显示选项");
 
         // 打字完成后显示选项
         ShowOptions(options);
@@ -254,6 +275,8 @@ public class DialogueManager : MonoBehaviour
     /// </summary>
     private void ShowOptions(DialogueOption[] options)
     {
+        Debug.Log($"DialogueManager: ShowOptions 被调用，选项数量: {(options != null ? options.Length : 0)}");
+
         // 清除旧的选项按钮
         if (optionsContainer != null)
         {
@@ -265,6 +288,8 @@ public class DialogueManager : MonoBehaviour
             // 创建新的选项按钮
             if (options != null && options.Length > 0)
             {
+                Debug.Log($"DialogueManager: 开始创建 {options.Length} 个选项按钮");
+
                 foreach (DialogueOption option in options)
                 {
                     CreateOptionButton(option);
@@ -272,9 +297,14 @@ public class DialogueManager : MonoBehaviour
             }
             else
             {
+                Debug.Log("DialogueManager: 没有选项，将自动关闭对话框");
                 // 如果没有选项，自动关闭对话框
                 autoCloseCoroutine = StartCoroutine(AutoCloseDialogue());
             }
+        }
+        else
+        {
+            Debug.LogError("DialogueManager: optionsContainer 为空，无法显示选项！");
         }
     }
 
@@ -283,7 +313,30 @@ public class DialogueManager : MonoBehaviour
     /// </summary>
     private void CreateOptionButton(DialogueOption option)
     {
-        if (optionButtonPrefab == null || optionsContainer == null) return;
+        if (optionButtonPrefab == null)
+        {
+            Debug.LogError("DialogueManager: optionButtonPrefab 为空，尝试从Resources加载");
+
+            // 尝试从Resources加载
+            optionButtonPrefab = Resources.Load<GameObject>("Prefabs/OptionButton");
+            if (optionButtonPrefab == null)
+            {
+                Debug.LogError("DialogueManager: 无法从Resources加载OptionButton预制体！");
+                return;
+            }
+            else
+            {
+                Debug.Log("DialogueManager: 成功从Resources加载OptionButton预制体");
+            }
+        }
+
+        if (optionsContainer == null)
+        {
+            Debug.LogError("DialogueManager: optionsContainer 为空，无法创建选项按钮！");
+            return;
+        }
+
+        Debug.Log($"DialogueManager: 创建选项按钮 - {option.optionText}");
 
         GameObject buttonObj = Instantiate(optionButtonPrefab, optionsContainer);
         Button button = buttonObj.GetComponent<Button>();
@@ -292,11 +345,21 @@ public class DialogueManager : MonoBehaviour
         if (buttonText != null)
         {
             buttonText.text = option.optionText;
+            Debug.Log($"DialogueManager: 选项按钮文字已设置为: {option.optionText}");
+        }
+        else
+        {
+            Debug.LogWarning("DialogueManager: 选项按钮中没有找到Text组件");
         }
 
         if (button != null)
         {
             button.onClick.AddListener(() => OnOptionSelected(option));
+            Debug.Log("DialogueManager: 选项按钮点击事件已添加");
+        }
+        else
+        {
+            Debug.LogWarning("DialogueManager: 选项按钮中没有找到Button组件");
         }
     }
 
