@@ -12477,37 +12477,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 57921b8fab2557946abfed6612dc6c04, type: 3}
---- !u!1 &1139619361
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1139619362}
-  m_Layer: 0
-  m_Name: game-jianzhi
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1139619362
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1139619361}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.335058, y: 0.8403959, z: 29.980835}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1139944206
 GameObject:
   m_ObjectHideFlags: 0
@@ -23832,13 +23801,9 @@ SceneRoots:
   - {fileID: 939901918}
   - {fileID: 1596947059}
   - {fileID: 1001597301}
-<<<<<<< Updated upstream
   - {fileID: 343215955}
   - {fileID: 1484395162}
   - {fileID: 273981276}
   - {fileID: 1942177142}
   - {fileID: 841993621}
   - {fileID: 392950195}
-=======
-  - {fileID: 1139619362}
->>>>>>> Stashed changes
