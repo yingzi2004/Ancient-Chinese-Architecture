@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
 // 这是一个围绕指定轴心点旋转研磨棒的动作脚本，点击后执行研磨动作
