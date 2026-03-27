@@ -7,7 +7,7 @@ public class DrawPath : MonoBehaviour
     public LineRenderer lineRenderer;
     
     [Header("Objects")]
-    public Collider2D fanweiCollider; // 拖动判定范围（挂载在fanwei上）
+    public Collider fanweiCollider; // 拖动判定范围（改成3D的Collider）
     public GameObject object1;        // 1物体
     public GameObject objectFanwei;   // fanwei物体
     public GameObject objectDrop1;    // 掉1物体
@@ -39,15 +39,25 @@ public class DrawPath : MonoBehaviour
         // 按住鼠标拖动时记录路径并画线
         else if (Input.GetMouseButton(0))
         {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mousePos.z = 0f; // 确保在2D平面上
-
-            // 距离大于0.1才添加点，避免点太密集
-            if (points.Count == 0 || Vector3.Distance(points[points.Count - 1], mousePos) > 0.1f)
+            // 通过射线检测准心（或是鼠标）所指的空间位置
+            Ray ray = Camera.main.ScreenPointToRay(new Vector2(Screen.width / 2f, Screen.height / 2f)); // 如果你要鼠标位置，改成 Input.mousePosition
+            RaycastHit hit;
+            
+            // 使用射线碰触到物体的位置。如果在3D中，你需要确保背景或者画布上有碰撞体（比如BoxCollider）
+            if (Physics.Raycast(ray, out hit, 100f))
             {
-                points.Add(mousePos);
-                lineRenderer.positionCount = points.Count;
-                lineRenderer.SetPosition(points.Count - 1, mousePos);
+                Vector3 worldPos = hit.point;
+
+                // 为了防止线条与物体表面重叠闪烁(Z-Fighting)，让线条稍微往前一点点
+                worldPos -= ray.direction * 0.05f;
+
+                // 距离大于0.05才添加点，避免点太密集
+                if (points.Count == 0 || Vector3.Distance(points[points.Count - 1], worldPos) > 0.05f)
+                {
+                    points.Add(worldPos);
+                    lineRenderer.positionCount = points.Count;
+                    lineRenderer.SetPosition(points.Count - 1, worldPos);
+                }
             }
         }
         // 鼠标抬起时，判断是否成功
@@ -90,12 +100,14 @@ public class DrawPath : MonoBehaviour
             int insideCount = 0;
             foreach (var p in points)
             {
-                if (fanweiCollider.OverlapPoint(p))
+                // 用ClosestPoint判断该点是否在碰撞体内或者极其靠近碰撞体
+                Vector3 closest = fanweiCollider.ClosestPoint(p);
+                if (Vector3.Distance(closest, p) < 0.2f)
                 {
                     insideCount++;
                 }
             }
-            // 如果绘制的轨迹中，有80%以上的点都在fanwei身上，可算成功
+            // 如果绘制的轨迹中，有80%以上的点都在fanwei区域内，可算成功
             float matchRate = (float)insideCount / points.Count;
             return matchRate > 0.8f;
         }
