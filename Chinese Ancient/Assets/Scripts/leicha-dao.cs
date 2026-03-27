@@ -1,46 +1,46 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// µã»÷ÎïÌåÊ±Ì§Æğ²¢×ö³öµ¹¶«Î÷µÄ¶¯×÷¡£½«´Ë½Å±¾¹Òµ½Ã¿¸öÍëÎïÌåÉÏ¡£
+
 public class LeichaDao : MonoBehaviour
 {
-    [Tooltip("Ì§ÆğµÄ¸ß¶È£¨±¾µØ×ø±ê£¬µ¥Î»ÎªÃ×£©")]
+    [Tooltip("æŠ¬èµ·çš„é«˜åº¦ï¼ˆå±€éƒ¨åæ ‡ï¼Œå•ä½ï¼šç±³ï¼‰")]
     public float liftHeight = 0.2f;
 
-    [Tooltip("Ì§ÆğËùĞèÊ±¼ä£¨Ãë£©")]
+    [Tooltip("æŠ¬èµ·è¿‡ç¨‹çš„æ—¶é•¿ï¼ˆç§’ï¼‰")]
     public float liftDuration = 0.3f;
 
-    [Tooltip("±¾µØ¿Õ¼äµÄµ¹³öĞı×ªÖá£¨ÀıÈç Vector3.right£©")]
+    [Tooltip("å±€éƒ¨ç©ºé—´å†…çš„å€¾å€’æ—‹è½¬è½´ï¼ˆé»˜è®¤ä¸º Vector3.rightï¼‰")]
     public Vector3 pourAxis = Vector3.right;
 
-    [Tooltip("µ¹³öÊ±Ğı×ª½Ç¶È£¨¶È£©")]
+    [Tooltip("å€¾å€’æ—¶çš„æ—‹è½¬è§’åº¦ï¼ˆåº¦ï¼‰")]
     public float pourAngle = 70f;
 
-    [Tooltip("µ¹³öĞı×ªËùĞèÊ±¼ä£¨Ãë£©")]
+    [Tooltip("å€¾å€’æ—‹è½¬è¿‡ç¨‹çš„æ—¶é•¿ï¼ˆç§’ï¼‰")]
     public float pourDuration = 0.5f;
 
-    [Tooltip("±£³Öµ¹³ö×ËÊÆµÄÊ±¼ä£¨Ãë£©")]
+    [Tooltip("ä¿æŒå€¾å€’çŠ¶æ€çš„æ—¶é—´ï¼ˆç§’ï¼‰")]
     public float holdDuration = 0.8f;
 
-    [Tooltip("·µ»Ø³õÊ¼×ËÊÆËùĞèÊ±¼ä£¨Ãë£©")]
+    [Tooltip("è¿”å›åˆå§‹çŠ¶æ€çš„è¿‡ç¨‹æ—¶é•¿ï¼ˆç§’ï¼‰")]
     public float returnDuration = 0.4f;
 
-    [Tooltip("ÔÚµ¹Ö®Ç°½«Íë³¯Ïò¸ÃÄ¿±ê£¨¿ÉÎª¿Õ£©")]
+    [Tooltip("å€¾å€’å‰æƒ³è¦æœå‘çš„ç›®æ ‡å¯¹è±¡ï¼ˆå¯ä¸ºç©ºï¼‰")]
     public Transform pourTarget;
 
-    [Tooltip("½«Íë³¯ÏòÄ¿±êËùĞèµÄÊ±¼ä£¨Ãë£©£¬Îª0Ôò²»×ö³¯Ïòµ÷Õû£©")]
+    [Tooltip("è½¬å‘æœå‘ç›®æ ‡çš„å¯¹é½æ—¶é•¿ï¼ˆç§’ï¼‰ã€‚ä¸º0æ—¶ä¸è¿›è¡Œå¯¹é½")]
     public float yawAlignDuration = 0.15f;
 
     bool isAnimating = false;
 
     void Reset()
     {
-        // È·±£ÓĞÅö×²ÌåÒÔ½ÓÊÕµã»÷ÊÂ¼ş£¨OnMouseDown£©
+        // ç¡®ä¿æœ‰ç¢°æ’ä½“ä»¥æ¥æ”¶ç‚¹å‡»äº‹ä»¶ï¼ˆOnMouseDownï¼‰
         if (GetComponent<Collider>() == null)
         {
             var box = gameObject.AddComponent<BoxCollider>();
-            // ¸ù¾İÍø¸ñ»òäÖÈ¾Æ÷µ÷Õû´óĞ¡ÊÇ¿ÉÑ¡µÄ£¬ÕâÀïÄ¬ÈÏÊ¹ÓÃ¶ÔÏó°üÎ§ºĞ
+            // å¦‚æœæ²¡æœ‰æ¸²æŸ“å™¨ï¼Œç¢°æ’ä½“å°ºå¯¸å¯èƒ½ä¸åˆé€‚ï¼›è¿™é‡Œå…ˆç”¨é»˜è®¤å€¼ï¼ˆUnity ä¼šæŒ‰é»˜è®¤ BoxCollider å°ºå¯¸åˆ›å»ºï¼‰
         }
     }
 
@@ -59,16 +59,16 @@ public class LeichaDao : MonoBehaviour
         Vector3 startPos = transform.localPosition;
         Quaternion startRot = transform.localRotation;
 
-        // Èç¹ûÓĞ pourTarget£¬ÏÈ×öË®Æ½³¯Ïò¶ÔÆë£¨Ö»Î§ÈÆ local upÖá£©
+        // å¦‚æœè®¾ç½®äº† pourTargetï¼Œåˆ™å…ˆæ°´å¹³è½¬å‘ç›®æ ‡ï¼ˆä»…ç»• local up è½´ï¼‰
         Quaternion alignedRot = startRot;
         if (pourTarget != null && yawAlignDuration > 0f)
         {
             Vector3 toTarget = pourTarget.position - transform.position;
-            // Í¶Ó°µ½Ë®Æ½ÃæÒÔ¼ÆËãÆ«º½
+            // æŠ•å½±åˆ°æ°´å¹³é¢ä»¥è®¡ç®—åè§’
             Vector3 toTargetProj = Vector3.ProjectOnPlane(toTarget, transform.up);
             if (toTargetProj.sqrMagnitude > 0.0001f)
             {
-                //Ä¿±ê³¯ÏòÔÚÊÀ½ç¿Õ¼ä£¬¼ÆËãÄ¿±ê³¯ÏòµÄ YĞı×ª£¨ÊÀ½ç×ø±ê£©
+                // ç›®æ ‡æœå‘ï¼ˆä¸–ç•Œç©ºé—´ï¼‰ï¼Œå– Y è½´åè½¬è§’
                 float targetYaw = Mathf.Atan2(toTargetProj.x, toTargetProj.z) * Mathf.Rad2Deg;
                 float currentYaw = transform.eulerAngles.y;
                 float yawOffset = Mathf.DeltaAngle(currentYaw, targetYaw);
@@ -87,11 +87,11 @@ public class LeichaDao : MonoBehaviour
             }
         }
 
-        //¼ÆËãÌ§ÆğÄ¿±ê£¨ÑØ±¾µØ up·½Ïò£©
+        // è®¡ç®—æŠ¬èµ·ç›®æ ‡ä½ç½®ï¼ˆæ²¿ local up æ–¹å‘ï¼‰
         Vector3 targetPos = startPos + transform.InverseTransformVector(Vector3.up) * liftHeight;
 
         float tt = 0f;
-        // Ì§Æğ
+        // æŠ¬èµ·
         while (tt < liftDuration)
         {
             tt += Time.deltaTime;
@@ -100,7 +100,7 @@ public class LeichaDao : MonoBehaviour
             yield return null;
         }
 
-        // ÇãĞ±µ¹³ö
+        // å€¾æ–œå€’èŒ¶
         tt = 0f;
         Quaternion pourStartRot = transform.localRotation; // use current (may be aligned)
         Quaternion targetRot = pourStartRot * Quaternion.AngleAxis(pourAngle, pourAxis.normalized);
@@ -112,10 +112,10 @@ public class LeichaDao : MonoBehaviour
             yield return null;
         }
 
-        // ±£³Ö
+        // ä¿æŒ
         yield return new WaitForSeconds(holdDuration);
 
-        // ·µ»ØĞı×ª£¨ÏÈ»Øµ½¶ÔÆëĞı×ª£©
+        // å›æ­£ï¼ˆå›åˆ°æŠ¬èµ·åçš„æ—‹è½¬ï¼‰
         tt = 0f;
         while (tt < returnDuration)
         {
@@ -125,7 +125,7 @@ public class LeichaDao : MonoBehaviour
             yield return null;
         }
 
-        // ½µÏÂ
+        // æ”¾ä¸‹
         tt = 0f;
         while (tt < returnDuration)
         {
@@ -135,7 +135,7 @@ public class LeichaDao : MonoBehaviour
             yield return null;
         }
 
-        // Èç¹ûÖ®Ç°×öÁË³¯Ïò¶ÔÆë£¬»Ö¸´µ½Ô­Ê¼Ğı×ªÒÔ±ÜÃâ±£³ÖÆ«º½
+        // å¦‚æœä¹‹å‰åšäº†è½¬å‘å¯¹é½ï¼Œæ¢å¤åˆ°åŸå§‹æ—‹è½¬ä»¥é¿å…ä¿ç•™åè§’
         if (pourTarget != null && yawAlignDuration > 0f)
         {
             float t = 0f;
@@ -148,7 +148,6 @@ public class LeichaDao : MonoBehaviour
             }
         }
 
-        // ĞŞÕı×îÖÕ×ËÌ¬ÒÔ±ÜÃâÊıÖµÎó²î
         transform.localPosition = startPos;
         transform.localRotation = startRot;
 
