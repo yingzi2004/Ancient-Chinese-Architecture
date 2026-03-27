@@ -2,32 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// ���������������������ָ����������λ����
-//1) �� Inspector ��ָ�� Slot1��Slot2 �� SpawnPrefab��Slot3����
-//2) ���û��ȵ�� Slot1��Ȼ���ڳ�ʱʱ���ڵ�� Slot2 ʱ�����������ǰ���� SpawnPrefab�򼤻���еĶ���
-// ���˽ű��ҵ������е�һ���ն������� GameManager����
+// 控制擂茶交互流程：按顺序点击两个槽位触发生成/激活对象
+// 1) 在 Inspector 中指定 Slot1、Slot2、SpawnPrefab
+// 2) 用户先点击 Slot1，然后在超时时间内点击 Slot2，会在相机前方生成 SpawnPrefab（或激活场景内对象）
+// 建议将此脚本挂载到场景中的一个空对象上（例如 GameManager）
 public class LeichaController : MonoBehaviour
 {
-    [Header("ָ��������λ���� Inspector �������Ӧ���壩")]
-    [Tooltip("�ȵ�������壨Slot1��")]
+    [Header("指定对象与位置（在 Inspector 中设置对应对象）")]
+    [Tooltip("先点击的物体（Slot1）")]
     public GameObject slot1;
 
-    [Tooltip("���������壨Slot2��")]
+    [Tooltip("后点击的物体（Slot2）")]
     public GameObject slot2;
 
-    [Tooltip("���� Slot1->Slot2 ˳������ɻ򼤻�Ķ���������ǳ����еĶ����ҳ�ʼΪ���أ���ᱻ SetActive(true)��")]
+    [Tooltip("按照 Slot1->Slot2 顺序点击后生成或激活的对象。若它是场景内对象且处于隐藏，会被 SetActive(true)")]
     public GameObject spawnPrefab;
 
-    [Tooltip("�����������������ľ��루���� spawnPrefab ΪԤ����ʵ����ʱ��Ч����λ���ף�")]
-    public float spawnDistance =1.2f;
+    [Tooltip("生成对象距离相机的距离（当 spawnPrefab 为预制件实例化时生效，单位：米）")]
+    public float spawnDistance = 1.2f;
 
-    [Tooltip("�������������������Ķ���ƫ�ƣ�����ʵ����ʱ��Ч��")]
+    [Tooltip("生成对象相对于相机的局部偏移（当实例化时生效）")]
     public Vector3 spawnOffset = Vector3.zero;
 
-    [Tooltip("��� Slot1 ���ڸ������ڵ�� Slot2 ����Ч���룩")]
-    public float selectionTimeout =5f;
+    [Tooltip("点击 Slot1 后，在该时间内点击 Slot2 才有效（秒）")]
+    public float selectionTimeout = 5f;
 
-    [Tooltip("ʹ�õ����߼��㣬Ĭ�����в�")]
+    [Tooltip("射线检测的层（LayerMask），默认所有层")]
     public LayerMask clickableLayers = ~0;
 
     bool slot1Selected = false;
@@ -35,7 +35,7 @@ public class LeichaController : MonoBehaviour
 
     void Update()
     {
-        // ��ʱ���� Slot1 ״̬
+        // 超时取消 Slot1 状态
         if (slot1Selected && Time.time - slot1SelectTime > selectionTimeout)
         {
             slot1Selected = false;
@@ -55,7 +55,7 @@ public class LeichaController : MonoBehaviour
                 GameObject hitObj = hit.collider.gameObject;
                 Debug.Log($"Raycast hit: {hitObj.name}");
 
-                // �����ǰû��ѡ�� Slot1������Ƿ������ slot1 �����Ӷ���
+                // 若当前未选中 Slot1：检查是否点击了 slot1 或其子对象
                 if (!slot1Selected)
                 {
                     if (IsMatch(hitObj, slot1))
@@ -66,23 +66,23 @@ public class LeichaController : MonoBehaviour
                     }
                     else
                     {
-                        // ������������壬����
+                        // 点击了其他物体，忽略
                         Debug.Log("Clicked other object while waiting for Slot1: " + hitObj.name);
                     }
                 }
                 else
                 {
-                    // ��ѡ�� Slot1������Ƿ����� Slot2 �����Ӷ���
+                    // 已选中 Slot1：检查是否点击了 Slot2 或其子对象
                     if (IsMatch(hitObj, slot2))
                     {
-                        //�������ɻ򼤻�
+                        // 触发生成或激活
                         Debug.Log("Slot2 clicked after Slot1. Triggering spawn/activate.");
                         SpawnOrActivate();
                         slot1Selected = false;
                     }
                     else
                     {
-                        // ����˷� Slot2������ѡ�񣨻�ɸ�Ϊ���� Slot1 ״̬��
+                        // 点击了非 Slot2：取消选择（恢复为未选中 Slot1 状态）
                         slot1Selected = false;
                         Debug.Log("Slot1 selection cancelled by clicking other object: " + hitObj.name);
                     }
@@ -110,13 +110,13 @@ public class LeichaController : MonoBehaviour
     {
         if (spawnPrefab == null)
         {
-            Debug.LogWarning("spawnPrefab δ���ã��޷����ɻ򼤻");
+            Debug.LogWarning("spawnPrefab 未设置，无法生成或激活。");
             return;
         }
 
         Debug.Log($"SpawnOrActivate called. spawnPrefab reference: {spawnPrefab.name}, scene valid: {spawnPrefab.scene.IsValid()}, activeInHierarchy: {spawnPrefab.activeInHierarchy}");
 
-        // ��� spawnPrefab ָ�򳡾��еĶ����ѷź�λ�úͽǶȣ����򼤻���
+        // 如果 spawnPrefab 指向场景内对象（已放好位置和角度），则直接激活
         if (spawnPrefab.scene.IsValid())
         {
             if (!spawnPrefab.activeInHierarchy)
@@ -132,7 +132,7 @@ public class LeichaController : MonoBehaviour
             return;
         }
 
-        // ����ٶ���Ԥ������Դ -> �������ǰʵ����
+        // 否则视为预制件资源 -> 在相机前方实例化
         Camera cam = Camera.main;
         if (cam == null) return;
 
