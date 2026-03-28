@@ -10,6 +10,15 @@ public class DialogueOption
 {
     public string optionText; // 选项显示的文本
     public string responseText; // 选择该选项后NPC的回复
+
+    [Header("后续选项（可选）")]
+    [Tooltip("选择该选项后显示的新选项列表，如果为空则结束对话")]
+    public DialogueOption[] followUpOptions;
+
+    public DialogueOption()
+    {
+        followUpOptions = null;
+    }
 }
 
 /// <summary>

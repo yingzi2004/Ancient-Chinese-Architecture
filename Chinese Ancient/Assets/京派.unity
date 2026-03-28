@@ -417,7 +417,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -437,11 +437,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   npcName: "\u5C0F\u8C37"
   greetingText: "\u4F60\u597D\u5440,\u6211\u662F\u5C0F\u8C37,\u6B22\u8FCE\u6765\u5230\u7948\u5E74\u6BBF,\u4F60\u6709\u4EC0\u4E48\u60F3\u4E86\u89E3\u7684\u5417"
-  dialogueOptions:
-  - optionText: "\u8BF7\u95EE\u7948\u5E74\u6BBF\u662F\u7528\u6765\u505A\u4EC0\u4E48\u7684?"
-    responseText: "\u7948\u5E74\u6BBF\u662F\u7687\u5E1D\u796D\u7948\u8C37\u795E\u7684\u5730\u65B9"
+  useAutoDialogue: 1
+  autoDialogueSequence:
+  - "\u80FD\u4ECB\u7ECD\u4E00\u4E0B\u7948\u5E74\u6BBF\u5417"
+  - "\u597D\u5440,\u7948\u5E74\u6BBF\u662F\u660E\u6E05\u4E24\u4EE3\u7687\u5E1D\u796D\u5929\u3001\u7948\u8C37\u7684\u795E\u5723\u573A\u6240\uFF0C\u5EFA\u4E8E\u660E\u6C38\u4E50\u5341\u516B\u5E74\uFF0C\u5DF2\u6709600\u591A\u5E74\u5386\u53F2\u4E86\u3002\u4F60\u770B\u8FD9\u5B8F\u4F1F\u7684\u5EFA\u7B51\uFF0C\u76F4\u5F8432\u7C73\uFF0C\u9AD838\u7C73\uFF0C\u5168\u90E8\u91C7\u7528\u6728\u8D28\u7ED3\u6784\uFF0C\u6CA1\u7528\u4E00\u9897\u9489\u5B50\uFF01"
+  dialogueOptions: []
   player: {fileID: 1724057531}
-  playerTag: Player
+  playerTag: player
   triggerDistance: 3
   triggerOnce: 1
   exitDistanceOffset: 1
@@ -1330,7 +1332,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 374, y: -160}
+  m_AnchoredPosition: {x: -104, y: 72}
   m_SizeDelta: {x: 7000, y: 1500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &563258692
@@ -1366,7 +1368,7 @@ MonoBehaviour:
   npcNameText: {fileID: 845530484}
   dialogueText: {fileID: 554794936}
   optionsContainer: {fileID: 1581341333}
-  optionButtonPrefab: {fileID: 7437630358727405497, guid: 2cde1950dd1fe5448bb2f255ce35a8c5, type: 3}
+  optionButtonPrefab: {fileID: 3454552674252206463, guid: 57531183883921444b49cbbdbb594edf, type: 3}
   typingSpeed: 0.05
   autoCloseDelay: 3
 --- !u!4 &563258694
@@ -1791,7 +1793,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 3431, y: -356}
+  m_AnchoredPosition: {x: 3724, y: -512}
   m_SizeDelta: {x: 800, y: 800}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &845530483
