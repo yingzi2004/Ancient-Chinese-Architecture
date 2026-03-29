@@ -8495,11 +8495,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 432875035}
+  useScreenCenter: 1
+  drawCamera: {fileID: 1193753715}
   fanweiCollider: {fileID: 432875036}
   object1: {fileID: 900321548}
   objectFanwei: {fileID: 432875032}
   objectDrop1: {fileID: 1874410163}
   object2: {fileID: 250273550}
+  requiredPoints: 120
 --- !u!1 &800100495
 GameObject:
   m_ObjectHideFlags: 0
@@ -9585,8 +9588,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 13.320003, y: 12.78, z: 0.20000005}
-  m_Center: {x: 0, y: 0, z: 0.0000038146973}
+  m_Size: {x: 13.320003, y: 12.78, z: 0.11504027}
+  m_Center: {x: -9.0503935e-17, y: 0, z: 0.04248373}
 --- !u!1 &915830279
 GameObject:
   m_ObjectHideFlags: 0
