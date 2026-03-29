@@ -20,11 +20,17 @@ public class DrawPath : MonoBehaviour
     public GameObject objectFanwei;   // fanwei物体
     public GameObject objectDrop1;    // 掉1物体
     public GameObject object2;        // 2物体
+    public GameObject objectDrop2;    // 掉2物体
+    public GameObject object3;        // 3成品
 
     private List<Vector3> points = new List<Vector3>();
 
     // 认为“绕一圈”所需的最少采样点数量，可以在 Inspector 中调整
     public int requiredPoints = 120;
+
+    // 阶段控制：第一阶段画轮廓，第二阶段点击掉2
+    private bool firstStageDone = false;
+    private bool secondStageDone = false;
 
     void Start()
     {
@@ -57,13 +63,28 @@ public class DrawPath : MonoBehaviour
         {
             drawCamera = Camera.main;
         }
-        
-        // 初始状态下隐藏掉落物体
-        if (objectDrop1 != null)
-            objectDrop1.SetActive(false);
+
+        // 初始状态下隐藏掉落物体、成品
+        if (objectDrop1 != null) objectDrop1.SetActive(false);
+        if (objectDrop2 != null) objectDrop2.SetActive(false);
+        if (object3 != null)     object3.SetActive(false);
     }
 
     void Update()
+    {
+        // 优先判断第二阶段：只要掉2已经显示并且还没完成第二阶段，就处理点击逻辑
+        if (!secondStageDone && objectDrop2 != null && objectDrop2.activeInHierarchy)
+        {
+            HandleSecondStage();
+        }
+        else
+        {
+            HandleFirstStage();
+        }
+    }
+
+    // 第一阶段：画线裁剪 1 + fanwei，触发 掉1
+    void HandleFirstStage()
     {
         // 鼠标按下，开始绘制，清空之前的轨迹
         if (Input.GetMouseButtonDown(0))
@@ -134,6 +155,11 @@ public class DrawPath : MonoBehaviour
                         manager.StartFalling();
                     }
                 }
+
+                // 第一阶段完成，开启第二阶段：显示 掉2 让玩家点击
+                firstStageDone = true;
+                if (objectDrop2 != null)
+                    objectDrop2.SetActive(true);
             }
             else
             {
@@ -141,6 +167,55 @@ public class DrawPath : MonoBehaviour
                 points.Clear();
                 if (lineRenderer != null)
                     lineRenderer.positionCount = 0;
+            }
+        }
+    }
+
+    // 第二阶段：准心点击 掉2，让其下落，同时隐藏 2，显示 3
+    void HandleSecondStage()
+    {
+        if (!Input.GetMouseButtonDown(0)) return;
+
+        if (drawCamera == null)
+        {
+            Debug.LogWarning("DrawPath SecondStage: drawCamera 为空");
+            return;
+        }
+
+        Vector3 screenPos = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
+        Ray ray = drawCamera.ScreenPointToRay(screenPos);
+        RaycastHit hit;
+
+        // 只检测掉2所在的图层，避免被背景板 Rectangle 的碰撞体挡住
+        int layerMask = ~0;
+        if (objectDrop2 != null)
+        {
+            layerMask = 1 << objectDrop2.layer;
+        }
+
+        if (Physics.Raycast(ray, out hit, 100f, layerMask))
+        {
+            Debug.Log("DrawPath SecondStage: Raycast hit " + hit.collider.name);
+
+            if (objectDrop2 != null && hit.collider != null &&
+                (hit.collider.gameObject == objectDrop2 || hit.collider.transform.IsChildOf(objectDrop2.transform)))
+            {
+                // 掉2 开始下落
+                ObjectManager manager = objectDrop2.GetComponent<ObjectManager>();
+                if (manager != null)
+                {
+                    manager.StartFalling();
+                }
+
+                // 隐藏 2，显示 3
+                if (object2 != null) object2.SetActive(false);
+                if (object3 != null) object3.SetActive(true);
+
+                secondStageDone = true;
+            }
+            else
+            {
+                Debug.Log("DrawPath SecondStage: 点击到的不是 掉2，而是 " + hit.collider.name);
             }
         }
     }
