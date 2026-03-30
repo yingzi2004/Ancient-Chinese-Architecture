@@ -209,10 +209,131 @@ public class DialogueManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 开始自动对话序列（无选项）
+    /// </summary>
+    public void StartAutoDialogue(string npcName, string[] dialogueSequence)
+    {
+        Debug.Log($"DialogueManager: 开始自动对话序列 - NPC: {npcName}, 对话数量: {dialogueSequence?.Length ?? 0}");
+
+        isDialogueActive = true;
+
+        // 显示对话面板
+        if (dialoguePanel != null)
+        {
+            dialoguePanel.SetActive(true);
+            Debug.Log("DialogueManager: 显示对话面板");
+        }
+        else
+        {
+            Debug.LogError("DialogueManager: dialoguePanel 为空，无法显示对话！");
+            return;
+        }
+
+        // 设置NPC名称
+        if (npcNameText != null)
+        {
+            npcNameText.text = npcName;
+            Debug.Log($"DialogueManager: 设置NPC名称: {npcName}");
+        }
+        else
+        {
+            Debug.LogError("DialogueManager: npcNameText 为空！");
+        }
+
+        // 开始播放对话序列
+        StartCoroutine(PlayDialogueSequence(dialogueSequence));
+    }
+
+    /// <summary>
+    /// 播放对话序列协程
+    /// </summary>
+    private IEnumerator PlayDialogueSequence(string[] dialogueSequence)
+    {
+        if (dialogueSequence == null || dialogueSequence.Length == 0)
+        {
+            Debug.LogWarning("DialogueManager: 对话序列为空！");
+            EndDialogue();
+            yield break;
+        }
+
+        // 清除之前的协程
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+        }
+        if (autoCloseCoroutine != null)
+        {
+            StopCoroutine(autoCloseCoroutine);
+        }
+
+        // 逐句播放
+        for (int i = 0; i < dialogueSequence.Length; i++)
+        {
+            Debug.Log($"DialogueManager: 播放第 {i + 1}/{dialogueSequence.Length} 句对话");
+
+            // 清除旧的选项按钮（如果有）
+            if (optionsContainer != null)
+            {
+                foreach (Transform child in optionsContainer)
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+
+            // 打字机效果显示当前句
+            if (typingCoroutine != null)
+            {
+                StopCoroutine(typingCoroutine);
+            }
+
+            typingCoroutine = StartCoroutine(TypeTextSingle(dialogueSequence[i]));
+
+            // 等待打字完成
+            yield return typingCoroutine;
+
+            // 每句之间暂停一下，让玩家有时间阅读
+            float readingTime = Mathf.Max(2f, dialogueSequence[i].Length * 0.05f + 1f);
+            Debug.Log($"DialogueManager: 等待阅读时间: {readingTime:F2}秒");
+            yield return new WaitForSeconds(readingTime);
+        }
+
+        // 序列播放完毕，延迟后关闭
+        Debug.Log("DialogueManager: 对话序列播放完毕");
+        autoCloseCoroutine = StartCoroutine(AutoCloseDialogue());
+    }
+
+    /// <summary>
+    /// 单句打字机效果
+    /// </summary>
+    private IEnumerator TypeTextSingle(string text)
+    {
+        Debug.Log($"DialogueManager: TypeTextSingle 开始，文本长度: {text?.Length ?? 0}");
+
+        if (dialogueText == null)
+        {
+            Debug.LogError("DialogueManager: dialogueText 为空，无法显示打字机效果！");
+            yield break;
+        }
+
+        dialogueText.text = "";
+
+        // 逐字显示文本
+        foreach (char c in text)
+        {
+            dialogueText.text += c;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+
+        Debug.Log("DialogueManager: 单句打字机效果完成");
+    }
+
+    /// <summary>
     /// 显示对话内容和选项
     /// </summary>
     private void ShowDialogue(string text, DialogueOption[] options)
     {
+        Debug.Log($"DialogueManager: ShowDialogue 被调用，文本: '{text}'，选项数量: {(options != null ? options.Length : 0)}");
+
         // 清除之前的自动关闭
         if (autoCloseCoroutine != null)
         {
@@ -227,6 +348,8 @@ public class DialogueManager : MonoBehaviour
 
         // 开始新的打字机效果
         typingCoroutine = StartCoroutine(TypeText(text, options));
+
+        Debug.Log("DialogueManager: 打字机协程已启动");
     }
 
     /// <summary>
@@ -234,16 +357,33 @@ public class DialogueManager : MonoBehaviour
     /// </summary>
     private IEnumerator TypeText(string text, DialogueOption[] options)
     {
-        if (dialogueText == null) yield break;
+        Debug.Log($"DialogueManager: TypeText 开始，文本长度: {text?.Length ?? 0}，选项数量: {(options != null ? options.Length : 0)}");
+
+        if (dialogueText == null)
+        {
+            Debug.LogError("DialogueManager: dialogueText 为空，无法显示打字机效果！");
+            yield break;
+        }
 
         dialogueText.text = "";
+        int charCount = 0;
 
         // 逐字显示文本
         foreach (char c in text)
         {
             dialogueText.text += c;
+            charCount++;
+
+            // 每10个字符输出一次进度
+            if (charCount % 10 == 0)
+            {
+                Debug.Log($"DialogueManager: 打字进度 {charCount}/{text.Length}");
+            }
+
             yield return new WaitForSeconds(typingSpeed);
         }
+
+        Debug.Log("DialogueManager: 打字机效果完成，准备显示选项");
 
         // 打字完成后显示选项
         ShowOptions(options);
@@ -254,6 +394,8 @@ public class DialogueManager : MonoBehaviour
     /// </summary>
     private void ShowOptions(DialogueOption[] options)
     {
+        Debug.Log($"DialogueManager: ShowOptions 被调用，选项数量: {(options != null ? options.Length : 0)}");
+
         // 清除旧的选项按钮
         if (optionsContainer != null)
         {
@@ -265,6 +407,8 @@ public class DialogueManager : MonoBehaviour
             // 创建新的选项按钮
             if (options != null && options.Length > 0)
             {
+                Debug.Log($"DialogueManager: 开始创建 {options.Length} 个选项按钮");
+
                 foreach (DialogueOption option in options)
                 {
                     CreateOptionButton(option);
@@ -272,9 +416,14 @@ public class DialogueManager : MonoBehaviour
             }
             else
             {
+                Debug.Log("DialogueManager: 没有选项，将自动关闭对话框");
                 // 如果没有选项，自动关闭对话框
                 autoCloseCoroutine = StartCoroutine(AutoCloseDialogue());
             }
+        }
+        else
+        {
+            Debug.LogError("DialogueManager: optionsContainer 为空，无法显示选项！");
         }
     }
 
@@ -283,20 +432,88 @@ public class DialogueManager : MonoBehaviour
     /// </summary>
     private void CreateOptionButton(DialogueOption option)
     {
-        if (optionButtonPrefab == null || optionsContainer == null) return;
+        if (optionButtonPrefab == null)
+        {
+            Debug.LogError("DialogueManager: optionButtonPrefab 为空，尝试从Resources加载");
+
+            // 尝试从Resources加载
+            optionButtonPrefab = Resources.Load<GameObject>("Prefabs/OptionButton");
+            if (optionButtonPrefab == null)
+            {
+                Debug.LogError("DialogueManager: 无法从Resources加载OptionButton预制体！");
+                return;
+            }
+            else
+            {
+                Debug.Log("DialogueManager: 成功从Resources加载OptionButton预制体");
+            }
+        }
+
+        if (optionsContainer == null)
+        {
+            Debug.LogError("DialogueManager: optionsContainer 为空，无法创建选项按钮！");
+            return;
+        }
+
+        Debug.Log($"DialogueManager: 创建选项按钮 - {option.optionText}");
 
         GameObject buttonObj = Instantiate(optionButtonPrefab, optionsContainer);
         Button button = buttonObj.GetComponent<Button>();
-        Text buttonText = buttonObj.GetComponentInChildren<Text>();
+
+        // 更可靠的Text组件查找方式
+        Text buttonText = null;
+
+        // 方法1: 尝试在直接子对象中查找名为"Text"的对象
+        Transform textTransform = buttonObj.transform.Find("Text");
+        if (textTransform != null)
+        {
+            buttonText = textTransform.GetComponent<Text>();
+        }
+
+        // 方法2: 如果没找到，使用GetComponentInChildren
+        if (buttonText == null)
+        {
+            buttonText = buttonObj.GetComponentInChildren<Text>(false); // false表示不包括非活动对象
+        }
+
+        // 方法3: 还是没找到，包括非活动对象
+        if (buttonText == null)
+        {
+            buttonText = buttonObj.GetComponentInChildren<Text>(true);
+        }
 
         if (buttonText != null)
         {
             buttonText.text = option.optionText;
+            Debug.Log($"DialogueManager: 选项按钮文字已设置为: {option.optionText}");
+
+            // 确保Text组件是激活的
+            if (!buttonText.gameObject.activeSelf)
+            {
+                buttonText.gameObject.SetActive(true);
+                Debug.Log("DialogueManager: Text对象已激活");
+            }
+
+            // 确保Text组件启用
+            if (!buttonText.enabled)
+            {
+                buttonText.enabled = true;
+                Debug.Log("DialogueManager: Text组件已启用");
+            }
+        }
+        else
+        {
+            Debug.LogError("DialogueManager: 选项按钮中没有找到Text组件！请确保预制体包含Text组件。尝试查找的路径：buttonObj.transform.Find('Text') 或 GetComponentInChildren<Text>()");
         }
 
         if (button != null)
         {
             button.onClick.AddListener(() => OnOptionSelected(option));
+            Debug.Log("DialogueManager: 选项按钮点击事件已添加");
+        }
+        else
+        {
+            Debug.LogWarning("DialogueManager: 选项按钮中没有找到Button组件");
         }
     }
 
@@ -305,6 +522,8 @@ public class DialogueManager : MonoBehaviour
     /// </summary>
     private void OnOptionSelected(DialogueOption option)
     {
+        Debug.Log($"DialogueManager: 选中选项 - {option.optionText}");
+
         // 清除选项
         if (optionsContainer != null)
         {
@@ -314,10 +533,20 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        // 显示NPC回复
+        // 显示NPC回复，并传入后续选项
         if (!string.IsNullOrEmpty(option.responseText))
         {
-            ShowDialogue(option.responseText, null); // null表示没有更多选项
+            // 检查是否有后续选项
+            if (option.followUpOptions != null && option.followUpOptions.Length > 0)
+            {
+                Debug.Log($"DialogueManager: 显示回复并显示 {option.followUpOptions.Length} 个后续选项");
+                ShowDialogue(option.responseText, option.followUpOptions);
+            }
+            else
+            {
+                Debug.Log("DialogueManager: 显示回复，无后续选项，将自动关闭");
+                ShowDialogue(option.responseText, null); // null表示没有更多选项
+            }
         }
         else
         {
