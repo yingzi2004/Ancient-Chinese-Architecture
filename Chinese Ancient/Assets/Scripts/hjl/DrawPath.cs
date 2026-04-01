@@ -23,6 +23,10 @@ public class DrawPath : MonoBehaviour
     public GameObject objectDrop2;    // 掉2物体
     public GameObject object3;        // 3成品
 
+    [Header("Stage2 Click Settings")]
+    // 准心与掉2屏幕位置距离小于这个像素，就认为点中了掉2
+    public float drop2ClickRadius = 80f;
+
     private List<Vector3> points = new List<Vector3>();
 
     // 认为“绕一圈”所需的最少采样点数量，可以在 Inspector 中调整
@@ -176,47 +180,34 @@ public class DrawPath : MonoBehaviour
     {
         if (!Input.GetMouseButtonDown(0)) return;
 
-        if (drawCamera == null)
+        if (drawCamera == null || objectDrop2 == null)
         {
-            Debug.LogWarning("DrawPath SecondStage: drawCamera 为空");
+            Debug.LogWarning("DrawPath SecondStage: drawCamera 或 objectDrop2 为空");
             return;
         }
 
-        Vector3 screenPos = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
-        Ray ray = drawCamera.ScreenPointToRay(screenPos);
-        RaycastHit hit;
+        // 掉2 在屏幕上的坐标
+        Vector3 drop2ScreenPos = drawCamera.WorldToScreenPoint(objectDrop2.transform.position);
+        Vector2 center = new Vector2(Screen.width / 2f, Screen.height / 2f);
+        float dist = Vector2.Distance(center, new Vector2(drop2ScreenPos.x, drop2ScreenPos.y));
 
-        // 只检测掉2所在的图层，避免被背景板 Rectangle 的碰撞体挡住
-        int layerMask = ~0;
-        if (objectDrop2 != null)
+        Debug.Log($"DrawPath SecondStage: drop2ScreenPos={drop2ScreenPos}, dist={dist}");
+
+        // 距离足够近，认为准心点中了掉2
+        if (dist <= drop2ClickRadius)
         {
-            layerMask = 1 << objectDrop2.layer;
-        }
-
-        if (Physics.Raycast(ray, out hit, 100f, layerMask))
-        {
-            Debug.Log("DrawPath SecondStage: Raycast hit " + hit.collider.name);
-
-            if (objectDrop2 != null && hit.collider != null &&
-                (hit.collider.gameObject == objectDrop2 || hit.collider.transform.IsChildOf(objectDrop2.transform)))
+            // 掉2 开始下落
+            ObjectManager manager = objectDrop2.GetComponent<ObjectManager>();
+            if (manager != null)
             {
-                // 掉2 开始下落
-                ObjectManager manager = objectDrop2.GetComponent<ObjectManager>();
-                if (manager != null)
-                {
-                    manager.StartFalling();
-                }
-
-                // 隐藏 2，显示 3
-                if (object2 != null) object2.SetActive(false);
-                if (object3 != null) object3.SetActive(true);
-
-                secondStageDone = true;
+                manager.StartFalling();
             }
-            else
-            {
-                Debug.Log("DrawPath SecondStage: 点击到的不是 掉2，而是 " + hit.collider.name);
-            }
+
+            // 隐藏 2，显示 3
+            if (object2 != null) object2.SetActive(false);
+            if (object3 != null) object3.SetActive(true);
+
+            secondStageDone = true;
         }
     }
 
