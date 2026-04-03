@@ -27,6 +27,10 @@ public class DrawPath : MonoBehaviour
     // 准心与掉2屏幕位置距离小于这个像素，就认为点中了掉2
     public float drop2ClickRadius = 80f;
 
+    [Header("Stage1 Draw Settings")]
+    // 距离物体多远以内才可以画线
+    public float maxDrawDistance = 3f;
+
     private List<Vector3> points = new List<Vector3>();
 
     // 认为“绕一圈”所需的最少采样点数量，可以在 Inspector 中调整
@@ -90,6 +94,22 @@ public class DrawPath : MonoBehaviour
     // 第一阶段：画线裁剪 1 + fanwei，触发 掉1
     void HandleFirstStage()
     {
+        // 如果玩家距离游戏区域（object1）超过设定的最大距离，则不允许画线
+        if (object1 != null && drawCamera != null)
+        {
+            float distToArea = Vector3.Distance(drawCamera.transform.position, object1.transform.position);
+            if (distToArea > maxDrawDistance)
+            {
+                // 可以选择清空已有的线条并直接返回
+                if (Input.GetMouseButtonUp(0))
+                {
+                    points.Clear();
+                    if (lineRenderer != null) lineRenderer.positionCount = 0;
+                }
+                return;
+            }
+        }
+
         // 鼠标按下，开始绘制，清空之前的轨迹
         if (Input.GetMouseButtonDown(0))
         {
