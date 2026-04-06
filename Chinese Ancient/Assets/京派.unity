@@ -441,6 +441,8 @@ MonoBehaviour:
   autoDialogueSequence:
   - "\u80FD\u4ECB\u7ECD\u4E00\u4E0B\u7948\u5E74\u6BBF\u5417"
   - "\u597D\u5440,\u7948\u5E74\u6BBF\u662F\u660E\u6E05\u4E24\u4EE3\u7687\u5E1D\u796D\u5929\u3001\u7948\u8C37\u7684\u795E\u5723\u573A\u6240\uFF0C\u5EFA\u4E8E\u660E\u6C38\u4E50\u5341\u516B\u5E74\uFF0C\u5DF2\u6709600\u591A\u5E74\u5386\u53F2\u4E86\u3002\u4F60\u770B\u8FD9\u5B8F\u4F1F\u7684\u5EFA\u7B51\uFF0C\u76F4\u5F8432\u7C73\uFF0C\u9AD838\u7C73\uFF0C\u5168\u90E8\u91C7\u7528\u6728\u8D28\u7ED3\u6784\uFF0C\u6CA1\u7528\u4E00\u9897\u9489\u5B50\uFF01"
+  - "\u54C7\u585E,\u597D\u5389\u5BB3\u554A"
+  - "\u5F53\u7136\u5566,\u8FD8\u6709\u6BBF\u5185\u768428\u6839\u6960\u6728\u5927\u67F1\u4E5F\u5404\u6709\u5BD3\u610F\u2014\u2014\u4E2D\u95F44\u6839\u9F99\u4E95\u67F1\u4EE3\u8868\u4E00\u5E74\u56DB\u5B63\uFF0C\u4E2D\u570812\u6839\u8C61\u5F81\u5341\u4E8C\u4E2A\u6708\uFF0C\u5916\u570812\u6839\u5BF9\u5E94\u5341\u4E8C\u65F6\u8FB0\uFF0C\u52A0\u8D77\u6765\u6070\u597D\u662F28\u661F\u5BBF\uFF0C\u662F\u4E0D\u662F\u5F88\u795E\u5947"
   dialogueOptions: []
   player: {fileID: 1724057531}
   playerTag: player
@@ -1370,7 +1372,9 @@ MonoBehaviour:
   optionsContainer: {fileID: 1581341333}
   optionButtonPrefab: {fileID: 3454552674252206463, guid: 57531183883921444b49cbbdbb594edf, type: 3}
   typingSpeed: 0.05
-  autoCloseDelay: 3
+  autoCloseDelay: 2.5
+  continuePromptText: {fileID: 0}
+  advanceKey: 32
 --- !u!4 &563258694
 Transform:
   m_ObjectHideFlags: 0
@@ -2371,6 +2375,85 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3218504196327248855, guid: 972c378e51b4b1b458167da621a28fd0, type: 3}
   m_PrefabInstance: {fileID: 857854254}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1018114759
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1018114760}
+  - component: {fileID: 1018114762}
+  - component: {fileID: 1018114761}
+  m_Layer: 0
+  m_Name: ContinuePrompt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1018114760
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018114759}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1104364156}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 160, y: 30}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1018114761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018114759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: New Text
+--- !u!222 &1018114762
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018114759}
+  m_CullTransparentMesh: 1
 --- !u!1001 &1031942033
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2500,6 +2583,7 @@ RectTransform:
   - {fileID: 845530482}
   - {fileID: 554794938}
   - {fileID: 1581341333}
+  - {fileID: 1018114760}
   m_Father: {fileID: 1595495004}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}

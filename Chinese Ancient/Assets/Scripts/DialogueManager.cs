@@ -34,9 +34,22 @@ public class DialogueManager : MonoBehaviour
     [Tooltip("自动关闭延迟（对话结束后）")]
     public float autoCloseDelay = 3f;
 
+    [Tooltip("继续提示文本")]
+    public Text continuePromptText;
+
+    [Header("按键设置")]
+    [Tooltip("推进对话的按键")]
+    public KeyCode advanceKey = KeyCode.L;
+
     private bool isDialogueActive = false;
     private Coroutine typingCoroutine;
     private Coroutine autoCloseCoroutine;
+
+    // 手动对话模式状态
+    private string[] currentDialogueSequence;
+    private int currentDialogueIndex = 0;
+    private bool isTyping = false;
+    private bool waitingForContinue = false;
 
     void Awake()
     {
@@ -54,6 +67,9 @@ public class DialogueManager : MonoBehaviour
 
     void Start()
     {
+        // 强制设置按键为L键
+        advanceKey = KeyCode.L;
+
         // 自动查找UI元素（如果没有手动赋值）
         AutoFindUIElements();
 
@@ -94,6 +110,58 @@ public class DialogueManager : MonoBehaviour
         if (dialoguePanel != null)
         {
             dialoguePanel.SetActive(false);
+        }
+
+        // 初始化继续提示文本
+        if (continuePromptText != null)
+        {
+            continuePromptText.gameObject.SetActive(false);
+        }
+    }
+
+    void Update()
+    {
+        // 检测推进对话按键
+        if (isDialogueActive && Input.GetKeyDown(advanceKey))
+        {
+            if (isTyping)
+            {
+                // 如果正在打字，立即完成打字
+                SkipTyping();
+            }
+            else if (waitingForContinue)
+            {
+                // 如果打字完成，推进到下一句
+                AdvanceDialogue();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 跳过打字效果，立即显示全部文本
+    /// </summary>
+    private void SkipTyping()
+    {
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+            typingCoroutine = null;
+        }
+
+        if (dialogueText != null && currentDialogueSequence != null && currentDialogueIndex < currentDialogueSequence.Length)
+        {
+            dialogueText.text = currentDialogueSequence[currentDialogueIndex];
+            isTyping = false;
+
+            Debug.Log("DialogueManager: 跳过打字效果，立即显示全部文本");
+
+            // 显示继续提示
+            if (continuePromptText != null)
+            {
+                continuePromptText.gameObject.SetActive(true);
+            }
+
+            waitingForContinue = true;
         }
     }
 
@@ -168,6 +236,25 @@ public class DialogueManager : MonoBehaviour
             else
             {
                 Debug.LogWarning("DialogueManager: 未找到OptionsButton预制体。请将预制体放在Assets/Resources/Prefabs/文件夹下，命名为'OptionButton'");
+            }
+        }
+
+        // 查找继续提示文本
+        if (continuePromptText == null)
+        {
+            Transform promptTransform = dialoguePanel.transform.Find("ContinuePrompt");
+            if (promptTransform != null)
+            {
+                continuePromptText = promptTransform.GetComponent<Text>();
+                if (continuePromptText != null)
+                {
+                    Debug.Log("DialogueManager: 自动找到ContinuePrompt文本");
+                    // 设置默认提示文本
+                    if (string.IsNullOrEmpty(continuePromptText.text))
+                    {
+                        continuePromptText.text = "按 L 键继续...";
+                    }
+                }
             }
         }
     }
@@ -256,6 +343,10 @@ public class DialogueManager : MonoBehaviour
             yield break;
         }
 
+        // 保存对话序列
+        currentDialogueSequence = dialogueSequence;
+        currentDialogueIndex = 0;
+
         // 清除之前的协程
         if (typingCoroutine != null)
         {
@@ -266,40 +357,114 @@ public class DialogueManager : MonoBehaviour
             StopCoroutine(autoCloseCoroutine);
         }
 
-        // 逐句播放
-        for (int i = 0; i < dialogueSequence.Length; i++)
+        // 显示第一句
+        ShowCurrentSentence();
+    }
+
+    /// <summary>
+    /// 显示当前句子
+    /// </summary>
+    private void ShowCurrentSentence()
+    {
+        if (currentDialogueSequence == null || currentDialogueIndex >= currentDialogueSequence.Length)
         {
-            Debug.Log($"DialogueManager: 播放第 {i + 1}/{dialogueSequence.Length} 句对话");
-
-            // 清除旧的选项按钮（如果有）
-            if (optionsContainer != null)
-            {
-                foreach (Transform child in optionsContainer)
-                {
-                    Destroy(child.gameObject);
-                }
-            }
-
-            // 打字机效果显示当前句
-            if (typingCoroutine != null)
-            {
-                StopCoroutine(typingCoroutine);
-            }
-
-            typingCoroutine = StartCoroutine(TypeTextSingle(dialogueSequence[i]));
-
-            // 等待打字完成
-            yield return typingCoroutine;
-
-            // 每句之间暂停一下，让玩家有时间阅读
-            float readingTime = Mathf.Max(2f, dialogueSequence[i].Length * 0.05f + 1f);
-            Debug.Log($"DialogueManager: 等待阅读时间: {readingTime:F2}秒");
-            yield return new WaitForSeconds(readingTime);
+            // 所有句子已显示完毕
+            Debug.Log("DialogueManager: 对话序列播放完毕");
+            autoCloseCoroutine = StartCoroutine(AutoCloseDialogue());
+            return;
         }
 
-        // 序列播放完毕，延迟后关闭
-        Debug.Log("DialogueManager: 对话序列播放完毕");
-        autoCloseCoroutine = StartCoroutine(AutoCloseDialogue());
+        Debug.Log($"DialogueManager: 播放第 {currentDialogueIndex + 1}/{currentDialogueSequence.Length} 句对话");
+
+        // 清除旧的选项按钮（如果有）
+        if (optionsContainer != null)
+        {
+            foreach (Transform child in optionsContainer)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
+        // 隐藏继续提示
+        if (continuePromptText != null)
+        {
+            continuePromptText.gameObject.SetActive(false);
+        }
+
+        // 开始打字机效果
+        waitingForContinue = false;
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+        }
+        typingCoroutine = StartCoroutine(TypeTextWithContinue(currentDialogueSequence[currentDialogueIndex]));
+    }
+
+    /// <summary>
+    /// 打字机效果（带继续等待）
+    /// </summary>
+    private IEnumerator TypeTextWithContinue(string text)
+    {
+        isTyping = true;
+
+        if (dialogueText == null)
+        {
+            Debug.LogError("DialogueManager: dialogueText 为空，无法显示打字机效果！");
+            yield break;
+        }
+
+        dialogueText.text = "";
+
+        // 逐字显示文本
+        foreach (char c in text)
+        {
+            dialogueText.text += c;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+
+        isTyping = false;
+        Debug.Log("DialogueManager: 打字机效果完成，等待玩家按空格键");
+
+        // 显示继续提示
+        if (continuePromptText != null)
+        {
+            continuePromptText.gameObject.SetActive(true);
+        }
+
+        // 等待玩家按空格键
+        waitingForContinue = true;
+    }
+
+    /// <summary>
+    /// 推进到下一句对话
+    /// </summary>
+    private void AdvanceDialogue()
+    {
+        Debug.Log("DialogueManager: 玩家按下L键，推进对话");
+
+        waitingForContinue = false;
+
+        // 隐藏继续提示
+        if (continuePromptText != null)
+        {
+            continuePromptText.gameObject.SetActive(false);
+        }
+
+        // 移动到下一句
+        currentDialogueIndex++;
+
+        // 检查是否已经显示完所有句子
+        if (currentDialogueIndex >= currentDialogueSequence.Length)
+        {
+            // 对话结束，立即关闭对话框
+            Debug.Log("DialogueManager: 对话序列播放完毕，立即关闭");
+            EndDialogue();
+        }
+        else
+        {
+            // 显示下一句
+            ShowCurrentSentence();
+        }
     }
 
     /// <summary>
@@ -580,11 +745,23 @@ public class DialogueManager : MonoBehaviour
         }
 
         isDialogueActive = false;
+        isTyping = false;
+        waitingForContinue = false;
+
+        // 重置对话序列状态
+        currentDialogueSequence = null;
+        currentDialogueIndex = 0;
 
         // 隐藏对话面板
         if (dialoguePanel != null)
         {
             dialoguePanel.SetActive(false);
+        }
+
+        // 隐藏继续提示
+        if (continuePromptText != null)
+        {
+            continuePromptText.gameObject.SetActive(false);
         }
 
         // 清除选项
