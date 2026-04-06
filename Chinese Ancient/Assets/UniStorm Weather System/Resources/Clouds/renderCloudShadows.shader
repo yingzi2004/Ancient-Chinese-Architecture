@@ -71,9 +71,9 @@
         float3 cloud = tex2Dlod(_MainTex, float4(uv.xy, 0.0f, 1.0f)).rgb - float3(0.0f, 1.0f, 0.0f);
 
         float n = norY * norY;
-        n *= cloud.b;
-        n += pow(1.0f - norY, 16.0f);
-        return remap(cloud.r - n, cloud.g, 1.0f);
+        //n *= cloud.b;
+        n += pow(1.0f - norY, 36.0f);
+        return remap(cloud.r - n, cloud.g - n, 1.0f);
     }
 
     float cloudMap(float2 pos, float norY)
@@ -86,8 +86,13 @@
         m -= dstrength * _uCloudsDetailStrength * 0.6f;
 
         //m = smoothstep(0.0f, _uCloudsBaseEdgeSoftness, m + ((_uCloudsCoverage + _uCloudsCoverageBias + 0.15f) - 1.0f));
-		m = smoothstep(0.0f, clamp(_uCloudsBaseEdgeSoftness, 0.12, 0.14), m + ((_uCloudsCoverage + _uCloudsCoverageBias + 0.15f) - 1.0f));
-        m *= linearstep0(0.15, norY);
+#if UNITY_COLORSPACE_GAMMA
+		m = smoothstep(0.0f, clamp(_uCloudsBaseEdgeSoftness, 0.01, 0.05), m + ((_uCloudsCoverage + _uCloudsCoverageBias + 0.14f) - 1.0f)); //Was  + _uCloudsCoverageBias + 0.15f
+#else
+		m = smoothstep(0.0f, clamp(_uCloudsBaseEdgeSoftness, 0.01, 0.05), m + ((_uCloudsCoverage + _uCloudsCoverageBias + 0.07f) - 1.0f)); //Was  + _uCloudsCoverageBias + 0.15f
+#endif
+
+        m *= linearstep0(0.05, norY);
 
 		//return 1.0f - saturate(m * _uCloudsDensity) * 2.0f;
         return 1.0f - saturate(m * clamp(_uCloudsDensity, 0.9, 1)) * 2.0f;

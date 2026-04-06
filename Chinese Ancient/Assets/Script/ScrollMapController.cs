@@ -134,6 +134,7 @@ public class ScrollMapController : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip scrollOpenClip;
     [SerializeField] private AudioClip buildingAppearClip;
+    [SerializeField] private AudioClip windBlowClip;
 
     [Header("══ 动画控制 ══")]
     [Tooltip("是否强制在唤出时播放卷轴打开动画？")]
@@ -331,7 +332,7 @@ public class ScrollMapController : MonoBehaviour
     private void InitializeUI()
     {
         // 音频兜底：如果配置了音效但未手动拖 AudioSource，则自动补一个
-        if (audioSource == null && (scrollOpenClip != null || buildingAppearClip != null))
+        if (audioSource == null && (scrollOpenClip != null || buildingAppearClip != null || windBlowClip != null))
         {
             audioSource = GetComponent<AudioSource>();
             if (audioSource == null)
@@ -851,7 +852,14 @@ public class ScrollMapController : MonoBehaviour
         {
             if (dialogueText != null)
             {
+                // 在“风吹过”这句开始打字时同步播放风声音效
+                if (i == openingDialogue.Length - 1 && audioSource != null && windBlowClip != null)
+                {
+                    audioSource.PlayOneShot(windBlowClip);
+                }
+
                 yield return StartCoroutine(TypewriterEffect(openingDialogue[i]));
+
                 yield return new WaitForSeconds(dialoguePauseDuration);
             }
         }

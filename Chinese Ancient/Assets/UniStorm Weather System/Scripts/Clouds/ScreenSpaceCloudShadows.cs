@@ -3,9 +3,11 @@ using System.Collections;
 
 namespace UniStorm.Effects
 {
-    [ExecuteInEditMode]
+    //[ExecuteInEditMode]
     public class ScreenSpaceCloudShadows : MonoBehaviour
     {
+        [HideInInspector]
+        public float Fade = 0.33f;
         [HideInInspector]
         public RenderTexture CloudShadowTexture;
         [HideInInspector]
@@ -36,18 +38,22 @@ namespace UniStorm.Effects
 
         void OnRenderImage(RenderTexture src, RenderTexture dest)
         {
-            //Set shader properties
-            ScreenSpaceShadowsMaterial.SetMatrix("_CamToWorld", UniStormSystem.Instance.PlayerCamera.cameraToWorldMatrix);         
-            ScreenSpaceShadowsMaterial.SetTexture("_CloudTex", CloudShadowTexture);
-            ScreenSpaceShadowsMaterial.SetFloat("_CloudTexScale", CloudTextureScale + (UniStormSystem.Instance.m_CurrentCloudHeight * 0.000001f - 0.001f) * 0.5f);
-            ScreenSpaceShadowsMaterial.SetFloat("_BottomThreshold", BottomThreshold);
-            ScreenSpaceShadowsMaterial.SetFloat("_TopThreshold", TopThreshold);
-            ScreenSpaceShadowsMaterial.SetFloat("_CloudShadowIntensity", ShadowIntensity);
-            ScreenSpaceShadowsMaterial.SetFloat("_CloudMovementSpeed", UniStormSystem.Instance.CloudSpeed * 0.01f * -0.5f);
-            ScreenSpaceShadowsMaterial.SetVector("_SunDirection", new Vector3(ShadowDirection.x, ShadowDirection.y, ShadowDirection.z));
+            if (Application.isPlaying && UniStormSystem.Instance.UniStormInitialized)
+            {
+                //Set shader properties
+                ScreenSpaceShadowsMaterial.SetMatrix("_CamToWorld", UniStormSystem.Instance.PlayerCamera.cameraToWorldMatrix);
+                ScreenSpaceShadowsMaterial.SetTexture("_CloudTex", CloudShadowTexture);
+                ScreenSpaceShadowsMaterial.SetFloat("_CloudTexScale", CloudTextureScale + (UniStormSystem.Instance.m_CurrentCloudHeight * 0.000001f) * 2);
+                ScreenSpaceShadowsMaterial.SetFloat("_BottomThreshold", BottomThreshold);
+                ScreenSpaceShadowsMaterial.SetFloat("_TopThreshold", TopThreshold);
+                ScreenSpaceShadowsMaterial.SetFloat("_CloudShadowIntensity", ShadowIntensity);
+                ScreenSpaceShadowsMaterial.SetFloat("_CloudMovementSpeed", UniStormSystem.Instance.CloudSpeed * -0.005f);
+                ScreenSpaceShadowsMaterial.SetVector("_SunDirection", new Vector3(ShadowDirection.x, ShadowDirection.y, ShadowDirection.z));
+                ScreenSpaceShadowsMaterial.SetFloat("_Fade", Fade);
 
-            //Execute the shader on input texture (src) and write to output (dest)
-            Graphics.Blit(src, dest, ScreenSpaceShadowsMaterial);
+                //Execute the shader on input texture (src) and write to output (dest)
+                Graphics.Blit(src, dest, ScreenSpaceShadowsMaterial);
+            }
         }
     }
 }

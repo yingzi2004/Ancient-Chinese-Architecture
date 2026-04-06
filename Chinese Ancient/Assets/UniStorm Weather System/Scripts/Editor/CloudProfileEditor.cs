@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
 
 namespace UniStorm.Utility
 {
@@ -39,7 +41,7 @@ namespace UniStorm.Utility
 
             if (GUILayout.Button(new GUIContent(HelpIcon), HelpStyle, GUILayout.ExpandWidth(true), GUILayout.Height(22.5f)))
             {
-                Application.OpenURL("https://docs.google.com/document/d/1uL_oMqHC_EduRGEnOihifwcpkQmWX9rubGw8qjkZ4b4/edit#heading=h.ol0c5nizkir6");
+                Application.OpenURL("https://github.com/Black-Horizon-Studios/UniStorm-Weather-System/wiki/Creating-a-Custom-Cloud-Profile#creating-a-custom-cloud-profile");
             }
 
             GUI.backgroundColor = new Color(0.25f, 0.25f, 0.25f, 0.5f);
@@ -50,7 +52,6 @@ namespace UniStorm.Utility
                 "variants and make each Weather Type unique. Cloud Profiles can only be used with volumetric clouds.", EditorStyles.helpBox);
             GUI.backgroundColor = Color.white;
             EditorGUILayout.Space();
-            //EditorGUILayout.LabelField(self.ProfileName, style, GUILayout.ExpandWidth(true));
             GUILayout.Space(2);
             EditorGUILayout.LabelField(new GUIContent(CloudProfileIcon), style, GUILayout.ExpandWidth(true), GUILayout.Height(64));
 
@@ -91,21 +92,26 @@ namespace UniStorm.Utility
             GUI.backgroundColor = Color.white;
             EditorGUILayout.Space();
 
-            self.CoverageBias = EditorGUILayout.Slider("Coverage Bias", self.CoverageBias, -0.05f, 0.05f);
+            self.CoverageBias = EditorGUILayout.Slider("Coverage Bias", self.CoverageBias, -0.05f, 0.1f);
             GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.19f);
             EditorGUILayout.LabelField("Controls the Coverage Bias of UniStorm's clouds for this profile. This is useful if the cloud clover is too full or not enough.", EditorStyles.helpBox);
             GUI.backgroundColor = Color.white;
             EditorGUILayout.Space();
 
-            /*
-            self.DetailScale = EditorGUILayout.IntSlider("Detail Scale", self.DetailScale, 600, 1000);
-            GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.19f);
-            EditorGUILayout.LabelField("Controls the Detail Scale of UniStorm's clouds for this profile. The Detail Scale controls the scale of the detail on the clouds.", EditorStyles.helpBox);
-            GUI.backgroundColor = Color.white;
-            EditorGUILayout.Space();
-            */
-
             EditorGUILayout.EndVertical();
+
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+            {
+                Undo.RecordObject(self, "Undo");
+
+                if (GUI.changed)
+                {
+                    EditorUtility.SetDirty(target);
+                    EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+                }
+            }
+#endif
         }
     }
 }
