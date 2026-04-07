@@ -435,7 +435,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6e59408ea7124447bdd77c4ded7615a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  npcName: "\u5C0F\u8C37"
+  npcName: "\u6309L\u952E\u7EE7\u7EED         \u5C0F\u8C37"
   greetingText: "\u4F60\u597D\u5440,\u6211\u662F\u5C0F\u8C37,\u6B22\u8FCE\u6765\u5230\u7948\u5E74\u6BBF,\u4F60\u6709\u4EC0\u4E48\u60F3\u4E86\u89E3\u7684\u5417"
   useAutoDialogue: 1
   autoDialogueSequence:
@@ -1797,8 +1797,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 3724, y: -512}
-  m_SizeDelta: {x: 800, y: 800}
+  m_AnchoredPosition: {x: 3698, y: -523}
+  m_SizeDelta: {x: 5000, y: 800}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &845530483
 CanvasRenderer:
@@ -1841,7 +1841,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u5C0F\u8C37"
+  m_Text: "\u6309L\u952E\u7EE7\u7EED         \u5C0F\u8C37"
 --- !u!1 &846023488
 GameObject:
   m_ObjectHideFlags: 0
@@ -2589,7 +2589,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 8, y: 124}
-  m_SizeDelta: {x: 8000, y: 2000}
+  m_SizeDelta: {x: 8000, y: 2105.2632}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1104364157
 MonoBehaviour:
@@ -3490,7 +3490,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
@@ -3622,6 +3622,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3717965258831531247, guid: 28857cf3dcafefe4a92260852800f777, type: 3}
       propertyPath: unlockedArray.Array.data[3]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7292476555799164409, guid: 28857cf3dcafefe4a92260852800f777, type: 3}
+      propertyPath: m_UiScaleMode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8886880707601062076, guid: 28857cf3dcafefe4a92260852800f777, type: 3}
