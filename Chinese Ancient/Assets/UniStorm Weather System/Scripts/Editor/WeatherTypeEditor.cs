@@ -17,20 +17,32 @@ namespace UniStorm.Utility
         public Texture PrecipitationIcon;
         public Texture NonPrecipitationIcon;
         Texture HelpIcon;
+        private SerializedProperty FogColorProp;
+        private SerializedProperty OverrideFogColorProp;
+        private SerializedProperty OverrideCameraFogHeightProp;
+        private SerializedProperty CloudColorProp;
+        private SerializedProperty OverrideCloudColorProp;
 
         void OnEnable()
         {
             WeatherType self = (WeatherType)target;
 
+            FogColorProp = serializedObject.FindProperty("FogColor");
+            OverrideFogColorProp = serializedObject.FindProperty("OverrideFogColor");
+            OverrideCameraFogHeightProp = serializedObject.FindProperty("OverrideCameraFogHeight");
+            CloudColorProp = serializedObject.FindProperty("CloudColor");
+            OverrideCloudColorProp = serializedObject.FindProperty("OverrideCloudColor");
+
             if (PrecipitationIcon == null && self.CustomizeWeatherIcon == WeatherType.Yes_No.No || PrecipitationIcon == null) PrecipitationIcon = Resources.Load("PrecipitationIcon") as Texture;
             if (NonPrecipitationIcon == null && self.CustomizeWeatherIcon == WeatherType.Yes_No.No || NonPrecipitationIcon == null)
                 NonPrecipitationIcon = Resources.Load("NonPrecipitationIcon") as Texture;
-
             if (HelpIcon == null) HelpIcon = Resources.Load("HelpIcon") as Texture;
         }
 
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
+
             WeatherType self = (WeatherType)target;
 
             GUIStyle TitleStyle = new GUIStyle(EditorStyles.toolbarButton);
@@ -45,14 +57,14 @@ namespace UniStorm.Utility
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
 
-            EditorGUILayout.BeginVertical(GUILayout.Width(90 * Screen.width / 100));
+            EditorGUILayout.BeginVertical(GUILayout.Width(90 * Screen.width / Screen.dpi));
             if (self.PrecipitationWeatherType == WeatherType.Yes_No.Yes)
             {
                 var style = new GUIStyle(EditorStyles.boldLabel) { alignment = TextAnchor.MiddleCenter };
 
                 if (GUILayout.Button(new GUIContent(HelpIcon), HelpStyle, GUILayout.ExpandWidth(true), GUILayout.Height(22.5f)))
                 {
-                    Application.OpenURL("https://docs.google.com/document/d/1uL_oMqHC_EduRGEnOihifwcpkQmWX9rubGw8qjkZ4b4/edit#heading=h.ol0c5nizkir6");
+                    Application.OpenURL("https://github.com/Black-Horizon-Studios/UniStorm-Weather-System/wiki/Creating-a-Custom-Weather-Type#creating-a-custom-weather-type");
                 }
 
                 EditorGUILayout.LabelField(self.WeatherTypeName, style, GUILayout.ExpandWidth(true));
@@ -65,7 +77,7 @@ namespace UniStorm.Utility
 
                 if (GUILayout.Button(new GUIContent(HelpIcon), HelpStyle, GUILayout.ExpandWidth(true), GUILayout.Height(22.5f)))
                 {
-                    Application.OpenURL("https://docs.google.com/document/d/1uL_oMqHC_EduRGEnOihifwcpkQmWX9rubGw8qjkZ4b4/edit#heading=h.ol0c5nizkir6");
+                    Application.OpenURL("https://github.com/Black-Horizon-Studios/UniStorm-Weather-System/wiki/Creating-a-Custom-Weather-Type#creating-a-custom-weather-type");
                 }
 
                 EditorGUILayout.LabelField(self.WeatherTypeName, style, GUILayout.ExpandWidth(true));
@@ -78,8 +90,6 @@ namespace UniStorm.Utility
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
-
-
 
             EditorGUILayout.BeginVertical("Box");
             EditorGUILayout.Space();
@@ -141,13 +151,11 @@ namespace UniStorm.Utility
             EditorGUILayout.BeginVertical();
             GUILayout.Space(10);
 
-            //Added
             self.CloudProfileComponent = (CloudProfile)EditorGUILayout.ObjectField("Cloud Profile", self.CloudProfileComponent, typeof(CloudProfile), false);
             GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.19f);
             EditorGUILayout.LabelField("Controls the cloud profile this weather type will use.", EditorStyles.helpBox);
             GUI.backgroundColor = Color.white;
             EditorGUILayout.Space();
-            //Added
 
             self.PrecipitationWeatherType = (WeatherType.Yes_No)EditorGUILayout.EnumPopup("Precipitation Weather Type?", self.PrecipitationWeatherType);
             GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.19f);
@@ -181,13 +189,25 @@ namespace UniStorm.Utility
             GUI.backgroundColor = Color.white;
             EditorGUILayout.Space();
 
+            self.FogHeight = EditorGUILayout.Slider("Fog Height", self.FogHeight, 0.0f, 1.0f);
+            GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.19f);
+            EditorGUILayout.LabelField("Controls the height of UniStorm's fog on UniStorm's clouds. If the clouds look they've lost too much detail, this setting may be too high.", EditorStyles.helpBox);
+            GUI.backgroundColor = Color.white;
+            EditorGUILayout.Space();
+
+            self.FogLightFalloff = EditorGUILayout.Slider("Fog Light Intensity", self.FogLightFalloff, 0.0f, 1f);
+            GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.19f);
+            EditorGUILayout.LabelField("Controls how much the fog is affected by the sun and moon's light for this weather type.", EditorStyles.helpBox);
+            GUI.backgroundColor = Color.white;
+            EditorGUILayout.Space();
+
             self.WindIntensity = EditorGUILayout.Slider("Wind Intensity", self.WindIntensity, 0.0f, 4f);
             GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.19f);
             EditorGUILayout.LabelField("Controls UniStorm's Wind Zone intensity.", EditorStyles.helpBox);
             GUI.backgroundColor = Color.white;
             EditorGUILayout.Space();
 
-            self.CloudHeight = EditorGUILayout.IntSlider("Cloud Height", self.CloudHeight, 500, 1100);
+            self.CloudHeight = EditorGUILayout.IntSlider("Cloud Height", self.CloudHeight, 150, 1100);
             GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.19f);
             EditorGUILayout.LabelField("Controls the cloud height for this weather type.", EditorStyles.helpBox);
             GUI.backgroundColor = Color.white;
@@ -239,7 +259,6 @@ namespace UniStorm.Utility
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
             GUILayout.Space(15);
-
 
             //Effects
             GUI.backgroundColor = new Color(0.25f, 0.25f, 0.25f, 0.5f);
@@ -359,6 +378,86 @@ namespace UniStorm.Utility
 
             //Conditions
             GUI.backgroundColor = new Color(0.25f, 0.25f, 0.25f, 0.5f);
+            EditorGUILayout.LabelField("Overrides", TitleStyle);
+            GUI.backgroundColor = Color.white;
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+            EditorGUILayout.BeginVertical();
+            GUILayout.Space(10);
+
+            EditorGUILayout.PropertyField(OverrideCloudColorProp, new GUIContent("Overrride Cloud Color"));
+            GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.19f);
+            EditorGUILayout.LabelField("Allows this weather type to override the system's cloud color. This is useful for adding variation to weather types or special event or quest related weather types.", EditorStyles.helpBox);
+            GUI.backgroundColor = Color.white;
+
+            if (self.OverrideCloudColor == WeatherType.Yes_No.Yes)
+            {
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(15);
+                EditorGUILayout.BeginVertical();
+
+                EditorGUILayout.PropertyField(CloudColorProp, new GUIContent("Cloud Color"));
+                GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.19f);
+                EditorGUILayout.LabelField("A gradient that controls the cloud color for this weather type.", EditorStyles.helpBox);
+                GUI.backgroundColor = Color.white;
+                EditorGUILayout.Space();
+
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.EndHorizontal();
+            }
+
+            EditorGUILayout.Space();
+
+            EditorGUILayout.PropertyField(OverrideFogColorProp, new GUIContent("Overrride Fog Color"));
+            GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.19f);
+            EditorGUILayout.LabelField("Allows this weather type to override the system's fog color. This is useful for adding variation to weather types or special event or quest related weather types.", EditorStyles.helpBox);
+            GUI.backgroundColor = Color.white;
+
+            if (self.OverrideFogColor == WeatherType.Yes_No.Yes)
+            {
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(15);
+                EditorGUILayout.BeginVertical();
+
+                EditorGUILayout.PropertyField(FogColorProp, new GUIContent("Fog Color"));
+                GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.19f);
+                EditorGUILayout.LabelField("A gradient that controls the fog color for this weather type.", EditorStyles.helpBox);
+                GUI.backgroundColor = Color.white;
+                EditorGUILayout.Space();
+
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.EndHorizontal();
+            }
+
+            EditorGUILayout.Space();
+
+            EditorGUILayout.PropertyField(OverrideCameraFogHeightProp, new GUIContent("Overrride Skybox Fog Height"));
+            GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.19f);
+            EditorGUILayout.LabelField("Allows this weather type to override the system's Skybox Fog Height. This is useful for adding variation to weather types. Setting this value to 1 can fully mask the sky with fog resulting in very dense looking fog that blends with the landscape.", EditorStyles.helpBox);
+            GUI.backgroundColor = Color.white;
+
+            if (self.OverrideCameraFogHeight == WeatherType.Yes_No.Yes)
+            {
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(15);
+                EditorGUILayout.BeginVertical();
+
+                self.CameraFogHeight = EditorGUILayout.Slider("Skybox Fog Height", self.CameraFogHeight, 0.0f, 1.0f);
+                GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.19f);
+                EditorGUILayout.LabelField("Controls how much UniStorm's Fog affects the skybox. The higher far clipping plane your camera uses, the higher this value will need to be set. This can also be used to fully mask the skybox with fog with a value of 1, if desired.", EditorStyles.helpBox);
+                GUI.backgroundColor = Color.white;
+
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.EndHorizontal();
+            }
+            EditorGUILayout.Space();
+
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndHorizontal();
+
+            //Conditions
+            GUI.backgroundColor = new Color(0.25f, 0.25f, 0.25f, 0.5f);
             EditorGUILayout.LabelField("Conditions", TitleStyle);
             GUI.backgroundColor = Color.white;
 
@@ -405,6 +504,7 @@ namespace UniStorm.Utility
                 }
             }
 #endif
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }

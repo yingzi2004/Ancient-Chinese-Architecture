@@ -135,8 +135,13 @@ public class PlayerController : MonoBehaviour
     void SetCursorState(bool locked)
     {
         isCursorLocked = locked;
-        Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
-        Cursor.visible = !locked;
+        
+        // 增加此处的判断，避免打字时被强行锁死鼠标
+        if (!isInspecting)
+        {
+            Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !locked;
+        }
     }
 
     void HandleMovement()

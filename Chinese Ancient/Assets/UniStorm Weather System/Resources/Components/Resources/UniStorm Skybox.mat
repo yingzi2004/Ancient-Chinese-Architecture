@@ -8,11 +8,11 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: UniStorm Skybox
-  m_Shader: {fileID: 4800000, guid: 4b334222e0f6c1247bd83b8fa29e2449, type: 3}
+  m_Shader: {fileID: 4800000, guid: 4398035ce0219f14195fc79f2eef5abf, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _SUNDISK_HIGH_QUALITY
+  - _SUNDISK_NONE
   m_InvalidKeywords:
   - SKYBOX_SUNDISK_HQ
   - SKYBOX_SUNDISK_SIMPLE
@@ -75,7 +75,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AtmosphereThickness: 0.9999782
+    - _AtmosphereThickness: 0.9999794
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
@@ -92,17 +92,17 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _SunBrightness: 3
-    - _SunDisk: 2
+    - _SunBrightness: 0
+    - _SunDisk: 0
     - _SunHDR: 1
-    - _SunSize: 0.044999998
+    - _SunSize: 0
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GroundColor: {r: 0.4056604, g: 0.4056604, b: 0.4056604, a: 1}
-    - _NightSkyTint: {r: 1, g: 1, b: 1, a: 1}
+    - _GroundColor: {r: 0.26708478, g: 0.32034656, b: 0.38235295, a: 1}
+    - _NightSkyTint: {r: 0.764151, g: 0.764151, b: 0.764151, a: 1}
     - _SkyTint: {r: 0.6886792, g: 0.6345687, b: 0.5165094, a: 1}
-    - _SunColor: {r: 1, g: 0.7833592, b: 0.5330188, a: 1}
+    - _SunColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

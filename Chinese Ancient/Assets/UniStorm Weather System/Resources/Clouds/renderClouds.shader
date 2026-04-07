@@ -45,7 +45,7 @@
                         float4(UNITY_MATRIX_V[0].xyz, 0.0f),
                         float4(UNITY_MATRIX_V[1].xyz, 0.0f),
                         float4(UNITY_MATRIX_V[2].xyz, 0.0f),
-                        float4(0, 0, 0, 1)
+                        float4(0, 0, 0, 1.1)
                     );
                     
                 

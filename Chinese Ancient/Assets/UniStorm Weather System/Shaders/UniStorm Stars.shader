@@ -34,6 +34,7 @@ Category {
 			fixed4 _Color;
 			half _LoY;
       		half _HiY;
+			uniform float3 _uWorldSpaceCameraPos;
 			
 			struct appdata_t {
 				float4 vertex : POSITION;
@@ -82,7 +83,7 @@ Category {
 						float4(UNITY_MATRIX_V[0].xyz, 0.0f),
 						float4(UNITY_MATRIX_V[1].xyz, 0.0f),
 						float4(UNITY_MATRIX_V[2].xyz, 0.0f),
-						float4(0, 0, 0, 1)
+						float4(0, 0, 0, 1.1)
 						);
 
 				o.vertex = mul(mul(UNITY_MATRIX_P, mvNoTranslation), v.vertex * float4(s, s, s, 1));
@@ -94,7 +95,7 @@ Category {
 				o.texcoord1.xy = TRANSFORM_TEX(rotateUV(v.texcoord, _Rotation), _Starmap);
 
 				float4 worldV = mul (unity_ObjectToWorld, v.vertex);
-		        o.color.a = 1 - saturate((worldV.y - _LoY) / (_HiY - _LoY)); 
+		        o.color.a = 1 - saturate(((_uWorldSpaceCameraPos.y - worldV.y) - _LoY) / (_HiY - _LoY));
 
 				return o;
 			}

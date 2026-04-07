@@ -12,12 +12,26 @@ namespace UniStorm
     {
         public static UniStormSystem Instance = null;
 
+        public CustomizeQualityEnum CustomizeQuality = CustomizeQualityEnum.No;
+        public enum CustomizeQualityEnum
+        {
+            No, Yes
+        }
+        public int ConvergenceSpeed = 75;
+        public int NearMarchSteps = 100;
+        public int DistantMarchSteps = 10;
+        public EnableFeature UpdateMarchStepsDuringRuntime = EnableFeature.Disabled;
+        public bool ColorSpaceSuggestionDismissed = false;
+        public int RendersPerFrame = 1;
+        UniStormClouds m_UniStormClouds;
+
         //Events
         public UnityEvent OnHourChangeEvent;
         public UnityEvent OnDayChangeEvent;
         public UnityEvent OnMonthChangeEvent;
         public UnityEvent OnYearChangeEvent;
         public UnityEvent OnWeatherChangeEvent;
+        public UnityEvent OnWeatherGenerationEvent;
         public UnityEvent OnLightningStrikePlayerEvent;
         public UnityEvent OnLightningStrikeObjectEvent;
 
@@ -42,7 +56,7 @@ namespace UniStorm
         public int WeatherTabNumbers = 0;
         public int CelestialTabNumbers = 0;
         public bool TimeFoldout = true, DateFoldout = true, TimeSoundsFoldout = true, TimeMusicFoldout = true,
-            SunFoldout = true, MoonFoldout = true, AtmosphereFoldout = true,
+            SunFoldout = true, MoonFoldout = true, AtmosphereFoldout = true, FogFoldout = true,
             WeatherFoldout = true, LightningFoldout = true, CameraFoldout = true, SettingsFoldout = true, CloudsFoldout = true, PlatformFoldout = true;
         public UniStormProfile m_UniStormProfile;
         public string FilePath = "";
@@ -84,6 +98,10 @@ namespace UniStorm
         public int Year = 0;
         public int DayLength = 10;
         public int NightLength = 10;
+        public int TimeOfDayUpdateSeconds = 0;
+        public enum UseTimeOfDayUpdateSeconds { Yes, No };
+        public UseTimeOfDayUpdateSeconds UseTimeOfDayUpdateControl = UseTimeOfDayUpdateSeconds.No;
+        float TimeOfDayUpdateTimer;
         public float m_TimeFloat;
         public EnableFeature TimeFlow = EnableFeature.Enabled;
         public EnableFeature RealWorldTime = EnableFeature.Disabled;
@@ -108,7 +126,11 @@ namespace UniStorm
         float m_CurrentMusicClipLength = 0;
         float m_TimeOfDayMusicTimer = 0;
         public EnableFeature TimeOfDaySoundsDuringPrecipitationWeather = EnableFeature.Disabled;
+        public EnableFeature TransitionMusicOnTimeOfDayChange = EnableFeature.Disabled;
         float m_CurrentClipLength = 0;
+        public bool m_UpdateTimeOfDayMusic = false;
+        public bool m_UpdateBiomeTimeOfDayMusic = false;
+        public int MusicTransitionLength = 3;
         int m_LastHour;
 
         public CurrentTimeOfDayEnum CurrentTimeOfDay;
@@ -131,6 +153,11 @@ namespace UniStorm
         }
 
         //Weather
+        public EnableFeature ForceLowClouds = EnableFeature.Disabled;
+        public int LowCloudHeight = 225;
+        public int CloudDomeTrisCountX = 48;
+        public int CloudDomeTrisCountY = 32;
+        public bool IgnoreConditions = false;
         public AnimationCurve CloudyFadeControl = AnimationCurve.Linear(0, 0.22f, 24, 0);
         public AnimationCurve PrecipitationGraph = AnimationCurve.Linear(1, 0, 13, 100);
         public List<WeatherType> NonPrecipiationWeatherTypes = new List<WeatherType>();
@@ -145,20 +172,23 @@ namespace UniStorm
         public static bool m_IsFading;
         public int TransitionSpeed = 5;
         public int HourToChangeWeather;
+        float m_CloudFadeLevelStart = -0.05f;
+        float m_CloudFadeLevelEnd = 0.22f;
         int m_GeneratedOdds;
         bool m_WeatherGenerated = false;
-        Coroutine CloudCoroutine, FogCoroutine, WeatherEffectCoroutine, AdditionalWeatherEffectCoroutine, ParticleFadeCoroutine, StormyCloudsCoroutine, CloudTallnessCoroutine, AuroraCoroutine;
-        Coroutine AdditionalParticleFadeCoroutine, SunCoroutine, MoonCoroutine, WindCoroutine, SoundInCoroutine, SoundOutCoroutine, MostlyCloudyCoroutine, SunAttenuationIntensityCoroutine;
-        Coroutine ColorCoroutine, CloudHeightCoroutine, RainShaderCoroutine, SnowShaderCoroutine, SunColorCoroutine, CloudProfileCoroutine, CloudShadowIntensityCoroutine;
+        Coroutine CloudCoroutine, FogCoroutine, WeatherEffectCoroutine, AdditionalWeatherEffectCoroutine, ParticleFadeCoroutine, StormyCloudsCoroutine, CloudTallnessCoroutine, AuroraCoroutine, FogLightFalloffCoroutine;
+        Coroutine AdditionalParticleFadeCoroutine, SunCoroutine, MoonCoroutine, WindCoroutine, SoundInCoroutine, SoundOutCoroutine, MostlyCloudyCoroutine, SunAttenuationIntensityCoroutine, AtmosphericFogCoroutine;
+        Coroutine ColorCoroutine, CloudHeightCoroutine, RainShaderCoroutine, SnowShaderCoroutine, SunColorCoroutine, CloudProfileCoroutine, CloudShadowIntensityCoroutine, MusicVolumeCoroutine, SunHeightCoroutine;
         public WindZone UniStormWindZone;
         public GameObject m_SoundTransform;
         public GameObject m_EffectsTransform;
         public Light m_LightningLight;
-        LightningSystem m_UniStormLightningSystem;
+        public LightningSystem m_UniStormLightningSystem;
         public LightningStrike m_LightningStrikeSystem;
         public int LightningSecondsMin = 5;
         public int LightningSecondsMax = 10;
         public Color LightningColor = new Color(0.725f,0.698f,0.713f, 1);
+        public Color LightningLightColor = new Color(195f / 255f, 213f / 255f, 226f / 255f, 1);
         int m_LightningSeconds;
         float m_LightningTimer;
         public List<AnimationCurve> LightningFlashPatterns = new List<AnimationCurve>();
@@ -188,6 +218,13 @@ namespace UniStorm
         public int LightningDetectionDistance = 20;
         public int m_CloudSeed;
         public Color CurrentFogColor;
+        public enum FogTypeEnum { UnistormFog, UnityFog };
+        public FogTypeEnum FogType = FogTypeEnum.UnistormFog;
+        public enum FogModeEnum { Exponential, ExponentialSquared };
+        public FogModeEnum FogMode = FogModeEnum.Exponential;
+        public UniStormAtmosphericFog m_UniStormAtmosphericFog;
+        public EnableFeature UseDithering = EnableFeature.Enabled;
+        public EnableFeature UseRadialDistantFog = EnableFeature.Disabled;
         public float SnowAmount = 0;
         public float CurrentWindIntensity = 0;
         public float MostlyCloudyFadeValue = 0;
@@ -221,6 +258,8 @@ namespace UniStorm
         public AnimationCurve TemperatureFluctuation = AnimationCurve.Linear(0, -25, 24, 25);
         public int Temperature;
         public GameObject LightningStruckObject;
+        public float FogLightFalloff = 9.7f;
+        public float CameraFogHeight = 0.85f;
         int m_FreezingTemperature;
 
         //Celestial
@@ -237,12 +276,19 @@ namespace UniStorm
         public float PrecipitationSunIntensity = 0.25f;
         public AnimationCurve SunIntensityCurve = AnimationCurve.Linear(0, 0, 24, 5);
         public AnimationCurve SunSize = AnimationCurve.Linear(0, 1, 24, 10);
+        public AnimationCurve SunAtmosphericFogIntensity = AnimationCurve.Linear(0, 2, 24, 2);
+        public AnimationCurve SunControlCurve = AnimationCurve.Linear(0, 1, 24, 1);
+        public AnimationCurve MoonAtmosphericFogIntensity = AnimationCurve.Linear(0, 1, 24, 1);
+        public AnimationCurve MoonObjectFade = AnimationCurve.Linear(0, 1, 24, 1);
+        public float AtmosphericFogMultiplier = 1;
         public Light m_MoonLight;
         public int MoonPhaseIndex = 5;
         public float MoonBrightness = 0.7f;
         public Material m_MoonPhaseMaterial;
         Renderer m_MoonRenderer;
         Transform m_MoonTransform;
+        Renderer m_SunRenderer;
+        Transform m_SunTransform;
         public float MoonIntensity = 1;
         public float MoonPhaseIntensity = 1;
         public AnimationCurve MoonIntensityCurve = AnimationCurve.Linear(0, 0, 24, 5);
@@ -258,6 +304,8 @@ namespace UniStorm
         public EnableFeature MoonShaftsEffect = EnableFeature.Enabled;
         UniStormSunShafts m_SunShafts;
         UniStormSunShafts m_MoonShafts;
+        public GameObject SunObject;
+        public Material SunObjectMaterial;
         public HemisphereEnum Hemisphere = HemisphereEnum.Northern;
         public enum HemisphereEnum
         {
@@ -279,23 +327,25 @@ namespace UniStorm
             public float MoonPhaseIntensity = 1;
         }
         public List<MoonPhaseClass> MoonPhaseList = new List<MoonPhaseClass>();
-        public SunQualityEnum SunQuality = SunQualityEnum.High;
-        public enum SunQualityEnum
-        {
-            Low = 1, High
-        }
-        public float SunSpotIntensity = 3;
         public GameObject m_AuroraParent;
         public StarmapTypeEnum StarmapType = StarmapTypeEnum.LightConstellations;
-        public enum StarmapTypeEnum
-        {
-            VeryStrongConstellations = 0, StrongConstellations, LightConstellations
-        }
+        public enum StarmapTypeEnum { VeryStrongConstellations = 0, StrongConstellations, LightConstellations }
         public CloudRenderTypeEnum CloudRenderType = CloudRenderTypeEnum.Transparent;
         public enum CloudRenderTypeEnum
         {
             Transparent = 0, Opaque
         }
+
+        //Light Shafts
+        public AnimationCurve SunLightShaftIntensity = AnimationCurve.Linear(0, 1, 24, 1);
+        public Gradient SunLightShaftsColor;
+        public float SunLightShaftsBlurSize = 4.86f;
+        public int SunLightShaftsBlurIterations = 2;
+        public AnimationCurve MoonLightShaftIntensity = AnimationCurve.Linear(0, 1, 24, 1);
+        public Gradient MoonLightShaftsColor;
+        public float MoonLightShaftsBlurSize = 3f;
+        public int MoonLightShaftsBlurIterations = 2;
+
 
         //Colors
         public Gradient SunColor;
@@ -312,12 +362,18 @@ namespace UniStorm
         public Gradient FogColor;
         public Gradient FogStormyColor;
         public Gradient CloudLightColor;
+        public Gradient StormyCloudLightColor;
         public Gradient CloudBaseColor;
         public Gradient CloudStormyBaseColor;
         public Gradient SkyTintColor;
+        [GradientUsage(true)]
+        public Gradient SunSpotColor;
+        public Gradient FogLightColor;
+        public Gradient StormyFogLightColor;
         public Color MoonPhaseColor = Color.white;
         public Color MoonlightColor;
 
+        //Internal
         float m_FadeValue;
         float m_ReceivedCloudValue;
 
@@ -326,6 +382,12 @@ namespace UniStorm
 
         public Gradient DefaultFogBaseColor;
         GradientColorKey[] FogColorKeySwitcher;
+
+        public Gradient DefaultCloudLightColor;
+        GradientColorKey[] CloudLightColorKeySwitcher;
+
+        public Gradient DefaultFogLightColor;
+        GradientColorKey[] FogLightColorKeySwitcher;
 
         public Gradient DefaultAmbientSkyLightBaseColor;
         GradientColorKey[] AmbientSkyLightColorKeySwitcher;
@@ -346,10 +408,12 @@ namespace UniStorm
         public List<AudioSource> WeatherSoundsList = new List<AudioSource>();
         public ParticleSystem CurrentParticleSystem;
         public float m_ParticleAmount = 0;
-        public ParticleSystem AdditionalCurrentParticleSystem;
-
+        public ParticleSystem AdditionalCurrentParticleSystem;       
         public bool UniStormInitialized = false;
         public UnityEngine.Audio.AudioMixer UniStormAudioMixer;
+        public bool UpgradedToCurrentVersion = false;
+        public VRState VRStateData;
+        float m_DetailStrength = 0.072f;
 
         void Awake()
         {
@@ -358,7 +422,19 @@ namespace UniStorm
             m_UniStormManager.AddComponent<UniStormManager>();
             m_UniStormManager.name = "UniStorm Manager";
             Instance = this;
+            m_UniStormClouds = FindObjectOfType<UniStormClouds>();
             InitializeCloudSettings();
+
+            //When in the Unity Editor, check the state of VR, along with the StereoRenderingPath, and cache it within VRState so can be used during runtime for VR related features.
+            var m_VRStateData = Resources.Load("VR State Data") as VRState;
+            #if UNITY_EDITOR
+                m_VRStateData.VREnabled = UnityEditor.PlayerSettings.virtualRealitySupported;
+            if (UnityEditor.PlayerSettings.stereoRenderingPath == UnityEditor.StereoRenderingPath.SinglePass)
+                m_VRStateData.StereoRenderingMode = VRState.StereoRenderingModes.SinglePass;
+            else if (UnityEditor.PlayerSettings.stereoRenderingPath == UnityEditor.StereoRenderingPath.MultiPass)
+                m_VRStateData.StereoRenderingMode = VRState.StereoRenderingModes.MultiPass;
+            #endif
+            VRStateData = m_VRStateData;
         }
 
         void Start()
@@ -416,6 +492,19 @@ namespace UniStorm
                 PlayerCamera = GameObject.Find(CameraName).GetComponent<Camera>();
             }
             InitializeUniStorm();
+        }
+
+        Gradient UpdateGradient(Gradient Reference, Gradient GradientToUpdate)
+        {
+            GradientToUpdate = new Gradient();
+            GradientColorKey[] m_ColorKey;
+            GradientAlphaKey[] m_AlphaKey;
+            m_ColorKey = new GradientColorKey[Reference.colorKeys.Length];
+            m_ColorKey = Reference.colorKeys;
+            m_AlphaKey = new GradientAlphaKey[Reference.alphaKeys.Length];
+            m_AlphaKey = Reference.alphaKeys;
+            GradientToUpdate.SetKeys(m_ColorKey, m_AlphaKey);
+            return GradientToUpdate;
         }
 
         //Intilialize UniStorm
@@ -537,7 +626,7 @@ namespace UniStorm
                 }
             }
 
-            //Initialize our color switching keys. This allows gradient colors to be switched between stormy and regular.
+            //Initialize the color switching keys. This allows gradient colors to be switched between stormy and regular.
             CloudColorKeySwitcher = new GradientColorKey[7];
             CloudColorKeySwitcher = CloudBaseColor.colorKeys;
             DefaultCloudBaseColor.colorKeys = new GradientColorKey[7];
@@ -547,6 +636,16 @@ namespace UniStorm
             FogColorKeySwitcher = FogColor.colorKeys;
             DefaultFogBaseColor.colorKeys = new GradientColorKey[7];
             DefaultFogBaseColor.colorKeys = FogColor.colorKeys;
+
+            CloudLightColorKeySwitcher = new GradientColorKey[7];
+            CloudLightColorKeySwitcher = CloudLightColor.colorKeys;
+            DefaultCloudLightColor.colorKeys = new GradientColorKey[7];
+            DefaultCloudLightColor.colorKeys = CloudLightColor.colorKeys;
+
+            FogLightColorKeySwitcher = new GradientColorKey[7];
+            FogLightColorKeySwitcher = FogLightColor.colorKeys;
+            DefaultFogLightColor.colorKeys = new GradientColorKey[7];
+            DefaultFogLightColor.colorKeys = FogLightColor.colorKeys;
 
             AmbientSkyLightColorKeySwitcher = new GradientColorKey[7];
             AmbientSkyLightColorKeySwitcher = AmbientSkyLightColor.colorKeys;
@@ -570,9 +669,9 @@ namespace UniStorm
 
             CalculatePrecipiation();
             CreateSun();
-            CreateMoon();
+            CreateMoon();            
 
-            //Intialize our other components and set the proper settings from within the editor
+            //Intialize the other components and set the proper settings from within the editor
             GameObject TempAudioSource = new GameObject("UniStorm Time of Day Sounds");
             TempAudioSource.transform.SetParent(this.transform);
             TempAudioSource.transform.localPosition = Vector3.zero;
@@ -606,20 +705,28 @@ namespace UniStorm
             {
                 m_StarsMaterial.SetTexture("_Starmap", Resources.Load("Starmap (Very Strong Constellations)") as Texture);
             }
-            m_CloudDomeMaterial = FindObjectOfType<UniStormClouds>().skyMaterial;
+
+            if (QualitySettings.activeColorSpace == ColorSpace.Linear)
+            {
+                m_StarsMaterial.SetFloat("_LoY", -2200);
+                m_StarsMaterial.SetFloat("_HiY", -60);
+            }
+
+            m_CloudDomeMaterial = m_UniStormClouds.skyMaterial;
             GameObject AuroraSystem = Resources.Load("UniStorm Auroras") as GameObject;
             m_AuroraParent = Instantiate(AuroraSystem, transform.position, Quaternion.identity);
-            m_AuroraParent.transform.SetParent(FindObjectOfType<UniStormClouds>().gameObject.transform);
-            m_AuroraParent.transform.position = new Vector3(0,-0.1f,0);
+            m_AuroraParent.transform.SetParent(m_UniStormClouds.transform);
+            m_AuroraParent.transform.localPosition = Vector3.zero;
+            m_AuroraParent.transform.localScale = Vector3.one * 0.001f;
             m_AuroraParent.name = "UniStorm Auroras";
 
             //Calculates our start time based off the user's input
             float StartingMinuteFloat = (int)Minute;
-            if (RealWorldTime == UniStormSystem.EnableFeature.Disabled)
+            if (RealWorldTime == EnableFeature.Disabled)
             {
                 m_TimeFloat = (float)Hour / 24 + StartingMinuteFloat / 1440;
             }
-            else if (RealWorldTime == UniStormSystem.EnableFeature.Enabled)
+            else if (RealWorldTime == EnableFeature.Enabled)
             {
                 m_TimeFloat = (float)System.DateTime.Now.Hour / 24 + (float)System.DateTime.Now.Minute / 1440;
             }
@@ -666,25 +773,7 @@ namespace UniStorm
             RenderSettings.skybox = m_SkyBoxMaterial;
             m_SkyBoxMaterial.SetFloat("_AtmosphereThickness", AtmosphereThickness.Evaluate((float)Hour));
             m_SkyBoxMaterial.SetColor("_NightSkyTint", SkyTintColor.Evaluate((float)Hour));
-            m_SkyBoxMaterial.SetFloat("_SunBrightness" , SunSpotIntensity);
             RenderSettings.reflectionIntensity = EnvironmentReflections.Evaluate((float)Hour);
-
-            if (SunQuality == SunQualityEnum.Low)
-            {
-                m_SkyBoxMaterial.DisableKeyword("_SUNDISK_NONE");
-                m_SkyBoxMaterial.DisableKeyword("_SUNDISK_HIGH_QUALITY");
-                m_SkyBoxMaterial.EnableKeyword("_SUNDISK_SIMPLE");
-                m_SkyBoxMaterial.SetInt("_SunDisk", (int)SunQuality);
-                
-            }
-            else if (SunQuality == SunQualityEnum.High)
-            {
-                m_SkyBoxMaterial.DisableKeyword("_SUNDISK_NONE");
-                m_SkyBoxMaterial.DisableKeyword("_SUNDISK_SIMPLE");
-                m_SkyBoxMaterial.EnableKeyword("_SUNDISK_HIGH_QUALITY");
-                m_SkyBoxMaterial.SetInt("_SunDisk", (int)SunQuality);
-                
-            }
 
             Temperature = (int)TemperatureCurve.Evaluate(m_PreciseCurveTime) + (int)TemperatureFluctuation.Evaluate((float)StartingHour);
 
@@ -701,13 +790,14 @@ namespace UniStorm
 
             GenerateWeather();
             CreateLightning();
+            CreateUniStormFog();
             UpdateColors();
             CalculateMoonPhase();
             InitializeWeather(true);
             CalculateTimeOfDay();
             CalculateSeason();
             UpdateCelestialLightShafts();
-            StartCoroutine(InitializeCloudShadows());
+            StartCoroutine(InitializeCloudShadows());           
 
             if (CurrentWeatherType.UseAuroras == WeatherType.Yes_No.Yes)
             {
@@ -735,6 +825,44 @@ namespace UniStorm
                 CreateUniStormMenu();
             }
 
+            Material m_CloudsMaterial = m_UniStormClouds.skyMaterial;
+            if (CustomizeQuality == CustomizeQualityEnum.Yes && CloudType == CloudTypeEnum.Volumetric)
+            {
+                if (CloudQuality == CloudQualityEnum.Ultra)
+                {
+                    m_CloudsMaterial.SetFloat("_UseHighConvergenceSpeed", 1);
+                    m_CloudDomeMaterial.SetFloat("_DistantCloudUpdateSpeed", ConvergenceSpeed);
+                    Shader.SetGlobalFloat("CLOUD_MARCH_STEPS", NearMarchSteps);
+                    Shader.SetGlobalFloat("DISTANT_CLOUD_MARCH_STEPS", DistantMarchSteps);
+                }
+                else
+                {
+                    m_CloudsMaterial.SetFloat("_UseHighConvergenceSpeed", 0);
+                    Shader.SetGlobalFloat("DISTANT_CLOUD_MARCH_STEPS", 10);
+                }
+            }
+            else
+            {
+                if (CloudQuality == CloudQualityEnum.Ultra) //If CustomizeQuality is not used, apply the default Ultra settings.
+                {
+                    m_CloudsMaterial.SetFloat("_UseHighConvergenceSpeed", 1);
+                    m_CloudDomeMaterial.SetFloat("_DistantCloudUpdateSpeed", 75);
+                    Shader.SetGlobalFloat("CLOUD_MARCH_STEPS", 100);
+                    Shader.SetGlobalFloat("DISTANT_CLOUD_MARCH_STEPS", 10);
+                }
+                else
+                {
+                    m_CloudsMaterial.SetFloat("_UseHighConvergenceSpeed", 0);
+                    Shader.SetGlobalFloat("DISTANT_CLOUD_MARCH_STEPS", 10);
+                }
+            }
+
+            //Enable Single Pass support for UniStorm's clouds, given that the VR settings are enabled.
+            if (VRStateData.VREnabled && VRStateData.StereoRenderingMode == VRState.StereoRenderingModes.SinglePass)
+                m_CloudsMaterial.SetFloat("_VRSinglePassEnabled", 1);
+            else if (!VRStateData.VREnabled || VRStateData.VREnabled && VRStateData.StereoRenderingMode == VRState.StereoRenderingModes.MultiPass)
+                m_CloudsMaterial.SetFloat("_VRSinglePassEnabled", 0);
+
             UniStormInitialized = true;
         }
 
@@ -742,8 +870,6 @@ namespace UniStorm
         {
             if (CloudShadows == EnableFeature.Enabled)
             {
-                UniStormClouds m_UniStormClouds = FindObjectOfType<UniStormClouds>();
-
                 if (PlayerCamera.gameObject.GetComponent<ScreenSpaceCloudShadows>() == null)
                 {
                     m_CloudShadows = PlayerCamera.gameObject.AddComponent<ScreenSpaceCloudShadows>();
@@ -761,17 +887,45 @@ namespace UniStorm
                 m_CloudShadows.TopThreshold = 1;
                 m_CloudShadows.CloudTextureScale = 0.001f;
                 m_CloudShadows.ShadowIntensity = CurrentWeatherType.CloudShadowIntensity;
+                PlayerCamera.clearFlags = CameraClearFlags.Skybox;
+            }
+            else
+            {
+                if (PlayerCamera.gameObject.GetComponent<ScreenSpaceCloudShadows>() != null)
+                {
+                    PlayerCamera.gameObject.GetComponent<ScreenSpaceCloudShadows>().enabled = false;
+                }
             }
         }
 
         void InitializeCloudSettings()
         {
-            UniStormClouds m_UniStormClouds = FindObjectOfType<UniStormClouds>();
-            Material m_CloudsMaterial = FindObjectOfType<UniStormClouds>().skyMaterial;
+            Material m_CloudsMaterial = m_UniStormClouds.skyMaterial;
             m_UniStormClouds.performance = (UniStormClouds.CloudPerformance)CloudQuality;
             m_CloudsMaterial.SetFloat("_uCloudsMovementSpeed", (float)CloudSpeed);
             m_CloudsMaterial.SetFloat("_uCloudsTurbulenceSpeed", (float)CloudTurbulence);
             m_CloudsMaterial.SetColor("_uMoonColor", MoonlightColor);
+            m_CloudsMaterial.SetColor("_uLightningColor", LightningLightColor);
+
+            /*
+            if (CloudQuality == CloudQualityEnum.Ultra && CustomizeQuality == CustomizeQualityEnum.Yes)
+            {
+                m_UniStormClouds.numRendersPerFrame = RendersPerFrame;
+            }
+            else
+            {
+                m_UniStormClouds.numRendersPerFrame = 1;
+            }
+            */
+
+            if (ForceLowClouds == EnableFeature.Enabled)
+            {
+                Shader.SetGlobalFloat("_uCloudNoiseScale", 1.8f);
+            } 
+            else
+            {
+                Shader.SetGlobalFloat("_uCloudNoiseScale", 0.7f);
+            }
 
             if (CloudShadows == EnableFeature.Enabled)
             {
@@ -800,23 +954,58 @@ namespace UniStorm
                 m_CloudsMaterial.SetFloat("_uCloudsBottomSoftness", m_CP.BaseSoftness);
                 m_CloudsMaterial.SetFloat("_uCloudsDetailStrength", m_CP.DetailStrength);
                 m_CloudsMaterial.SetFloat("_uCloudsDensity", m_CP.Density);
-                m_CloudsMaterial.SetFloat("_uCloudsCoverageBias", m_CP.CoverageBias);
+                m_CloudsMaterial.SetFloat("_uCloudsDetailScale", 1000f);
+
+                if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                {
+                    m_CloudsMaterial.SetFloat("_uCloudsCoverageBias", m_CP.CoverageBias);
+                    m_CloudsMaterial.SetFloat("_uCloudsDetailStrength", m_CP.DetailStrength);
+                }
+                else
+                {
+                    m_CloudsMaterial.SetFloat("_uCloudsCoverageBias", 0.02f);
+                    m_CloudsMaterial.SetFloat("_uCloudsDetailStrength", m_DetailStrength);
+                }
+
                 m_CloudsMaterial.SetFloat("_uCloudsBaseScale", 1.72f);
             }
             else if (CloudType == CloudTypeEnum._2D)
             {
                 m_UniStormClouds.cloudType = UniStormClouds.CloudType.TwoD;
-                m_CloudsMaterial.SetFloat("_uCloudsBaseEdgeSoftness", 0.2f);
-                m_CloudsMaterial.SetFloat("_uCloudsBottomSoftness", 0.3f);
+                m_CloudsMaterial.SetFloat("_uCloudsBaseEdgeSoftness", 0.05f);
+                m_CloudsMaterial.SetFloat("_uCloudsBottomSoftness", 0.15f);
                 m_CloudsMaterial.SetFloat("_uCloudsDetailStrength", 0.1f);
-                m_CloudsMaterial.SetFloat("_uCloudsDensity", 0.3f);
-                m_CloudsMaterial.SetFloat("_uCloudsBaseScale", 1f);
+                m_CloudsMaterial.SetFloat("_uCloudsDensity", 1f);
+                m_CloudsMaterial.SetFloat("_uCloudsBaseScale", 1.5f);
+                m_CloudsMaterial.SetFloat("_uCloudsDetailScale", 700f);
             }
         }
 
         //Initialize our starting weather so it fades in instantly on start
         public void InitializeWeather(bool UseWeatherConditions)
         {
+            if (CloudCoroutine != null) { StopCoroutine(CloudCoroutine); }
+            if (FogCoroutine != null) { StopCoroutine(FogCoroutine); }
+            if (WeatherEffectCoroutine != null) { StopCoroutine(WeatherEffectCoroutine); }
+            if (AdditionalWeatherEffectCoroutine != null) { StopCoroutine(AdditionalWeatherEffectCoroutine); }
+            if (ParticleFadeCoroutine != null) { StopCoroutine(ParticleFadeCoroutine); }
+            if (AdditionalParticleFadeCoroutine != null) { StopCoroutine(AdditionalParticleFadeCoroutine); }
+            if (SunCoroutine != null) { StopCoroutine(SunCoroutine); }
+            if (MoonCoroutine != null) { StopCoroutine(MoonCoroutine); }
+            if (SoundInCoroutine != null) { StopCoroutine(SoundInCoroutine); }
+            if (SoundOutCoroutine != null) { StopCoroutine(SoundOutCoroutine); }
+            if (ColorCoroutine != null) { StopCoroutine(ColorCoroutine); }
+            if (SunColorCoroutine != null) { StopCoroutine(SunColorCoroutine); }
+            if (CloudHeightCoroutine != null) { StopCoroutine(CloudHeightCoroutine); }
+            if (WindCoroutine != null) { StopCoroutine(WindCoroutine); }
+            if (RainShaderCoroutine != null) { StopCoroutine(RainShaderCoroutine); }
+            if (SnowShaderCoroutine != null) { StopCoroutine(SnowShaderCoroutine); }
+            if (StormyCloudsCoroutine != null) { StopCoroutine(StormyCloudsCoroutine); }
+            if (CloudProfileCoroutine != null) { StopCoroutine(CloudProfileCoroutine); }
+            if (CloudShadowIntensityCoroutine != null) { StopCoroutine(CloudShadowIntensityCoroutine); }
+            if (SunAttenuationIntensityCoroutine != null) { StopCoroutine(SunAttenuationIntensityCoroutine); }
+            if (AuroraCoroutine != null) { StopCoroutine(AuroraCoroutine); }
+
             //If our starting weather type's conditions are not met, keep rerolling weather until an appropriate one is found.
             TempWeatherType = CurrentWeatherType;
 
@@ -850,8 +1039,16 @@ namespace UniStorm
             CurrentWindIntensity = CurrentWeatherType.WindIntensity;
             SunIntensity = CurrentWeatherType.SunIntensity;
             MoonIntensity = CurrentWeatherType.MoonIntensity;
-            m_CloudDomeMaterial.SetFloat("_uCloudsBottom", CurrentWeatherType.CloudHeight);
-            m_CurrentCloudHeight = CurrentWeatherType.CloudHeight;
+            if (ForceLowClouds == EnableFeature.Disabled)
+            {
+                m_CloudDomeMaterial.SetFloat("_uCloudsBottom", CurrentWeatherType.CloudHeight);
+                m_CurrentCloudHeight = CurrentWeatherType.CloudHeight;
+            }
+            else
+            {
+                m_CloudDomeMaterial.SetFloat("_uCloudsBottom", LowCloudHeight);
+                m_CurrentCloudHeight = LowCloudHeight;
+            }            
 
             if (CurrentWeatherType.CloudLevel == WeatherType.CloudLevelEnum.Cloudy || CurrentWeatherType.CloudLevel == WeatherType.CloudLevelEnum.MostlyCloudy)
             {
@@ -863,6 +1060,56 @@ namespace UniStorm
                 m_CloudDomeMaterial.SetFloat("_uCloudsHeight", 1000);
             }
 
+            if (FogMode == FogModeEnum.Exponential)
+            {
+                RenderSettings.fogMode = UnityEngine.FogMode.Exponential;
+            }
+            else if (FogMode == FogModeEnum.ExponentialSquared)
+            {
+                RenderSettings.fogMode = UnityEngine.FogMode.ExponentialSquared;
+            }
+
+            if (FogType == FogTypeEnum.UnistormFog)
+            {
+                //Disable Unity's fog while UniStorm's fog is being used.
+                RenderSettings.fog = false;
+
+                if (CurrentWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.Yes)
+                {
+                    if (CurrentWeatherType.OverrideCameraFogHeight == WeatherType.Yes_No.No)
+                    {
+                        m_UniStormAtmosphericFog.BlendHeight = 0.0f;
+                    }
+                    else if (CurrentWeatherType.OverrideCameraFogHeight == WeatherType.Yes_No.Yes)
+                    {
+                        m_UniStormAtmosphericFog.BlendHeight = ((1 - CurrentWeatherType.CameraFogHeight) / 10);
+                    }
+                    m_CloudDomeMaterial.SetFloat("_FogBlendHeight", (1-CurrentWeatherType.FogHeight));
+                    SunObjectMaterial.SetFloat("_OpaqueY", -600);
+                    SunObjectMaterial.SetFloat("_TransparentY", -400);
+                }
+                else if (CurrentWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.No)
+                {
+                    if (CurrentWeatherType.OverrideCameraFogHeight == WeatherType.Yes_No.No)
+                    {
+                        m_UniStormAtmosphericFog.BlendHeight = ((1 - CameraFogHeight) / 10);
+                    }
+                    else if (CurrentWeatherType.OverrideCameraFogHeight == WeatherType.Yes_No.Yes)
+                    {
+                        m_UniStormAtmosphericFog.BlendHeight = ((1 - CurrentWeatherType.CameraFogHeight) / 10);
+                    }
+                    m_CloudDomeMaterial.SetFloat("_FogBlendHeight", (1-CurrentWeatherType.FogHeight));
+                    SunObjectMaterial.SetFloat("_OpaqueY", -100);
+                    SunObjectMaterial.SetFloat("_TransparentY", -70);
+                }
+
+                if (UseRadialDistantFog == EnableFeature.Enabled)
+                {
+                    m_UniStormAtmosphericFog.useRadialDistance = true;
+                }
+
+                FogLightFalloff = CurrentWeatherType.FogLightFalloff;
+            }
 
             if (CurrentWeatherType.ShaderControl == WeatherType.ShaderControlEnum.Rain)
             {
@@ -930,18 +1177,52 @@ namespace UniStorm
                 m_CloudDomeMaterial.SetFloat("_uHorizonColorFadeStart", -0.2f);
                 m_CloudDomeMaterial.SetFloat("_uHorizonColorFadeEnd", 0.32f);
                 m_CloudDomeMaterial.SetFloat("_uHorizonFadeStart", 0);
-                m_CloudDomeMaterial.SetFloat("_uHorizonFadeEnd", 0);
+
+                if (FogType == FogTypeEnum.UnistormFog)
+                {
+                    m_CloudDomeMaterial.SetFloat("_uHorizonFadeEnd", 0.22f);
+                    m_CloudDomeMaterial.SetFloat("_uSunFadeEnd", 0.18f);
+                }
+                else if (FogType == FogTypeEnum.UnityFog)
+                {
+                    m_CloudDomeMaterial.SetFloat("_uHorizonFadeEnd", 0);
+                }
+
                 m_CloudDomeMaterial.SetFloat("_uCloudAlpha", StormyHorizonBrightness);
-                SunAttenuationMultipler = 0.2f;
+                SunAttenuationMultipler = 0.35f;
 
                 for (int i = 0; i < CloudBaseColor.colorKeys.Length; i++)
                 {
-                    CloudColorKeySwitcher[i].color = Color.Lerp(CloudColorKeySwitcher[i].color, CloudStormyBaseColor.colorKeys[i].color, 1);
+                    if (CurrentWeatherType.OverrideCloudColor == WeatherType.Yes_No.No)
+                    {
+                        CloudColorKeySwitcher[i].color = Color.Lerp(CloudColorKeySwitcher[i].color, CloudStormyBaseColor.colorKeys[i].color, 1);
+                    }
+                    else if (CurrentWeatherType.OverrideCloudColor == WeatherType.Yes_No.Yes)
+                    {
+                        CloudColorKeySwitcher[i].color = Color.Lerp(CloudColorKeySwitcher[i].color, CurrentWeatherType.CloudColor.colorKeys[i].color, 1);
+                    }
                 }
 
                 for (int i = 0; i < FogColor.colorKeys.Length; i++)
                 {
-                    FogColorKeySwitcher[i].color = Color.Lerp(FogColorKeySwitcher[i].color, FogStormyColor.colorKeys[i].color, 1);
+                    if (CurrentWeatherType.OverrideFogColor == WeatherType.Yes_No.No)
+                    {
+                        FogColorKeySwitcher[i].color = Color.Lerp(FogColorKeySwitcher[i].color, FogStormyColor.colorKeys[i].color, 1);
+                    }
+                    else if (CurrentWeatherType.OverrideFogColor == WeatherType.Yes_No.Yes)
+                    {
+                        FogColorKeySwitcher[i].color = Color.Lerp(FogColorKeySwitcher[i].color, CurrentWeatherType.FogColor.colorKeys[i].color, 1);
+                    }
+                }
+              
+                for (int i = 0; i < CloudLightColor.colorKeys.Length; i++)
+                {
+                    CloudLightColorKeySwitcher[i].color = Color.Lerp(CloudLightColorKeySwitcher[i].color, StormyCloudLightColor.colorKeys[i].color, 1);
+                }
+                           
+                for (int i = 0; i < FogLightColor.colorKeys.Length; i++)
+                {
+                    FogLightColorKeySwitcher[i].color = Color.Lerp(FogLightColorKeySwitcher[i].color, StormyFogLightColor.colorKeys[i].color, 1);
                 }
 
                 for (int i = 0; i < AmbientSkyLightColor.colorKeys.Length; i++)
@@ -964,6 +1245,8 @@ namespace UniStorm
                     SunLightColorKeySwitcher[i].color = Color.Lerp(SunLightColorKeySwitcher[i].color, StormySunColor.colorKeys[i].color, 1);
                 }
 
+                FogLightColor.SetKeys(FogLightColorKeySwitcher, FogLightColor.alphaKeys);
+                CloudLightColor.SetKeys(CloudLightColorKeySwitcher, CloudLightColor.alphaKeys);
                 FogColor.SetKeys(FogColorKeySwitcher, FogColor.alphaKeys);
                 CloudBaseColor.SetKeys(CloudColorKeySwitcher, CloudBaseColor.alphaKeys);
                 AmbientSkyLightColor.SetKeys(AmbientSkyLightColorKeySwitcher, AmbientSkyLightColor.alphaKeys);
@@ -976,24 +1259,58 @@ namespace UniStorm
             {
                 m_CloudDomeMaterial.SetFloat("_uHorizonColorFadeStart", 0);
                 m_CloudDomeMaterial.SetFloat("_uHorizonColorFadeEnd", 0);
-                m_CloudDomeMaterial.SetFloat("_uHorizonFadeStart", -0.05f);
-                m_CloudDomeMaterial.SetFloat("_uHorizonFadeEnd", 0.22f);
+                m_CloudDomeMaterial.SetFloat("_uHorizonFadeStart", m_CloudFadeLevelStart);
+                m_CloudDomeMaterial.SetFloat("_uHorizonFadeEnd", m_CloudFadeLevelEnd);
+                m_CloudDomeMaterial.SetFloat("_uSunFadeEnd", 0.045f);
                 m_CloudDomeMaterial.SetFloat("_uCloudAlpha", 1);
-                SunAttenuationMultipler = 1;
+
+                //Reduce the sun's attenuation by 50% if Gamma Color Space is used to stop the clouds from being too bright.
+                if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                {
+                    SunAttenuationMultipler = 0.5f;
+                }
+                else
+                {
+                    SunAttenuationMultipler = 1;
+                }              
 
                 for (int i = 0; i < CloudBaseColor.colorKeys.Length; i++)
                 {
-                    CloudColorKeySwitcher[i].color = Color.Lerp(CloudColorKeySwitcher[i].color, DefaultCloudBaseColor.colorKeys[i].color, 1);
+                    if (CurrentWeatherType.OverrideCloudColor == WeatherType.Yes_No.No)
+                    {
+                        CloudColorKeySwitcher[i].color = Color.Lerp(CloudColorKeySwitcher[i].color, DefaultCloudBaseColor.colorKeys[i].color, 1);
+                    }
+                    else if (CurrentWeatherType.OverrideCloudColor == WeatherType.Yes_No.Yes)
+                    {
+                        CloudColorKeySwitcher[i].color = Color.Lerp(CloudColorKeySwitcher[i].color, CurrentWeatherType.CloudColor.colorKeys[i].color, 1);
+                    }
                 }
 
                 for (int i = 0; i < FogColor.colorKeys.Length; i++)
                 {
-                    FogColorKeySwitcher[i].color = Color.Lerp(FogColorKeySwitcher[i].color, DefaultFogBaseColor.colorKeys[i].color, 1);
+                    if (CurrentWeatherType.OverrideFogColor == WeatherType.Yes_No.No)
+                    {
+                        FogColorKeySwitcher[i].color = Color.Lerp(FogColorKeySwitcher[i].color, DefaultFogBaseColor.colorKeys[i].color, 1);
+                    }
+                    else if (CurrentWeatherType.OverrideFogColor == WeatherType.Yes_No.Yes)
+                    {
+                        FogColorKeySwitcher[i].color = Color.Lerp(FogColorKeySwitcher[i].color, CurrentWeatherType.FogColor.colorKeys[i].color, 1);
+                    }                       
                 }
 
                 for (int i = 0; i < AmbientSkyLightColor.colorKeys.Length; i++)
                 {
                     AmbientSkyLightColorKeySwitcher[i].color = Color.Lerp(AmbientSkyLightColorKeySwitcher[i].color, DefaultAmbientSkyLightBaseColor.colorKeys[i].color, 1);
+                }
+
+                for (int i = 0; i < CloudLightColor.colorKeys.Length; i++)
+                {
+                    CloudLightColorKeySwitcher[i].color = Color.Lerp(CloudLightColorKeySwitcher[i].color, DefaultCloudLightColor.colorKeys[i].color, 1);
+                }
+
+                for (int i = 0; i < FogLightColor.colorKeys.Length; i++)
+                {
+                    FogLightColorKeySwitcher[i].color = Color.Lerp(FogLightColorKeySwitcher[i].color, DefaultFogLightColor.colorKeys[i].color, 1);
                 }
 
                 for (int i = 0; i < AmbientEquatorLightColor.colorKeys.Length; i++)
@@ -1011,6 +1328,8 @@ namespace UniStorm
                     SunLightColorKeySwitcher[i].color = Color.Lerp(SunLightColorKeySwitcher[i].color, DefaultSunLightBaseColor.colorKeys[i].color, 1);
                 }
 
+                FogLightColor.SetKeys(FogLightColorKeySwitcher, FogLightColor.alphaKeys);
+                CloudLightColor.SetKeys(CloudLightColorKeySwitcher, CloudLightColor.alphaKeys);
                 FogColor.SetKeys(FogColorKeySwitcher, FogColor.alphaKeys);
                 CloudBaseColor.SetKeys(CloudColorKeySwitcher, CloudBaseColor.alphaKeys);
                 AmbientSkyLightColor.SetKeys(AmbientSkyLightColorKeySwitcher, AmbientSkyLightColor.alphaKeys);
@@ -1041,6 +1360,7 @@ namespace UniStorm
         void FollowPlayer()
         {
             m_MoonLight.transform.position = PlayerTransform.position;
+            m_SunLight.transform.position = PlayerTransform.position;
         }
 
         //Calculate our precipitation odds based on the UniStorm date
@@ -1057,6 +1377,41 @@ namespace UniStorm
             m_CurrentPrecipitationAmountFloat = PrecipitationGraph.Evaluate(m_PreciseCurveTime);
             m_CurrentPrecipitationAmountInt = (int)Mathf.Round(m_CurrentPrecipitationAmountFloat);
             m_PrecipitationOdds = m_CurrentPrecipitationAmountInt;
+        }
+
+        void CreateUniStormFog ()
+        {
+            if (FogType == FogTypeEnum.UnistormFog)
+            {
+                m_UniStormAtmosphericFog = PlayerCamera.gameObject.AddComponent<UniStormAtmosphericFog>();
+                m_UniStormAtmosphericFog.fogShader = Shader.Find("Hidden/UniStorm Atmospheric Fog");
+                m_UniStormAtmosphericFog.SunSource = m_SunLight;
+                m_UniStormAtmosphericFog.MoonSource = m_MoonLight;
+                m_UniStormAtmosphericFog.MoonColor = MoonlightColor;
+                m_CloudDomeMaterial.SetColor("_MoonColor", MoonlightColor);
+                m_CloudDomeMaterial.SetFloat("_UseUniStormFog", 1);
+                m_CloudFadeLevelStart = 0;
+                m_CloudFadeLevelEnd = 0.18f;
+
+                //Enable dithering on both UniStorm's clouds and Fog 
+                if (UseDithering == EnableFeature.Enabled)
+                {
+                    m_UniStormAtmosphericFog.Dither = UniStormAtmosphericFog.DitheringControl.Enabled;
+                    m_UniStormAtmosphericFog.NoiseTexture = (Texture2D)Resources.Load("Clouds/baseNoise") as Texture2D;
+
+                    m_CloudDomeMaterial.SetFloat("_EnableDithering", 1);
+                    m_CloudDomeMaterial.SetTexture("_NoiseTex", (Texture2D)Resources.Load("Clouds/baseNoise") as Texture2D);
+                }
+
+                Invoke("CheckSinglePass", 0.05f);
+            }
+        }
+
+        void CheckSinglePass()
+        {
+            //Enable Single Pass support for UniStorm Fog, given that the VR settings are enabled.
+            if (VRStateData.VREnabled && VRStateData.StereoRenderingMode == VRState.StereoRenderingModes.SinglePass)
+                m_UniStormAtmosphericFog.fogMaterial.SetFloat("_VRSinglePassEnabled", 1);
         }
 
         //Create and positioned UniStorm's moon
@@ -1094,7 +1449,7 @@ namespace UniStorm
 
             if (MoonShaftsEffect == EnableFeature.Enabled)
             {
-                CreatMoonShafts();
+                CreateMoonShafts();
             }
         }
 
@@ -1109,6 +1464,25 @@ namespace UniStorm
             m_SunLight.shadowResolution = SunShadowResolution;
             m_SunLight.shadows = SunShadowType;
             m_SunLight.shadowStrength = SunShadowStrength;
+
+            SunObject = Instantiate((GameObject)Resources.Load("UniStorm Sun Object") as GameObject, transform.position, Quaternion.identity);
+            SunObject.name = "UniStorm Sun Object";
+            SunObjectMaterial = SunObject.GetComponent<Renderer>().material;
+            m_SunRenderer = GameObject.Find("UniStorm Sun Object").GetComponent<Renderer>();
+            m_SunTransform = m_SunRenderer.transform;
+            m_SunTransform.parent = m_SunLight.transform;
+
+            if (PlayerCamera.farClipPlane < 2000)
+            {
+                m_SunTransform.localPosition = new Vector3(0, 0, PlayerCamera.farClipPlane * -1);
+                m_SunTransform.localEulerAngles = new Vector3(270, 0, 0);
+                float RecalculatedSunSize = (PlayerCamera.farClipPlane) / 2000;
+            }
+            else
+            {
+                m_SunTransform.localPosition = new Vector3(0, 0, -2000);
+                m_SunTransform.localEulerAngles = new Vector3(270, 0, 0);
+            }
 
             if (SunShaftsEffect == EnableFeature.Enabled)
             {
@@ -1135,13 +1509,13 @@ namespace UniStorm
             m_SunShafts.sunThreshold = ThresholdColor;
         }
 
-        void CreatMoonShafts()
+        void CreateMoonShafts()
         {
             m_MoonShafts = PlayerCamera.gameObject.AddComponent<UniStormSunShafts>();
             m_MoonShafts.sunShaftsShader = Shader.Find("Hidden/UniStormSunShafts");
             m_MoonShafts.simpleClearShader = Shader.Find("Hidden/UniStormSimpleClear");
             m_MoonShafts.useDepthTexture = true;
-            m_MoonShafts.maxRadius = 0.573f;
+            m_MoonShafts.maxRadius = 0.3f;
             m_MoonShafts.sunShaftBlurRadius = 3.32f;
             m_MoonShafts.radialBlurIterations = 3;
             m_MoonShafts.sunShaftIntensity = 1;
@@ -1180,6 +1554,7 @@ namespace UniStorm
             m_LightningLight.shadowResolution = LightningShadowResolution;
             m_LightningLight.shadows = LightningShadowType;
             m_LightningLight.shadowStrength = LightningShadowStrength;
+            m_LightningLight.color = LightningLightColor;
             m_UniStormLightningSystem.LightningLightSource = m_LightningLight;
             m_UniStormLightningSystem.PlayerTransform = PlayerTransform;
             m_UniStormLightningSystem.LightningGenerationDistance = LightningGenerationDistance;
@@ -1240,11 +1615,11 @@ namespace UniStorm
         //Gets a custom DateTime using UniStorm's current date
         public System.DateTime GetDate()
         {
-            if (RealWorldTime == UniStormSystem.EnableFeature.Disabled)
+            if (RealWorldTime == EnableFeature.Disabled)
             {
                 UniStormDate = new System.DateTime(Year, Month, Day, Hour, Minute, 0);
             }
-            else if (RealWorldTime == UniStormSystem.EnableFeature.Enabled)
+            else if (RealWorldTime == EnableFeature.Enabled)
             {
                 UniStormDate = new System.DateTime(System.DateTime.Now.Year, System.DateTime.Now.Month, System.DateTime.Now.Day, Hour, Minute, 0);
                 Year = UniStormDate.Year;
@@ -1258,32 +1633,56 @@ namespace UniStorm
         //Move our sun according to the time of day
         public void MoveSun()
         {
-            m_CelestialAxisTransform.eulerAngles = new Vector3(m_TimeFloat * 360 - 100, SunRevolution, 180);
-
-            if (CloudShadows == EnableFeature.Enabled)
+            if (UseTimeOfDayUpdateControl == UseTimeOfDayUpdateSeconds.Yes)
             {
-                m_CloudShadows.ShadowDirection = m_SunLight.transform.forward;
+                TimeOfDayUpdateTimer += Time.deltaTime;
+                if (TimeOfDayUpdateTimer >= TimeOfDayUpdateSeconds)
+                {
+                    m_CelestialAxisTransform.eulerAngles = new Vector3(m_TimeFloat * 360 - 100, SunRevolution, 180);
+
+                    if (CloudShadows == EnableFeature.Enabled)
+                    {
+                        m_CloudShadows.ShadowDirection = m_SunLight.transform.forward;
+                    }
+
+                    TimeOfDayUpdateTimer = 0;
+                }
+            }
+            else if (UseTimeOfDayUpdateControl == UseTimeOfDayUpdateSeconds.No)
+            {
+                m_CelestialAxisTransform.eulerAngles = new Vector3(m_TimeFloat * 360 - 100, SunRevolution, 180);
+
+                if (CloudShadows == EnableFeature.Enabled)
+                {
+                    m_CloudShadows.ShadowDirection = m_SunLight.transform.forward;
+                }
             }
         }
 
         void UpdateCelestialLightShafts ()
         {
-            if (m_SunLight.intensity <= 0)
+            if (SunShaftsEffect == EnableFeature.Enabled)
             {
-                m_SunShafts.enabled = false;
-            }
-            else
-            {
-                m_SunShafts.enabled = true;
+                if (m_SunLight.intensity <= 0)
+                {
+                    m_SunShafts.enabled = false;
+                }
+                else
+                {
+                    m_SunShafts.enabled = true;
+                }
             }
 
-            if (m_MoonLight.intensity <= 0)
+            if (MoonShaftsEffect == EnableFeature.Enabled)
             {
-                m_MoonShafts.enabled = false;
-            }
-            else
-            {
-                m_MoonShafts.enabled = true;
+                if (m_MoonLight.intensity <= 0)
+                {
+                    m_MoonShafts.enabled = false;
+                }
+                else
+                {
+                    m_MoonShafts.enabled = true;
+                }
             }
         }
 
@@ -1300,6 +1699,15 @@ namespace UniStorm
             //Only run UniStorm if it has been initialized.
             if (UniStormInitialized)
             {
+                //Only allow runtime editing of Customize Quality settings if enabled.
+                if (CustomizeQuality == CustomizeQualityEnum.Yes && UpdateMarchStepsDuringRuntime == EnableFeature.Enabled && CloudQuality == CloudQualityEnum.Ultra)
+                {
+                    m_CloudDomeMaterial.SetFloat("_DistantCloudUpdateSpeed", ConvergenceSpeed);
+                    Shader.SetGlobalFloat("CLOUD_MARCH_STEPS", NearMarchSteps);
+                    Shader.SetGlobalFloat("DISTANT_CLOUD_MARCH_STEPS", DistantMarchSteps);
+                    //m_UniStormClouds.numRendersPerFrame = RendersPerFrame;
+                }
+
                 if (UseUniStormMenu == EnableFeature.Enabled)
                 {
                     //Some versions of Unity cannot have the Canvas disabled without causing issues with dropdown menus.
@@ -1365,7 +1773,7 @@ namespace UniStorm
                         m_LightningTimer += Time.deltaTime;
 
                         //Only create a lightning strike if the clouds have fully faded in
-                        if (m_LightningTimer >= m_LightningSeconds && m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.54f)
+                        if (m_LightningTimer >= m_LightningSeconds && m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.5f)
                         {
                             m_UniStormLightningSystem.LightningCurve = LightningFlashPatterns[Random.Range(0, LightningFlashPatterns.Count)];
                             m_UniStormLightningSystem.GenerateLightning();
@@ -1397,7 +1805,7 @@ namespace UniStorm
         //Generate and return a random cloud intensity based on the current weather type cloud level
         float GetCloudLevel(bool InstantFade)
         {
-            Random.InitState(System.DateTime.Now.Millisecond); //Initialize Random.Range with a random seed
+            Random.InitState(System.DateTime.Now.Millisecond); //Initialize Random.Range with a random seed 
             float GeneratedCloudLevel = 0;
 
             if (MostlyCloudyCoroutine != null) { StopCoroutine(MostlyCloudyCoroutine); }
@@ -1405,7 +1813,7 @@ namespace UniStorm
             
             if (CurrentWeatherType.CloudLevel == WeatherType.CloudLevelEnum.Clear)
             {
-                GeneratedCloudLevel = 0.25f;
+                GeneratedCloudLevel = 0.36f;
                 if (!InstantFade)
                 {
                     MostlyCloudyCoroutine = StartCoroutine(MostlyCloudyAdjustment(10 * TransitionSpeed, 1, true));
@@ -1414,7 +1822,11 @@ namespace UniStorm
             }
             else if (CurrentWeatherType.CloudLevel == WeatherType.CloudLevelEnum.MostlyClear)
             {
-                GeneratedCloudLevel = Random.Range(0.37f, 0.43f);
+                if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                    GeneratedCloudLevel = Random.Range(0.35f, 0.39f);
+                else
+                    GeneratedCloudLevel = Random.Range(0.41f, 0.44f);
+
                 if (!InstantFade)
                 {
                     MostlyCloudyCoroutine = StartCoroutine(MostlyCloudyAdjustment(10 * TransitionSpeed, 1, true));
@@ -1423,7 +1835,11 @@ namespace UniStorm
             }
             else if (CurrentWeatherType.CloudLevel == WeatherType.CloudLevelEnum.PartyCloudy)
             {
-                GeneratedCloudLevel = Random.Range(0.46f, 0.52f);
+                if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                    GeneratedCloudLevel = Random.Range(0.43f, 0.47f);
+                else
+                    GeneratedCloudLevel = Random.Range(0.45f, 0.48f);
+
                 if (!InstantFade)
                 {
                     MostlyCloudyCoroutine = StartCoroutine(MostlyCloudyAdjustment(10 * TransitionSpeed, 1, true));
@@ -1432,7 +1848,11 @@ namespace UniStorm
             }
             else if (CurrentWeatherType.CloudLevel == WeatherType.CloudLevelEnum.MostlyCloudy)
             {
-                GeneratedCloudLevel = Random.Range(0.54f, 0.58f);
+                if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                    GeneratedCloudLevel = Random.Range(0.5f, 0.55f);
+                else
+                    GeneratedCloudLevel = Random.Range(0.49f, 0.52f);
+
                 if (!InstantFade)
                 {
                     MostlyCloudyCoroutine = StartCoroutine(MostlyCloudyAdjustment(10 * TransitionSpeed, 1, false));
@@ -1448,7 +1868,11 @@ namespace UniStorm
 
                 if (CurrentWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.No)
                 {
-                    GeneratedCloudLevel = 0.64f;
+                    if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                        GeneratedCloudLevel = 0.6f;
+                    else
+                        GeneratedCloudLevel = Random.Range(0.53f, 0.55f);
+
                     if (!InstantFade)
                     {
                         MostlyCloudyCoroutine = StartCoroutine(MostlyCloudyAdjustment(10 * TransitionSpeed, 1, false));
@@ -1456,7 +1880,11 @@ namespace UniStorm
                 }
                 else if (CurrentWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.Yes)
                 {
-                    GeneratedCloudLevel = 0.69f;
+                    if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                        GeneratedCloudLevel = 0.6f;
+                    else
+                        GeneratedCloudLevel = Random.Range(0.53f, 0.55f);
+
                     if (!InstantFade)
                     {
                         MostlyCloudyCoroutine = StartCoroutine(MostlyCloudyAdjustment(5 * TransitionSpeed, 1, true));
@@ -1476,6 +1904,7 @@ namespace UniStorm
         public void CalculateTimeSlider()
         {
             m_TimeFloat = TimeSlider.value;
+            TimeOfDayUpdateTimer = TimeOfDayUpdateSeconds;
         }
 
         public void UpdateTimeSlider()
@@ -1487,6 +1916,8 @@ namespace UniStorm
         void HourlyUpdate()
         {
             OnHourChangeEvent.Invoke();
+
+            MoveSun();
 
             if (CloudRenderType == CloudRenderTypeEnum.Transparent)
             {
@@ -1546,18 +1977,34 @@ namespace UniStorm
         {
             if (Hour >= 6 && Hour <= 7)
             {
-                CurrentTimeOfDay = CurrentTimeOfDayEnum.Morning;
+                if (CurrentTimeOfDay != CurrentTimeOfDayEnum.Morning)
+                {
+                    m_UpdateTimeOfDayMusic = true;
+                }
+                CurrentTimeOfDay = CurrentTimeOfDayEnum.Morning;               
             }
             else if (Hour >= 8 && Hour <= 16)
             {
+                if (CurrentTimeOfDay != CurrentTimeOfDayEnum.Day)
+                {
+                    m_UpdateTimeOfDayMusic = true;
+                }
                 CurrentTimeOfDay = CurrentTimeOfDayEnum.Day;
             }
             else if (Hour >= 17 && Hour <= 18)
             {
+                if (CurrentTimeOfDay != CurrentTimeOfDayEnum.Evening)
+                {
+                    m_UpdateTimeOfDayMusic = true;
+                }
                 CurrentTimeOfDay = CurrentTimeOfDayEnum.Evening;
             }
             else if (Hour >= 19 && Hour <= 23 || Hour >= 0 && Hour <= 5)
             {
+                if (CurrentTimeOfDay != CurrentTimeOfDayEnum.Night)
+                {
+                    m_UpdateTimeOfDayMusic = true;
+                }
                 CurrentTimeOfDay = CurrentTimeOfDayEnum.Night;
             }
         }
@@ -1686,18 +2133,19 @@ namespace UniStorm
         {
             m_TimeOfDayMusicTimer += Time.deltaTime;
 
-            if (m_TimeOfDayMusicTimer >= m_CurrentMusicClipLength + TimeOfDayMusicDelay)
+            if (m_TimeOfDayMusicTimer >= m_CurrentMusicClipLength + TimeOfDayMusicDelay || m_UpdateTimeOfDayMusic && TransitionMusicOnTimeOfDayChange == EnableFeature.Enabled || m_UpdateBiomeTimeOfDayMusic)
             {
                 if (CurrentTimeOfDay == CurrentTimeOfDayEnum.Morning)
                 {
                     //Morning Music
                     if (MorningMusic.Count != 0)
                     {
-                        TimeOfDayMusicAudioSource.clip = MorningMusic[Random.Range(0, MorningMusic.Count)];
-                        if (TimeOfDayMusicAudioSource.clip != null)
+                        if (MusicVolumeCoroutine != null) { StopCoroutine(MusicVolumeCoroutine); }
+                        AudioClip RandomMorningSound = MorningMusic[Random.Range(0, MorningMusic.Count)];
+                        if (RandomMorningSound != null)
                         {
-                            TimeOfDayMusicAudioSource.Play();
-                            m_CurrentMusicClipLength = TimeOfDayMusicAudioSource.clip.length;
+                            MusicVolumeCoroutine = StartCoroutine(MusicFadeSequence(MusicTransitionLength, RandomMorningSound));
+                            m_CurrentMusicClipLength = RandomMorningSound.length;
                         }
                     }
                 }
@@ -1706,11 +2154,12 @@ namespace UniStorm
                     //Day Music
                     if (DayMusic.Count != 0)
                     {
-                        TimeOfDayMusicAudioSource.clip = DayMusic[Random.Range(0, DayMusic.Count)];
-                        if (TimeOfDayMusicAudioSource.clip != null)
+                        if (MusicVolumeCoroutine != null) { StopCoroutine(MusicVolumeCoroutine); }
+                        AudioClip RandomDaySound = DayMusic[Random.Range(0, DayMusic.Count)];
+                        if (RandomDaySound != null)
                         {
-                            TimeOfDayMusicAudioSource.Play();
-                            m_CurrentMusicClipLength = TimeOfDayMusicAudioSource.clip.length;
+                            MusicVolumeCoroutine = StartCoroutine(MusicFadeSequence(MusicTransitionLength, RandomDaySound));
+                            m_CurrentMusicClipLength = RandomDaySound.length;
                         }
                     }
                 }
@@ -1719,11 +2168,12 @@ namespace UniStorm
                     //Evening Music
                     if (EveningMusic.Count != 0)
                     {
-                        TimeOfDayMusicAudioSource.clip = EveningMusic[Random.Range(0, EveningMusic.Count)];
-                        if (TimeOfDayMusicAudioSource.clip != null)
+                        if (MusicVolumeCoroutine != null) { StopCoroutine(MusicVolumeCoroutine); }
+                        AudioClip RandomEveningSound = EveningMusic[Random.Range(0, EveningMusic.Count)];
+                        if (RandomEveningSound != null)
                         {
-                            TimeOfDayMusicAudioSource.Play();
-                            m_CurrentMusicClipLength = TimeOfDayMusicAudioSource.clip.length;
+                            MusicVolumeCoroutine = StartCoroutine(MusicFadeSequence(MusicTransitionLength, RandomEveningSound));
+                            m_CurrentMusicClipLength = RandomEveningSound.length;
                         }
                     }
                 }
@@ -1732,16 +2182,19 @@ namespace UniStorm
                     //Night Music
                     if (NightMusic.Count != 0)
                     {
-                        TimeOfDayMusicAudioSource.clip = NightMusic[Random.Range(0, NightMusic.Count)];
-                        if (TimeOfDayMusicAudioSource.clip != null)
+                        if (MusicVolumeCoroutine != null) { StopCoroutine(MusicVolumeCoroutine); }
+                        AudioClip RandomNightSound = NightMusic[Random.Range(0, NightMusic.Count)];
+                        if (RandomNightSound != null)
                         {
-                            TimeOfDayMusicAudioSource.Play();
-                            m_CurrentMusicClipLength = TimeOfDayMusicAudioSource.clip.length;
+                            MusicVolumeCoroutine = StartCoroutine(MusicFadeSequence(MusicTransitionLength, RandomNightSound));
+                            m_CurrentMusicClipLength = RandomNightSound.length;
                         }
                     }
                 }
 
                 m_TimeOfDayMusicTimer = 0;
+                m_UpdateTimeOfDayMusic = false;
+                m_UpdateBiomeTimeOfDayMusic = false;
             }
         }
 
@@ -1804,6 +2257,9 @@ namespace UniStorm
             if (CloudShadowIntensityCoroutine != null) { StopCoroutine(CloudShadowIntensityCoroutine); }
             if (SunAttenuationIntensityCoroutine != null) { StopCoroutine(SunAttenuationIntensityCoroutine); }
             if (AuroraCoroutine != null) { StopCoroutine(AuroraCoroutine); }
+            if (AtmosphericFogCoroutine != null) { StopCoroutine(AtmosphericFogCoroutine); }
+            if (FogLightFalloffCoroutine != null) { StopCoroutine(FogLightFalloffCoroutine); }
+            if (SunHeightCoroutine != null) { StopCoroutine(SunHeightCoroutine); }
 
             //Reset our time of day sounds timer so it doesn't play right after a weather change
             m_TimeOfDaySoundsTimer = 0;
@@ -1824,12 +2280,19 @@ namespace UniStorm
                 CloudCoroutine = StartCoroutine(CloudFadeSequence(10 * TransitionSpeed, m_ReceivedCloudValue, true));
             }
 
-            CloudHeightCoroutine = StartCoroutine(CloudHeightSequence(10 * TransitionSpeed, CurrentWeatherType.CloudHeight));
+            if (ForceLowClouds == EnableFeature.Disabled)
+            {
+                CloudHeightCoroutine = StartCoroutine(CloudHeightSequence(10 * TransitionSpeed, CurrentWeatherType.CloudHeight));
+            }
 
             if (CloudType == CloudTypeEnum.Volumetric && CurrentWeatherType.CloudLevel != WeatherType.CloudLevelEnum.DontChange)
             {
                 CloudProfile m_CP = CurrentWeatherType.CloudProfileComponent;
-                CloudProfileCoroutine = StartCoroutine(CloudProfileSequence(10 * TransitionSpeed, m_CP.EdgeSoftness, m_CP.BaseSoftness, m_CP.DetailStrength, m_CP.Density, m_CP.CoverageBias, m_CP.DetailScale));
+
+                if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                    CloudProfileCoroutine = StartCoroutine(CloudProfileSequence(10 * TransitionSpeed, m_CP.EdgeSoftness, m_CP.BaseSoftness, m_CP.DetailStrength, m_CP.Density, m_CP.CoverageBias, m_CP.DetailScale));
+                else
+                    CloudProfileCoroutine = StartCoroutine(CloudProfileSequence(10 * TransitionSpeed, m_CP.EdgeSoftness, m_CP.BaseSoftness, m_DetailStrength, m_CP.Density, 0.02f, m_CP.DetailScale));
             }
 
             //Cloud Shadows
@@ -1846,7 +2309,12 @@ namespace UniStorm
             else
             {
                 WindCoroutine = StartCoroutine(WindFadeSequence(10 * TransitionSpeed, CurrentWeatherType.WindIntensity, true));
-            }          
+            } 
+            
+            if (FogType == FogTypeEnum.UnistormFog)
+            {
+                FogLightFalloffCoroutine = StartCoroutine(FogLightFalloffSequence(10 * TransitionSpeed, CurrentWeatherType.FogLightFalloff));
+            }
 
             //Fog
             if (RenderSettings.fogDensity < CurrentWeatherType.FogDensity)
@@ -1875,10 +2343,23 @@ namespace UniStorm
             {
                 SunCoroutine = StartCoroutine(SunFadeSequence(10 * TransitionSpeed, CurrentWeatherType.SunIntensity, false));
                 MoonCoroutine = StartCoroutine(MoonFadeSequence(10 * TransitionSpeed, CurrentWeatherType.MoonIntensity, false));
-                ColorCoroutine = StartCoroutine(ColorFadeSequence(30 * TransitionSpeed, 1));
+                ColorCoroutine = StartCoroutine(ColorFadeSequence(10 * TransitionSpeed, 1, CurrentWeatherType.FogColor, CurrentWeatherType.CloudColor));
                 SunColorCoroutine = StartCoroutine(SunColorFadeSequence(10 * TransitionSpeed, 1));
                 StormyCloudsCoroutine = StartCoroutine(StormyCloudsSequence(10 * TransitionSpeed, false));
-                SunAttenuationIntensityCoroutine = StartCoroutine(SunAttenuationIntensitySequence(10 * TransitionSpeed, 0.2f));
+                SunAttenuationIntensityCoroutine = StartCoroutine(SunAttenuationIntensitySequence(10 * TransitionSpeed, 0.35f));
+                SunHeightCoroutine = StartCoroutine(SunHeightSequence(10 * TransitionSpeed, -600, -400));
+
+                if (FogType == FogTypeEnum.UnistormFog)
+                {
+                    if (CurrentWeatherType.OverrideCameraFogHeight == WeatherType.Yes_No.No)
+                    {
+                        AtmosphericFogCoroutine = StartCoroutine(AtmosphericFogFadeSequence(10 * TransitionSpeed, 0.0f, (1 - CurrentWeatherType.FogHeight)));
+                    }
+                    else if (CurrentWeatherType.OverrideCameraFogHeight == WeatherType.Yes_No.Yes)
+                    {
+                        AtmosphericFogCoroutine = StartCoroutine(AtmosphericFogFadeSequence(10 * TransitionSpeed, ((1 - CurrentWeatherType.CameraFogHeight) / 10), (1 - CurrentWeatherType.FogHeight)));
+                    }
+                }
 
                 if (CurrentWeatherType.ShaderControl == WeatherType.ShaderControlEnum.Rain)
                 {
@@ -1900,10 +2381,34 @@ namespace UniStorm
             {
                 SunCoroutine = StartCoroutine(SunFadeSequence(10 * TransitionSpeed, CurrentWeatherType.SunIntensity, false));
                 MoonCoroutine = StartCoroutine(MoonFadeSequence(10 * TransitionSpeed, CurrentWeatherType.MoonIntensity, false));
-                ColorCoroutine = StartCoroutine(ColorFadeSequence(30 * TransitionSpeed, 1));
+                ColorCoroutine = StartCoroutine(ColorFadeSequence(30 * TransitionSpeed, 1, CurrentWeatherType.FogColor, CurrentWeatherType.CloudColor));
                 SunColorCoroutine = StartCoroutine(SunColorFadeSequence(10 * TransitionSpeed, 1));
                 StormyCloudsCoroutine = StartCoroutine(StormyCloudsSequence(10 * TransitionSpeed, true));
-                SunAttenuationIntensityCoroutine = StartCoroutine(SunAttenuationIntensitySequence(10 * TransitionSpeed, 1));
+
+                //Reduce the sun's attenuation by 50% if Gamma Color Space is used to stop the clouds from being too bright.
+                if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                {
+                    SunAttenuationIntensityCoroutine = StartCoroutine(SunAttenuationIntensitySequence(10 * TransitionSpeed, 0.5f));
+                }
+                else
+                {
+                    SunAttenuationIntensityCoroutine = StartCoroutine(SunAttenuationIntensitySequence(10 * TransitionSpeed, 1));
+                }
+
+                SunHeightCoroutine = StartCoroutine(SunHeightSequence(10 * TransitionSpeed, -100, -70));
+
+                if (FogType == FogTypeEnum.UnistormFog)
+                {
+                    if (CurrentWeatherType.OverrideCameraFogHeight == WeatherType.Yes_No.No)
+                    {
+                        AtmosphericFogCoroutine = StartCoroutine(AtmosphericFogFadeSequence(10 * TransitionSpeed, ((1 - CameraFogHeight) / 10), (1 - CurrentWeatherType.FogHeight)));
+                    }
+                    else if (CurrentWeatherType.OverrideCameraFogHeight == WeatherType.Yes_No.Yes)
+                    {
+                        AtmosphericFogCoroutine = StartCoroutine(AtmosphericFogFadeSequence(10 * TransitionSpeed, ((1 - CurrentWeatherType.CameraFogHeight) / 10), (1 - CurrentWeatherType.FogHeight)));
+                    }
+
+                }
 
                 if (CurrentWeatherType.ShaderControl == WeatherType.ShaderControlEnum.None)
                 {
@@ -2032,15 +2537,11 @@ namespace UniStorm
         //Continuously update our colors based on the time of day
         void UpdateColors()
         {
-            if (CurrentWeatherType.CloudLevel == WeatherType.CloudLevelEnum.MostlyCloudy &&
-            CurrentWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.No || MostlyCloudyFadeValue > 0)
-            {
-                m_CloudDomeMaterial.SetFloat("_uHorizonFadeEnd", 0.22f + CloudyFadeControl.Evaluate(m_TimeFloat * 24) * MostlyCloudyFadeValue);
-            }
-
             m_SunLight.color = SunColor.Evaluate(m_TimeFloat);
             m_MoonLight.color = MoonColor.Evaluate(m_TimeFloat);
             m_StarsMaterial.color = StarLightColor.Evaluate(m_TimeFloat);
+            m_StarsRenderer.transform.position = PlayerTransform.position;
+            m_StarsMaterial.SetVector("_uWorldSpaceCameraPos", PlayerCamera.transform.position);
             m_SkyBoxMaterial.SetColor("_SkyTint", SkyColor.Evaluate(m_TimeFloat));
             m_SkyBoxMaterial.SetFloat("_AtmosphereThickness", AtmosphereThickness.Evaluate(m_TimeFloat * 24));
             m_SkyBoxMaterial.SetColor("_NightSkyTint", SkyTintColor.Evaluate(m_TimeFloat));
@@ -2054,13 +2555,56 @@ namespace UniStorm
             RenderSettings.ambientSkyColor = AmbientSkyLightColor.Evaluate(m_TimeFloat);
             RenderSettings.ambientEquatorColor = AmbientEquatorLightColor.Evaluate(m_TimeFloat);
             RenderSettings.ambientGroundColor = AmbientGroundLightColor.Evaluate(m_TimeFloat);
-            RenderSettings.fogColor = FogColor.Evaluate(m_TimeFloat);
             RenderSettings.reflectionIntensity = EnvironmentReflections.Evaluate(m_TimeFloat * 24);
-            CurrentFogColor = FogColor.Evaluate(m_TimeFloat);
+
+            SunObjectMaterial.SetVector("_uWorldSpaceCameraPos", PlayerCamera.transform.position);
+            SunObjectMaterial.SetColor("_SunColor", SunSpotColor.Evaluate(m_TimeFloat));
+            SunObject.transform.localScale = Vector3.one * SunSize.Evaluate(m_TimeFloat * 24) * 3;
             m_SunLight.intensity = SunIntensityCurve.Evaluate(m_TimeFloat * 24) * SunIntensity;
-            m_SkyBoxMaterial.SetFloat("_SunSize", SunSize.Evaluate(m_TimeFloat * 24) * 0.01f);
             m_MoonLight.intensity = MoonIntensityCurve.Evaluate(m_TimeFloat * 24) * MoonIntensity * MoonPhaseIntensity;
             m_MoonTransform.localScale = MoonSize.Evaluate(m_TimeFloat * 24) * m_MoonStartingSize;
+
+            m_MoonPhaseMaterial.SetFloat("_MoonBrightness", MoonObjectFade.Evaluate(m_TimeFloat * 24) * MoonBrightness);
+
+            if (SunShaftsEffect == EnableFeature.Enabled && m_SunLight.intensity > 0)
+            {
+                m_SunShafts.sunShaftIntensity = SunLightShaftIntensity.Evaluate(m_TimeFloat * 24);
+                m_SunShafts.radialBlurIterations = SunLightShaftsBlurIterations;
+                m_SunShafts.sunShaftBlurRadius = SunLightShaftsBlurSize;
+                m_SunShafts.sunColor = SunLightShaftsColor.Evaluate(m_TimeFloat);
+            }
+            else if (MoonShaftsEffect == EnableFeature.Enabled && m_MoonLight.intensity > 0)
+            {
+                m_MoonShafts.sunShaftIntensity = MoonLightShaftIntensity.Evaluate(m_TimeFloat * 24);
+                m_MoonShafts.radialBlurIterations = MoonLightShaftsBlurIterations;
+                m_MoonShafts.sunShaftBlurRadius = MoonLightShaftsBlurSize;
+                m_MoonShafts.sunColor = MoonLightShaftsColor.Evaluate(m_TimeFloat);
+            }
+
+            if (FogType == FogTypeEnum.UnityFog)
+            {
+                CurrentFogColor = FogColor.Evaluate(m_TimeFloat);
+                RenderSettings.fogColor = CurrentFogColor;
+                m_CloudDomeMaterial.SetFloat("_UseUniStormFog", 0);
+            }
+            else if (FogType == FogTypeEnum.UnistormFog)
+            {
+                CurrentFogColor = FogColor.Evaluate(m_TimeFloat);
+                m_UniStormAtmosphericFog.BottomColor = CurrentFogColor;
+                m_UniStormAtmosphericFog.SunColor = FogLightColor.Evaluate(m_TimeFloat);
+                m_UniStormAtmosphericFog.SunControl = SunControlCurve.Evaluate(m_TimeFloat * 24);
+                m_UniStormAtmosphericFog.MoonControl = m_MoonLight.intensity;
+                m_UniStormAtmosphericFog.SunIntensity = SunAtmosphericFogIntensity.Evaluate(m_TimeFloat * 24) * FogLightFalloff;
+                m_UniStormAtmosphericFog.MoonIntensity = MoonAtmosphericFogIntensity.Evaluate(m_TimeFloat * 24) * FogLightFalloff;
+                m_CloudDomeMaterial.SetColor("_FogColor", CurrentFogColor);
+                m_CloudDomeMaterial.SetColor("_SunColor", FogLightColor.Evaluate(m_TimeFloat));
+                m_CloudDomeMaterial.SetFloat("_SunControl", SunControlCurve.Evaluate(m_TimeFloat * 24));
+                m_CloudDomeMaterial.SetFloat("_MoonControl", m_MoonLight.intensity);
+                m_CloudDomeMaterial.SetVector("_SunVector", m_SunLight.transform.rotation * -Vector3.forward);
+                m_CloudDomeMaterial.SetVector("_MoonVector", m_MoonLight.transform.rotation * -Vector3.forward);
+                m_CloudDomeMaterial.SetFloat("_SunIntensity", SunAtmosphericFogIntensity.Evaluate(m_TimeFloat * 24) * FogLightFalloff);
+                m_CloudDomeMaterial.SetFloat("_MoonIntensity", MoonAtmosphericFogIntensity.Evaluate(m_TimeFloat * 24) * FogLightFalloff);
+            }
         }
 
         //Calculates our days and updates our Animation curves.
@@ -2165,8 +2709,10 @@ namespace UniStorm
 
         //Check our generated weather for seasonal and temperature conditions. 
         //Reroll the weather if they are not met until an appropriate weather type in the same category is found.
-        void CheckGeneratedWeather()
+        public void CheckGeneratedWeather()
         {
+            CalculatePrecipiation();
+
             if (m_GeneratedOdds <= m_PrecipitationOdds && PrecipiationWeatherTypes.Count != 0)
             {
                 TempWeatherType = PrecipiationWeatherTypes[Random.Range(0, PrecipiationWeatherTypes.Count)];
@@ -2176,32 +2722,37 @@ namespace UniStorm
                 TempWeatherType = NonPrecipiationWeatherTypes[Random.Range(0, NonPrecipiationWeatherTypes.Count)];
             }
 
-            while (TempWeatherType.TemperatureType == WeatherType.TemperatureTypeEnum.AboveFreezing && Temperature <= m_FreezingTemperature
-                || TempWeatherType.Season != WeatherType.SeasonEnum.All && (int)TempWeatherType.Season != (int)CurrentSeason
-            || TempWeatherType.TemperatureType == WeatherType.TemperatureTypeEnum.BelowFreezing && Temperature > m_FreezingTemperature
-            || TempWeatherType.SpecialWeatherType == WeatherType.Yes_No.Yes)
+            if (!IgnoreConditions)
             {
-                if (TempWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.No)
+                while (TempWeatherType.TemperatureType == WeatherType.TemperatureTypeEnum.AboveFreezing && Temperature <= m_FreezingTemperature
+                    || TempWeatherType.Season != WeatherType.SeasonEnum.All && (int)TempWeatherType.Season != (int)CurrentSeason
+                || TempWeatherType.TemperatureType == WeatherType.TemperatureTypeEnum.BelowFreezing && Temperature > m_FreezingTemperature
+                || TempWeatherType.SpecialWeatherType == WeatherType.Yes_No.Yes)
                 {
-                    TempWeatherType = NonPrecipiationWeatherTypes[Random.Range(0, NonPrecipiationWeatherTypes.Count)];
-                }
-                else if (TempWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.Yes)
-                {
-                    TempWeatherType = PrecipiationWeatherTypes[Random.Range(0, PrecipiationWeatherTypes.Count)];
-                }
-                else
-                {
-                    break;
+                    if (TempWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.No)
+                    {
+                        TempWeatherType = NonPrecipiationWeatherTypes[Random.Range(0, NonPrecipiationWeatherTypes.Count)];
+                    }
+                    else if (TempWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.Yes)
+                    {
+                        TempWeatherType = PrecipiationWeatherTypes[Random.Range(0, PrecipiationWeatherTypes.Count)];
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
 
             if (WeatherGenerationMethod == WeatherGenerationMethodEnum.Daily)
             {
                 NextWeatherType = TempWeatherType;
+                OnWeatherGenerationEvent.Invoke();
             }
             else if (WeatherGenerationMethod == WeatherGenerationMethodEnum.Hourly)
             {
                 WeatherForecast.Add(TempWeatherType);
+                OnWeatherGenerationEvent.Invoke();
             }
             m_WeatherGenerated = true;
         }
@@ -2215,7 +2766,15 @@ namespace UniStorm
             {
                 if (CurrentWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.Yes)
                 {
-                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.55f);
+                    if (FogType == FogTypeEnum.UnistormFog)
+                    {
+                        yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.45f);
+                    }
+                    else if (FogType == FogTypeEnum.UnityFog)
+                    {
+                        yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= m_ReceivedCloudValue);
+                    }
+
                     t += Time.deltaTime / TransitionTime * 0.01f;
                     LerpValue += Time.deltaTime / TransitionTime;
 
@@ -2243,10 +2802,15 @@ namespace UniStorm
             }
         }
 
-        IEnumerator ColorFadeSequence(float TransitionTime, float MaxValue)
+        IEnumerator ColorFadeSequence(float TransitionTime, float MaxValue, Gradient FogGradientColor, Gradient CloudGradientColor)
         {
             float LerpValue = 0;
             float t = 0;
+
+            if (CurrentWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.Yes && CurrentWeatherType.CloudLevel == WeatherType.CloudLevelEnum.Cloudy)
+            {
+                yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.48f);
+            }
 
             while (LerpValue < MaxValue)
             {
@@ -2257,17 +2821,41 @@ namespace UniStorm
 
                     for (int i = 0; i < CloudBaseColor.colorKeys.Length; i++)
                     {
-                        CloudColorKeySwitcher[i].color = Color.Lerp(CloudColorKeySwitcher[i].color, CloudStormyBaseColor.colorKeys[i].color, t);
+                        if (CurrentWeatherType.OverrideCloudColor == WeatherType.Yes_No.No)
+                        {
+                            CloudColorKeySwitcher[i].color = Color.Lerp(CloudColorKeySwitcher[i].color, CloudStormyBaseColor.colorKeys[i].color, t);
+                        }
+                        else if (CurrentWeatherType.OverrideCloudColor == WeatherType.Yes_No.Yes)
+                        {
+                            CloudColorKeySwitcher[i].color = Color.Lerp(CloudColorKeySwitcher[i].color, CloudGradientColor.colorKeys[i].color, t);
+                        }                           
                     }
 
                     for (int i = 0; i < FogColor.colorKeys.Length; i++)
                     {
-                        FogColorKeySwitcher[i].color = Color.Lerp(FogColorKeySwitcher[i].color, FogStormyColor.colorKeys[i].color, t);
+                        if (CurrentWeatherType.OverrideFogColor == WeatherType.Yes_No.No)
+                        {
+                            FogColorKeySwitcher[i].color = Color.Lerp(FogColorKeySwitcher[i].color, FogStormyColor.colorKeys[i].color, t);
+                        }
+                        else if (CurrentWeatherType.OverrideFogColor == WeatherType.Yes_No.Yes)
+                        {
+                            FogColorKeySwitcher[i].color = Color.Lerp(FogColorKeySwitcher[i].color, FogGradientColor.colorKeys[i].color, t);
+                        }                           
                     }
 
                     for (int i = 0; i < AmbientSkyLightColor.colorKeys.Length; i++)
                     {
                         AmbientSkyLightColorKeySwitcher[i].color = Color.Lerp(AmbientSkyLightColorKeySwitcher[i].color, StormyAmbientSkyLightColor.colorKeys[i].color, t);
+                    }
+
+                    for (int i = 0; i < CloudLightColor.colorKeys.Length; i++)
+                    {
+                        CloudLightColorKeySwitcher[i].color = Color.Lerp(CloudLightColorKeySwitcher[i].color, StormyCloudLightColor.colorKeys[i].color, t);
+                    }
+
+                    for (int i = 0; i < FogLightColor.colorKeys.Length; i++)
+                    {
+                        FogLightColorKeySwitcher[i].color = Color.Lerp(FogLightColorKeySwitcher[i].color, StormyFogLightColor.colorKeys[i].color, t);
                     }
 
                     for (int i = 0; i < AmbientEquatorLightColor.colorKeys.Length; i++)
@@ -2280,6 +2868,8 @@ namespace UniStorm
                         AmbientGroundLightColorKeySwitcher[i].color = Color.Lerp(AmbientGroundLightColorKeySwitcher[i].color, StormyAmbientGroundLightColor.colorKeys[i].color, t);
                     }
 
+                    FogLightColor.SetKeys(FogLightColorKeySwitcher, FogLightColor.alphaKeys);
+                    CloudLightColor.SetKeys(CloudLightColorKeySwitcher, CloudLightColor.alphaKeys);
                     FogColor.SetKeys(FogColorKeySwitcher, FogColor.alphaKeys);
                     CloudBaseColor.SetKeys(CloudColorKeySwitcher, CloudBaseColor.alphaKeys);
                     AmbientSkyLightColor.SetKeys(AmbientSkyLightColorKeySwitcher, AmbientSkyLightColor.alphaKeys);
@@ -2293,17 +2883,41 @@ namespace UniStorm
 
                     for (int i = 0; i < CloudBaseColor.colorKeys.Length; i++)
                     {
-                        CloudColorKeySwitcher[i].color = Color.Lerp(CloudColorKeySwitcher[i].color, DefaultCloudBaseColor.colorKeys[i].color, t);
+                        if (CurrentWeatherType.OverrideCloudColor == WeatherType.Yes_No.No)
+                        {
+                            CloudColorKeySwitcher[i].color = Color.Lerp(CloudColorKeySwitcher[i].color, DefaultCloudBaseColor.colorKeys[i].color, t);
+                        }
+                        else if (CurrentWeatherType.OverrideCloudColor == WeatherType.Yes_No.Yes)
+                        {
+                            CloudColorKeySwitcher[i].color = Color.Lerp(CloudColorKeySwitcher[i].color, CloudGradientColor.colorKeys[i].color, t);
+                        }
                     }
 
                     for (int i = 0; i < FogColor.colorKeys.Length; i++)
                     {
-                        FogColorKeySwitcher[i].color = Color.Lerp(FogColorKeySwitcher[i].color, DefaultFogBaseColor.colorKeys[i].color, t);
+                        if (CurrentWeatherType.OverrideFogColor == WeatherType.Yes_No.No)
+                        {
+                            FogColorKeySwitcher[i].color = Color.Lerp(FogColorKeySwitcher[i].color, DefaultFogBaseColor.colorKeys[i].color, t);
+                        }
+                        else if (CurrentWeatherType.OverrideFogColor == WeatherType.Yes_No.Yes)
+                        {
+                            FogColorKeySwitcher[i].color = Color.Lerp(FogColorKeySwitcher[i].color, FogGradientColor.colorKeys[i].color, t);
+                        }                      
                     }
 
                     for (int i = 0; i < AmbientSkyLightColor.colorKeys.Length; i++)
                     {
                         AmbientSkyLightColorKeySwitcher[i].color = Color.Lerp(AmbientSkyLightColorKeySwitcher[i].color, DefaultAmbientSkyLightBaseColor.colorKeys[i].color, t);
+                    }
+
+                    for (int i = 0; i < CloudLightColor.colorKeys.Length; i++)
+                    {
+                        CloudLightColorKeySwitcher[i].color = Color.Lerp(CloudLightColorKeySwitcher[i].color, DefaultCloudLightColor.colorKeys[i].color, t);
+                    }
+
+                    for (int i = 0; i < FogLightColor.colorKeys.Length; i++)
+                    {
+                        FogLightColorKeySwitcher[i].color = Color.Lerp(FogLightColorKeySwitcher[i].color, DefaultFogLightColor.colorKeys[i].color, t);
                     }
 
                     for (int i = 0; i < AmbientEquatorLightColor.colorKeys.Length; i++)
@@ -2316,6 +2930,8 @@ namespace UniStorm
                         AmbientGroundLightColorKeySwitcher[i].color = Color.Lerp(AmbientGroundLightColorKeySwitcher[i].color, DefaultAmbientGroundLightBaseColor.colorKeys[i].color, t);
                     }
 
+                    FogLightColor.SetKeys(FogLightColorKeySwitcher, FogLightColor.alphaKeys);
+                    CloudLightColor.SetKeys(CloudLightColorKeySwitcher, CloudLightColor.alphaKeys);
                     FogColor.SetKeys(FogColorKeySwitcher, FogColor.alphaKeys);
                     CloudBaseColor.SetKeys(CloudColorKeySwitcher, CloudBaseColor.alphaKeys);
                     AmbientSkyLightColor.SetKeys(AmbientSkyLightColorKeySwitcher, AmbientSkyLightColor.alphaKeys);
@@ -2352,8 +2968,10 @@ namespace UniStorm
 
             float HorizonFadeStart = m_CloudDomeMaterial.GetFloat("_uHorizonFadeStart");
             float HorizonFadeEnd = m_CloudDomeMaterial.GetFloat("_uHorizonFadeEnd");
+            float HorizonSunFadeEnd = m_CloudDomeMaterial.GetFloat("_uSunFadeEnd");
             float LerpValueStart = HorizonFadeStart;
             float LerpValueEnd = HorizonFadeEnd;
+            float LerpSunValueEnd = HorizonSunFadeEnd;
 
             float HorizonBrightness = m_CloudDomeMaterial.GetFloat("_uCloudAlpha");
             float LerpValueHorizonBrightness = HorizonBrightness;
@@ -2366,7 +2984,7 @@ namespace UniStorm
 
                 while (LerpValueColorEnd < 0.32)
                 {
-                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.55f);
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= m_ReceivedCloudValue-0.05f);                   
 
                     t += Time.deltaTime * 1.5f;
                     LerpValueColorStart = Mathf.Lerp(HorizonColorFadeStart, -0.2f, t * 15 / TransitionTime);
@@ -2374,13 +2992,24 @@ namespace UniStorm
                     m_CloudDomeMaterial.SetFloat("_uHorizonColorFadeStart", LerpValueColorStart);
                     m_CloudDomeMaterial.SetFloat("_uHorizonColorFadeEnd", LerpValueColorEnd);
 
-                    LerpValueStart = Mathf.Lerp(HorizonFadeStart, 0, t * 4 / TransitionTime);
-                    LerpValueEnd = Mathf.Lerp(HorizonFadeEnd, 0, t * 4 / TransitionTime);
+                    if (FogType == FogTypeEnum.UnistormFog)
+                    {
+                        LerpValueStart = Mathf.Lerp(HorizonFadeStart, 0, t * 4 / TransitionTime);
+                        LerpValueEnd = Mathf.Lerp(HorizonFadeEnd, 0.22f, t * 4 / TransitionTime);
+                        LerpSunValueEnd = Mathf.Lerp(HorizonSunFadeEnd, 0.18f, t * 4 / TransitionTime);
+                    }
+                    else if (FogType == FogTypeEnum.UnityFog)
+                    {
+                        LerpValueStart = Mathf.Lerp(HorizonFadeStart, 0, t * 4 / TransitionTime);
+                        LerpValueEnd = Mathf.Lerp(HorizonFadeEnd, 0.015f, t * 4 / TransitionTime);
+                        LerpSunValueEnd = Mathf.Lerp(HorizonSunFadeEnd, 0.18f, t * 4 / TransitionTime);
+                    }
+
                     m_CloudDomeMaterial.SetFloat("_uHorizonFadeStart", LerpValueStart);
                     m_CloudDomeMaterial.SetFloat("_uHorizonFadeEnd", LerpValueEnd);
+                    m_CloudDomeMaterial.SetFloat("_uSunFadeEnd", LerpSunValueEnd);
 
                     LerpValueHorizonBrightness = Mathf.Lerp(HorizonBrightness, StormyHorizonBrightness, t * 5 / TransitionTime);
-                    //LerpValueHorizonBrightness = Mathf.Lerp(HorizonBrightness, 1.4f, t * 5 / TransitionTime);
                     m_CloudDomeMaterial.SetFloat("_uCloudAlpha", LerpValueHorizonBrightness);
 
                     if (LerpValueColorEnd >= 0.32f)
@@ -2395,8 +3024,8 @@ namespace UniStorm
             {
                 yield return new WaitUntil(() => MostlyCloudyFadeValue <= 0);
 
-                while (LerpValueEnd < 0.22f)
-                {
+                while (LerpValueEnd > m_CloudFadeLevelEnd)
+                {                   
                     //Make lowest value the control
                     t += Time.deltaTime;
                     LerpValueColorStart = Mathf.Lerp(HorizonColorFadeStart, 0, t * 2f / TransitionTime);
@@ -2404,18 +3033,16 @@ namespace UniStorm
                     m_CloudDomeMaterial.SetFloat("_uHorizonColorFadeStart", LerpValueColorStart);
                     m_CloudDomeMaterial.SetFloat("_uHorizonColorFadeEnd", LerpValueColorEnd);
 
-                    LerpValueStart = Mathf.Lerp(HorizonFadeStart, -0.05f, t * 10f / TransitionTime);
-                    LerpValueEnd = Mathf.Lerp(HorizonFadeEnd, 0.22f, t * 1f / TransitionTime);
+                    LerpValueStart = Mathf.Lerp(HorizonFadeStart, m_CloudFadeLevelStart, t * 10f / TransitionTime);
+                    LerpValueEnd = Mathf.Lerp(HorizonFadeEnd, m_CloudFadeLevelEnd, t * 1f / TransitionTime);
+                    LerpSunValueEnd = Mathf.Lerp(HorizonSunFadeEnd, 0.045f, t * 1f / TransitionTime);
+
                     m_CloudDomeMaterial.SetFloat("_uHorizonFadeStart", LerpValueStart);
                     m_CloudDomeMaterial.SetFloat("_uHorizonFadeEnd", LerpValueEnd);
+                    m_CloudDomeMaterial.SetFloat("_uSunFadeEnd", LerpSunValueEnd);
 
                     LerpValueHorizonBrightness = Mathf.Lerp(HorizonBrightness, 1, t * 1f / TransitionTime);
                     m_CloudDomeMaterial.SetFloat("_uCloudAlpha", LerpValueHorizonBrightness);
-
-                    if (LerpValueEnd >= 0.22f)
-                    {
-                        break;
-                    }
 
                     yield return null;
                 }
@@ -2426,7 +3053,10 @@ namespace UniStorm
         {
             if (CurrentWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.Yes)
             {
-                yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.6f);
+                if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.6f);
+                else
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.5f);
             }
 
             float CurrentValue = RenderSettings.fogDensity;
@@ -2473,7 +3103,14 @@ namespace UniStorm
 
             if (CurrentWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.Yes)
             {
-                yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.55f);
+                if (FogType == FogTypeEnum.UnistormFog)
+                {
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.45f);
+                }
+                else if (FogType == FogTypeEnum.UnityFog)
+                {
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= m_ReceivedCloudValue);
+                }
             }
 
             float CurrentValue = SunIntensity;
@@ -2504,7 +3141,14 @@ namespace UniStorm
 
             if (CurrentWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.Yes)
             {
-                yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.55f);
+                if (FogType == FogTypeEnum.UnistormFog)
+                {
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.45f);
+                }
+                else if (FogType == FogTypeEnum.UnityFog)
+                {
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= m_ReceivedCloudValue);
+                }
             }
 
             float CurrentValue = MoonIntensity;
@@ -2567,7 +3211,7 @@ namespace UniStorm
 
         IEnumerator CloudTallnessSequence(float TransitionTime, float MaxValue)
         {
-            if (UniStormInitialized)
+            if (UniStormInitialized && ForceLowClouds == EnableFeature.Disabled)
             {
                 float CurrentValue = m_CloudDomeMaterial.GetFloat("_uCloudsHeight");
                 float LerpValue = CurrentValue;
@@ -2588,7 +3232,10 @@ namespace UniStorm
         {
             if (CurrentWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.Yes)
             {
-                yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.59f);
+                if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.59f);
+                else
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= m_ReceivedCloudValue);
             }
             else if (CurrentWeatherType.WaitForCloudLevel == WeatherType.Yes_No.Yes)
             {
@@ -2634,7 +3281,10 @@ namespace UniStorm
         {
             if (CurrentWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.Yes)
             {
-                yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.59f);
+                if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.59f);
+                else
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= m_ReceivedCloudValue);
             }
             else if (CurrentWeatherType.WaitForCloudLevel == WeatherType.Yes_No.Yes)
             {
@@ -2679,7 +3329,10 @@ namespace UniStorm
         {
             if (CurrentWeatherType.PrecipitationWeatherType == WeatherType.Yes_No.Yes)
             {
-                yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.59f);
+                if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.59f);
+                else
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= m_ReceivedCloudValue);
             }
             else if (CurrentWeatherType.WaitForCloudLevel == WeatherType.Yes_No.Yes)
             {
@@ -2704,7 +3357,10 @@ namespace UniStorm
         {
             if (!FadeOut)
             {
-                yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.59f);
+                if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.59f);
+                else
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= m_ReceivedCloudValue);
             }
             else
             {
@@ -2718,7 +3374,7 @@ namespace UniStorm
             while ((LerpValue > MaxValue && FadeOut) || (LerpValue < MaxValue && !FadeOut))
             {
                 t += Time.deltaTime;
-                LerpValue = Mathf.Lerp(CurrentValue, MaxValue, t / TransitionTime) * 0.1f;
+                LerpValue = Mathf.Lerp(CurrentValue, MaxValue, (t / TransitionTime));
                 Shader.SetGlobalFloat("_WetnessStrength", LerpValue);
 
                 yield return null;
@@ -2729,7 +3385,12 @@ namespace UniStorm
         {
             if (!FadeOut)
             {
-                yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.59f);
+                if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= 0.59f);
+                else
+                    yield return new WaitUntil(() => m_CloudDomeMaterial.GetFloat("_uCloudsCoverage") >= m_ReceivedCloudValue);
+
+                TransitionTime = TransitionTime * 2;
             }
 
             float CurrentValue = Shader.GetGlobalFloat("_SnowStrength");
@@ -2739,7 +3400,7 @@ namespace UniStorm
             while ((LerpValue > MaxValue && FadeOut) || (LerpValue < MaxValue && !FadeOut))
             {
                 t += Time.deltaTime;
-                LerpValue = Mathf.Lerp(CurrentValue, MaxValue, t / TransitionTime);
+                LerpValue = Mathf.Lerp(CurrentValue, MaxValue, (t / TransitionTime));
                 Shader.SetGlobalFloat("_SnowStrength", LerpValue);
                 yield return null;
             }
@@ -2872,6 +3533,112 @@ namespace UniStorm
             }
         }
 
+        IEnumerator MusicFadeSequence(float TransitionTime, AudioClip NewMusicClip)
+        {
+            if (UniStormInitialized)
+            {
+                float CurrentValue = TimeOfDayMusicAudioSource.volume;
+                float LerpValue = CurrentValue;
+                float t = 0;
+
+                //Fade out for transition, only if the AudioSource has a clip
+                if (TimeOfDayMusicAudioSource.clip != null)
+                {                   
+                    while ((t / TransitionTime) < 1)
+                    {
+                        t += Time.deltaTime;
+                        LerpValue = Mathf.Lerp(CurrentValue, 0, t / TransitionTime);
+                        TimeOfDayMusicAudioSource.volume = LerpValue;
+
+                        yield return null;
+                    }
+                }
+                else
+                {
+                    TimeOfDayMusicAudioSource.volume = 0;
+                }
+
+                //Assign new music clip
+                TimeOfDayMusicAudioSource.clip = NewMusicClip;               
+                TimeOfDayMusicAudioSource.Play();
+
+                //Reset values to fade in from 0
+                CurrentValue = TimeOfDayMusicAudioSource.volume;
+                LerpValue = CurrentValue;
+                t = 0;
+
+                //Fade back in with new clip
+                while ((t / TransitionTime) < 1)
+                {
+                    t += Time.deltaTime;
+                    LerpValue = Mathf.Lerp(CurrentValue, MusicVolume, t / TransitionTime);
+                    TimeOfDayMusicAudioSource.volume = LerpValue;
+
+                    yield return null;
+                }
+
+                m_TimeOfDayMusicTimer = 0;
+            }
+        }
+
+        IEnumerator AtmosphericFogFadeSequence(float TransitionTime, float ShaderMaxValue, float CloudMaxValue)
+        {
+            float ShaderCurrentValue = m_UniStormAtmosphericFog.BlendHeight;
+            float ShaderLerpValue = ShaderCurrentValue;
+            float CloudsCurrentValue = m_CloudDomeMaterial.GetFloat("_FogBlendHeight");
+            float CloudsLerpValue = CloudsCurrentValue;
+            float t = 0;
+
+            while ((t / TransitionTime) < 1)
+            {
+                t += Time.deltaTime;
+                ShaderLerpValue = Mathf.Lerp(ShaderCurrentValue, ShaderMaxValue, t / TransitionTime);
+                m_UniStormAtmosphericFog.BlendHeight = ShaderLerpValue;
+
+                CloudsLerpValue = Mathf.Lerp(CloudsCurrentValue, CloudMaxValue, t / TransitionTime);
+                m_CloudDomeMaterial.SetFloat("_FogBlendHeight", CloudsLerpValue);
+
+                yield return null;
+            }
+        }
+
+        IEnumerator FogLightFalloffSequence(float TransitionTime, float MaxValue)
+        {
+            float CurrentValue = FogLightFalloff;
+            float LerpValue = CurrentValue;
+            float t = 0;
+
+            while ((t / TransitionTime) < 1)
+            {
+                t += Time.deltaTime;
+                LerpValue = Mathf.Lerp(CurrentValue, MaxValue, t / TransitionTime);
+                FogLightFalloff = LerpValue;
+
+                yield return null;
+            }
+        }
+
+        IEnumerator SunHeightSequence(float TransitionTime, float OpaqueValue, float TransparentValue)
+        {
+            float CurrentOpaqueValue = SunObjectMaterial.GetFloat("_OpaqueY");
+            float LerpOpaqueValue = CurrentOpaqueValue;
+            float CurrentTransparentValue = SunObjectMaterial.GetFloat("_TransparentY");
+            float LerpTransparentValue = CurrentTransparentValue;
+            float t = 0;
+
+            while ((t / TransitionTime) < 1)
+            {
+                t += Time.deltaTime * 0.85f;
+                LerpOpaqueValue = Mathf.Lerp(CurrentOpaqueValue, OpaqueValue, t / TransitionTime);
+                SunObjectMaterial.SetFloat("_OpaqueY", LerpOpaqueValue);
+
+                LerpTransparentValue = Mathf.Lerp(CurrentTransparentValue, TransparentValue, t / TransitionTime);
+                SunObjectMaterial.SetFloat("_TransparentY", LerpTransparentValue);
+
+                yield return null;
+            }
+        }
+
         void OnApplicationQuit()
         {
             //Reset our weather shader when the scene is stopped so the shader values remain unchanged in the editor.
@@ -2881,9 +3648,11 @@ namespace UniStorm
 
             m_CloudDomeMaterial.SetFloat("_uHorizonColorFadeStart", 0);
             m_CloudDomeMaterial.SetFloat("_uHorizonColorFadeEnd", 0);
-            m_CloudDomeMaterial.SetFloat("_uHorizonFadeStart", -0.05f);
-            m_CloudDomeMaterial.SetFloat("_uHorizonFadeEnd", 0.22f);
+            m_CloudDomeMaterial.SetFloat("_uHorizonFadeStart", m_CloudFadeLevelStart);
+            m_CloudDomeMaterial.SetFloat("_uHorizonFadeEnd", 0.18f);
+            m_CloudDomeMaterial.SetFloat("_uSunFadeEnd", 0.045f);
             m_CloudDomeMaterial.SetFloat("_uCloudAlpha", 1);
+            m_CloudDomeMaterial.SetFloat("_FogBlendHeight", 0.3f);
 
             if (CloudShadows == EnableFeature.Enabled)
             {

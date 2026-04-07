@@ -4,8 +4,9 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: UniStorm Stars
   m_Shader: {fileID: 4800000, guid: 2c82a57a257b9314e87d2bd80e91dea4, type: 3}
   m_ShaderKeywords: 
@@ -57,9 +58,9 @@ Material:
     m_Floats:
     - _CloudThickness: 1
     - _FogAmount: 1
-    - _HiY: 180
+    - _HiY: -180
     - _InvFade: 3
-    - _LoY: 400
+    - _LoY: -400
     - _MoonFade: 0
     - _RotationA: 0
     - _RotationSpeed: 1

@@ -6,7 +6,7 @@ namespace UniStorm.Utility
 {
     public class GenerateNoise
     {
-        public static string baseFolder = "Assets/UniStorm 3.0/Resources/";
+        public static string baseFolder = "Assets/UniStorm Weather System/Resources/";
 
         private static ComputeShader _noiseCompute = null;
         public static ComputeShader noiseCompute
@@ -75,7 +75,7 @@ namespace UniStorm.Utility
 
         public static void EditorGenerateBaseCloudNoise()
         {
-            int resolution = 256; // Multiple of 8, default 128
+            int resolution = 256;
 
             Texture2D cpuBaseNoiseTexture = new Texture2D(resolution, resolution, TextureFormat.RGBAFloat, false, true);
             cpuBaseNoiseTexture.wrapMode = TextureWrapMode.Repeat;
@@ -88,17 +88,10 @@ namespace UniStorm.Utility
                 for (int y = 0; y < resolution; y++)
                 {
                     Vector4 result = Vector4.zero;
-
                     Vector3 coord = new Vector3(x / (float)(resolution), y / (float)(resolution), 0.5f);
-
-                    //result.x = Mathf.Lerp(1.0f, PNG.OctaveNoise(coord, 7, 4), 0.9f) *
-                    //    Mathf.Lerp(1.0f, WNG.OctaveNoise(coord, 8, 9), 0.7f); // Move perlin noise to the GPU for randomness
-                    result.x = WNG.OctaveNoise(coord, 8, 9);
-                    result.y = 0.625f * WNG.OctaveNoise(coord, 3, 15) +
-                        0.250f * WNG.OctaveNoise(coord, 3, 19) +
-                        0.125f * WNG.OctaveNoise(coord, 3, 23);
-                    result.z = 1.0f - WNG.OctaveNoise(coord + new Vector3(0.5f, 0.5f, 0.5f), 6, 9);
-
+                    result.x = 0.5f - (0.75f * WNG.ModifiedOctaveNoise(coord, 8, 9, 1, 0.0f, -0.25f)) + (0.2f * WNG.ModifiedOctaveNoise(coord, 4, 4, 1, 0.25f, -0.25f));
+                    result.y = 0.5f - (0.75f * WNG.ModifiedOctaveNoise(coord, 4, 20, 1, 0.5f, -0.25f) + (0.2f * WNG.ModifiedOctaveNoise(coord, 8, 10, 1, 0.0f, -0.25f)));
+                    result.z = WNG.ModifiedOctaveNoise(coord, 2, 40, 1, 0.25f, -0.25f);
                     pixels[x + y * resolution] = result;
                 }
             }
@@ -125,11 +118,12 @@ namespace UniStorm.Utility
 
         public static void EditorGenerateCloudDetailNoise()
         {
-            int resolution = 64;
+            int resolution = 45; //Was 45
 
             Texture3D cpuDetailNoiseTexture = new Texture3D(resolution, resolution, resolution, TextureFormat.RGBAFloat, false);
             cpuDetailNoiseTexture.wrapMode = TextureWrapMode.Repeat;
             cpuDetailNoiseTexture.filterMode = FilterMode.Trilinear;
+            cpuDetailNoiseTexture.anisoLevel = 16;
 
             Color[] pixels = new Color[resolution * resolution * resolution];
 
@@ -141,9 +135,9 @@ namespace UniStorm.Utility
                     {
                         Vector3 coord = new Vector3(x / (float)(resolution), y / (float)(resolution), z / (float)(resolution));
 
-                        float r = WNG.OctaveNoise(coord, 16, 3);
-                        float g = WNG.OctaveNoise(coord, 4, 8);
-                        float b = WNG.OctaveNoise(coord, 4, 16);
+                        float r = WNG.OctaveNoise(coord, 4, 4, 0, 0.4f);
+                        float g = WNG.OctaveNoise(coord, 1, 1, 0, 0.2f);
+                        float b = WNG.OctaveNoise(coord, 2, 25);
 
                         float c = Mathf.Max(0.0f, 1.0f - (r + g * 0.5f + b * 0.25f) / 1.75f);
                         float c2 = Mathf.Max(0.0f, 1.0f - (g + r * 0.5f + b * 0.25f) / 1.75f);
@@ -163,7 +157,7 @@ namespace UniStorm.Utility
 
         public static void EditorGenerateCloudCurlNoise()
         {
-            int resolution = 128;
+            int resolution = 64;
 
             Texture2D cpuCurlNoiseTexture = new Texture2D(resolution, resolution, TextureFormat.RGBAFloat, false);
             cpuCurlNoiseTexture.wrapMode = TextureWrapMode.Repeat;
@@ -315,6 +309,24 @@ namespace UniStorm.Utility
         public static float OctaveNoise(Vector3 pos, int octaves, int period, int seed = 0, float persistence = 0.5f)
         {
             float result = 0.0f;
+            float amp = .5f;
+            float freq = 1.0f;
+            float totalAmp = 0.0f;
+            for (int i = 0; i < octaves; i++)
+            {
+                totalAmp += amp;
+                result += Noise(pos, Mathf.RoundToInt(freq * period), seed) * amp;
+                amp *= persistence;
+                freq /= persistence;
+            }
+            if (octaves == 0)
+                return 0.0f;
+            return result / totalAmp;
+        }
+
+        public static float ModifiedOctaveNoise(Vector3 pos, int octaves, int period, int seed = 0, float persistence = 0.5f, float fade = 0.0f)
+        {
+            float result = fade;
             float amp = .5f;
             float freq = 1.0f;
             float totalAmp = 0.0f;

@@ -142,7 +142,7 @@ float tilableFbm(float3 p, const int octaves, float tile) {
 }
 
 
-
+//Generates base cloud shape
 [numthreads(8,8,1)]
 void CSBaseNoiseMain (uint3 id : SV_DispatchThreadID)
 {
@@ -155,21 +155,23 @@ void CSBaseNoiseMain (uint3 id : SV_DispatchThreadID)
     float mfbm = 0.9f;// 0.9f;
     float mvor = 0.7f;// 0.7f;
 
-    //result.r = lerp(1.0f, tilableFbm(coord, 7, 4.0f), mfbm) *
-    //    lerp(1.0f, tilableVoronoi(coord, 8, 9.0f), mvor);
-    //result.g = 0.625f * tilableVoronoi(coord + 0.0f, 3, 15.0f) +
-    //    0.250f * tilableVoronoi(coord + 0.0f, 3, 19.0f) +
-    //    0.125f * tilableVoronoi(coord + 0.0f, 3, 23.0f);
-    //result.b = 1.0f - tilableVoronoi(coord + 0.5f, 6, 9.0f);
+	/*
+    result.r = lerp(1.0f, tilableFbm(coord, 7, 4.0f), mfbm) *
+        lerp(1.0f, tilableVoronoi(coord, 8, 9.0f), mvor);
+    result.g = 0.625f * tilableVoronoi(coord + 0.0f, 3, 15.0f) +
+        0.250f * tilableVoronoi(coord + 0.0f, 3, 19.0f) +
+        0.125f * tilableVoronoi(coord + 0.0f, 3, 23.0f);
+    result.b = 1.0f - tilableVoronoi(coord + 0.5f, 6, 9.0f);
+	*/
 
     rand_lcg();
 
     float fbm = tilableFbm(coord + rand() * 314.15f, 7, 4.0f);
     float4 mainTex = _CPUBase.SampleLevel(sampler_point_repeat, vUV + bias, 0);
-
     _Base[id.xy] = float4(lerp(1.0f, fbm, mfbm) * lerp(1.0f, mainTex.r, mvor), mainTex.g, mainTex.b, mainTex.a);
 }
 
+//Generates cloud noise
 [numthreads(8, 8, 8)]
 void CSDetailNoiseMain(uint3 id : SV_DispatchThreadID)
 {

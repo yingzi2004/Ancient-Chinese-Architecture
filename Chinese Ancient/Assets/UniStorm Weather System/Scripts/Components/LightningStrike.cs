@@ -27,7 +27,7 @@ namespace UniStorm.Utility
         public string FireTag = "Finish";
         [HideInInspector]
         public List<string> LightningFireTags = new List<string>();
-        //[HideInInspector]
+        [HideInInspector]
         public GameObject HitObject;
         [HideInInspector]
         public string PlayerTag = "Player";
@@ -35,9 +35,9 @@ namespace UniStorm.Utility
         public int EmeraldAIRagdollForce = 500;
         [HideInInspector]
         public int EmeraldAILightningDamage = 500;
-        //[HideInInspector]
+        [HideInInspector]
         public bool EmeraldAIAgentDetected = false;
-        //[HideInInspector]
+        [HideInInspector]
         public GameObject HitAgent;
         [HideInInspector]
         public string EmeraldAITag = "Respawn";

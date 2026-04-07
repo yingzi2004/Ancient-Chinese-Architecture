@@ -24,6 +24,12 @@ namespace UniStorm
         public int MinimumFogLevel = 300;
         public int MaximumFogLevel = 600;
         public float FogDensity = 0.0015f;
+        public float FogLightFalloff = 0.65f;
+        public float FogHeight = 0.73f;
+        public float CameraFogHeight = 0.85f;
+        public Yes_No OverrideFogColor = Yes_No.No;
+        public Yes_No OverrideCameraFogHeight = Yes_No.No;
+        public Gradient FogColor;
 
         //Wind
         public float WindSpeedLevel = 0.85f;
@@ -86,6 +92,8 @@ namespace UniStorm
             None = 2
         }
 
+        public Yes_No OverrideCloudColor = Yes_No.No;
+        public Gradient CloudColor;
         public Yes_No UseLightning = Yes_No.No;
         public Yes_No CustomizeWeatherIcon = Yes_No.No;
         public Yes_No WaitForCloudLevel = Yes_No.No;

@@ -151,6 +151,7 @@ namespace UniStorm
                 UniStormSystem.Instance.m_SoundTransform.transform.SetParent(PlayerTransform);
                 UniStormSystem.Instance.m_SoundTransform.transform.localPosition = Vector3.zero;
                 UniStormSystem.Instance.PlayerCamera = CameraSource;
+                UniStormSystem.Instance.m_UniStormLightningSystem.PlayerTransform = PlayerTransform;
 
                 //Look to see if the Render Clouds CommandBuffer exists on the newly assignned camera source, if it doesn't add one as this is needed to properly render the clouds.
                 UnityEngine.Rendering.CommandBuffer[] CommandBuffers = CameraSource.GetCommandBuffers(UnityEngine.Rendering.CameraEvent.AfterSkybox);
@@ -187,7 +188,10 @@ namespace UniStorm
                 }
                 else
                 {
-                    UniStormSystem.Instance.PlayerCamera.GetComponent<ScreenSpaceCloudShadows>().enabled = true;
+                    if (UniStormSystem.Instance.CloudShadows == UniStormSystem.EnableFeature.Enabled)
+                    {
+                        UniStormSystem.Instance.PlayerCamera.GetComponent<ScreenSpaceCloudShadows>().enabled = true;
+                    }
                 }
 
                 UniStormSystem.Instance.PlayerCamera.enabled = true;
@@ -300,6 +304,7 @@ namespace UniStorm
             {
                 UniStormSystem.Instance.CloudQuality = CloudQuality;
                 UniStormClouds m_UniStormClouds = FindObjectOfType<UniStormClouds>();
+                Material m_CloudsMaterial = FindObjectOfType<UniStormClouds>().skyMaterial;
 
                 if (UniStormSystem.Instance.CloudShadows == UniStormSystem.EnableFeature.Enabled)
                 {
@@ -308,6 +313,13 @@ namespace UniStorm
                 else if (UniStormSystem.Instance.CloudShadows == UniStormSystem.EnableFeature.Disabled)
                 {
                     m_UniStormClouds.SetCloudDetails((UniStormClouds.CloudPerformance)CloudQuality, (UniStormClouds.CloudType)UniStormSystem.Instance.CloudType, UniStormClouds.CloudShadowsType.Off);
+                }
+
+                if (CloudQuality == UniStormSystem.CloudQualityEnum.Ultra)
+                {                    
+                    m_CloudsMaterial.SetFloat("_DistantCloudUpdateSpeed", 75);
+                    Shader.SetGlobalFloat("CLOUD_MARCH_STEPS", 100);
+                    Shader.SetGlobalFloat("DISTANT_CLOUD_MARCH_STEPS", 10);
                 }
             }
         }
@@ -325,20 +337,32 @@ namespace UniStorm
 
                 if (UniStormSystem.Instance.CloudType == UniStormSystem.CloudTypeEnum._2D)
                 {
-                    m_CloudsMaterial.SetFloat("_uCloudsBaseEdgeSoftness", 0.2f);
-                    m_CloudsMaterial.SetFloat("_uCloudsBottomSoftness", 0.3f);
+                    m_CloudsMaterial.SetFloat("_uCloudsBaseEdgeSoftness", 0.05f);
+                    m_CloudsMaterial.SetFloat("_uCloudsBottomSoftness", 0.15f);
                     m_CloudsMaterial.SetFloat("_uCloudsDetailStrength", 0.1f);
-                    m_CloudsMaterial.SetFloat("_uCloudsDensity", 0.3f);
+                    m_CloudsMaterial.SetFloat("_uCloudsDensity", 1f);
+                    m_CloudsMaterial.SetFloat("_uCloudsBaseScale", 1.5f);
+                    m_CloudsMaterial.SetFloat("_uCloudsDetailScale", 700f);
                 }
                 else if (UniStormSystem.Instance.CloudType == UniStormSystem.CloudTypeEnum.Volumetric)
                 {
                     CloudProfile m_CP = UniStormSystem.Instance.CurrentWeatherType.CloudProfileComponent;
                     m_CloudsMaterial.SetFloat("_uCloudsBaseEdgeSoftness", m_CP.EdgeSoftness);
                     m_CloudsMaterial.SetFloat("_uCloudsBottomSoftness", m_CP.BaseSoftness);
-                    m_CloudsMaterial.SetFloat("_uCloudsDetailStrength", m_CP.DetailStrength);
                     m_CloudsMaterial.SetFloat("_uCloudsDensity", m_CP.Density);
-                    m_CloudsMaterial.SetFloat("_uCloudsCoverageBias", m_CP.CoverageBias);
                     m_CloudsMaterial.SetFloat("_uCloudsBaseScale", 1.72f);
+                    m_CloudsMaterial.SetFloat("_uCloudsDetailScale", 1000f);
+
+                    if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
+                    {
+                        m_CloudsMaterial.SetFloat("_uCloudsCoverageBias", m_CP.CoverageBias);
+                        m_CloudsMaterial.SetFloat("_uCloudsDetailStrength", m_CP.DetailStrength);
+                    }
+                    else
+                    {
+                        m_CloudsMaterial.SetFloat("_uCloudsCoverageBias", 0.02f);
+                        m_CloudsMaterial.SetFloat("_uCloudsDetailStrength", 0.072f);
+                    }
                 }
 
                 if (UniStormSystem.Instance.CloudShadows == UniStormSystem.EnableFeature.Enabled)
