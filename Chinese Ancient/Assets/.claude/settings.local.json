@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//f/attackgit/Ancient-Chinese-Architecture/Chinese Ancient/**)",
+      "Bash(grep -r \"UniStorm\" --include=\"*.cs\" Assets/Script/*.cs)",
+      "Bash(grep -l \"UniStorm\" *.unity)",
+      "Bash(cd:*)",
+      "Bash(rm:*)"
+    ]
+  }
+}

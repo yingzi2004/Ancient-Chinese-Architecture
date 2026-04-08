@@ -15,6 +15,14 @@ namespace UniStorm.Utility
     [System.Serializable]
     public class UniStormEditor : Editor
     {
+        //5.0
+        SerializedProperty CustomizeQualityProp;
+        SerializedProperty ConvergenceSpeedProp;
+        SerializedProperty NearMarchStepsProp;
+        SerializedProperty DistantMarchStepsProp;
+        SerializedProperty UpdateMarchStepsDuringRuntimeProp;
+        //SerializedProperty RendersPerFrameProp;
+
         //Audio Mixer
         SerializedProperty TimeOfDaySoundsVolumeProp;
         SerializedProperty TimeOfDayMusicVolumeProp;
@@ -66,12 +74,16 @@ namespace UniStorm.Utility
         SerializedProperty TemperatureCurveProp;
         SerializedProperty TemperatureFluctuationProp;
         SerializedProperty FogColorProp;
+        SerializedProperty FogLightColorProp;
+        SerializedProperty StormyFogLightColorProp;
         SerializedProperty FogStormyColorProp;
         SerializedProperty CloudLightColorProp;
+        SerializedProperty StormyCloudLightColorProp;
         SerializedProperty CloudBaseColorProp;
         SerializedProperty CloudStormyBaseColorProp;
         SerializedProperty TransitionSpeedProp;
         SerializedProperty WeatherFoldoutProp;
+        SerializedProperty FogFoldoutProp;
         SerializedProperty CloudsFoldoutProp;
         SerializedProperty LightningFoldoutProp;
         SerializedProperty LightningStrikeOddsProp;
@@ -93,6 +105,10 @@ namespace UniStorm.Utility
         SerializedProperty TemperatureTypeProp;
         SerializedProperty LightningStrikesProp;
         SerializedProperty CloudTypeProp;
+        SerializedProperty CloudDomeTrisCountXProp;
+        SerializedProperty CloudDomeTrisCountYProp;
+        SerializedProperty ForceLowCloudsProp;
+        SerializedProperty LowCloudHeightProp;
         SerializedProperty CloudQualityProp;
         SerializedProperty SunAttenuationCurveProp;
         SerializedProperty StormyHorizonBrightnessProp;
@@ -100,15 +116,23 @@ namespace UniStorm.Utility
         SerializedProperty CloudShadowResolutionProp;
         SerializedProperty CloudRenderTypeProp;
         SerializedProperty LightningColorProp;
+        SerializedProperty LightningLightColorProp;
+        SerializedProperty FogTypeProp;
+        SerializedProperty FogModeProp;
+        SerializedProperty CameraFogHeightProp;
+        SerializedProperty UseRadialDistantFogProp;
         #if EMERALD_AI_PRESENT
         SerializedProperty LightningStrikesEmeraldAIProp;
         SerializedProperty EmeraldAIRagdollForceProp;
         SerializedProperty EmeraldAILightningDamageProp;
         SerializedProperty EmeraldAITagProp;
-        #endif
+#endif
 
         //Celestial
         SerializedProperty SunColorProp;
+        SerializedProperty SunSpotColorProp; 
+        SerializedProperty CelestialUpdateSecondsProp;
+        SerializedProperty CelestialUpdateEnabledProp;
         SerializedProperty StormySunColorProp;
         SerializedProperty MoonColorProp;
         SerializedProperty SkyTintColorProp;
@@ -151,8 +175,17 @@ namespace UniStorm.Utility
         SerializedProperty SunShadowStrengthProp;
         SerializedProperty MoonShadowStrengthProp;
         SerializedProperty LightningShadowStrengthProp;
-        SerializedProperty SunQualityProp;
-        SerializedProperty SunSpotIntensityProp;
+        SerializedProperty UseDitheringProp;
+
+        //Light Shafts       
+        SerializedProperty SunLightShaftIntensityProp;
+        SerializedProperty SunLightShaftsColorProp;
+        SerializedProperty SunLightShaftsBlurSizeProp;
+        SerializedProperty SunLightShaftsBlurIterationsProp;
+        SerializedProperty MoonLightShaftIntensityProp;
+        SerializedProperty MoonLightShaftsColorProp;
+        SerializedProperty MoonLightShaftsBlurSizeProp;
+        SerializedProperty MoonLightShaftsBlurIterationsProp;
 
         Texture TimeIcon;
         Texture WeatherIcon;
@@ -186,6 +219,7 @@ namespace UniStorm.Utility
         void UpdateColorProperties()
         {
             SunColorProp = serializedObject.FindProperty("SunColor");
+            SunSpotColorProp = serializedObject.FindProperty("SunSpotColor"); 
             StormySunColorProp = serializedObject.FindProperty("StormySunColor");
             MoonColorProp = serializedObject.FindProperty("MoonColor");
             SkyTintColorProp = serializedObject.FindProperty("SkyTintColor");
@@ -196,19 +230,29 @@ namespace UniStorm.Utility
             StormyAmbientEquatorLightColorProp = serializedObject.FindProperty("StormyAmbientEquatorLightColor");
             AmbientGroundLightColorProp = serializedObject.FindProperty("AmbientGroundLightColor");
             StormyAmbientGroundLightColorProp = serializedObject.FindProperty("StormyAmbientGroundLightColor");
-            StarLightColorProp = serializedObject.FindProperty("StarLightColor");
             FogColorProp = serializedObject.FindProperty("FogColor");
+            FogLightColorProp = serializedObject.FindProperty("FogLightColor");
+            StormyFogLightColorProp = serializedObject.FindProperty("StormyFogLightColor"); 
             FogStormyColorProp = serializedObject.FindProperty("FogStormyColor");
+            StarLightColorProp = serializedObject.FindProperty("StarLightColor");
             CloudLightColorProp = serializedObject.FindProperty("CloudLightColor");
+            StormyCloudLightColorProp = serializedObject.FindProperty("StormyCloudLightColor"); 
             CloudBaseColorProp = serializedObject.FindProperty("CloudBaseColor");
             CloudStormyBaseColorProp = serializedObject.FindProperty("CloudStormyBaseColor");
         }
 
         void OnEnable()
         {
-
             EditorApplication.update += Update;
             UniStormSystem self = (UniStormSystem)target;
+
+            //5.0
+            CustomizeQualityProp = serializedObject.FindProperty("CustomizeQuality");
+            ConvergenceSpeedProp = serializedObject.FindProperty("ConvergenceSpeed");
+            NearMarchStepsProp = serializedObject.FindProperty("NearMarchSteps"); 
+            DistantMarchStepsProp = serializedObject.FindProperty("DistantMarchSteps");
+            UpdateMarchStepsDuringRuntimeProp = serializedObject.FindProperty("UpdateMarchStepsDuringRuntime");
+            //RendersPerFrameProp = serializedObject.FindProperty("RendersPerFrame");
 
             //Audio Mixer
             TimeOfDaySoundsVolumeProp = serializedObject.FindProperty("AmbienceVolume");
@@ -268,12 +312,16 @@ namespace UniStorm.Utility
             TemperatureCurveProp = serializedObject.FindProperty("TemperatureCurve");
             TemperatureFluctuationProp = serializedObject.FindProperty("TemperatureFluctuation");
             FogColorProp = serializedObject.FindProperty("FogColor");
+            FogLightColorProp = serializedObject.FindProperty("FogLightColor");
+            StormyFogLightColorProp = serializedObject.FindProperty("StormyFogLightColor"); 
             FogStormyColorProp = serializedObject.FindProperty("FogStormyColor");
             CloudLightColorProp = serializedObject.FindProperty("CloudLightColor");
+            StormyCloudLightColorProp = serializedObject.FindProperty("StormyCloudLightColor"); 
             CloudBaseColorProp = serializedObject.FindProperty("CloudBaseColor");
             CloudStormyBaseColorProp = serializedObject.FindProperty("CloudStormyBaseColor");
             TransitionSpeedProp = serializedObject.FindProperty("TransitionSpeed");
             WeatherFoldoutProp = serializedObject.FindProperty("WeatherFoldout");
+            FogFoldoutProp = serializedObject.FindProperty("FogFoldout");
             CloudsFoldoutProp = serializedObject.FindProperty("CloudsFoldout");
             LightningFoldoutProp = serializedObject.FindProperty("LightningFoldout");
             LightningStrikeOddsProp = serializedObject.FindProperty("LightningGroundStrikeOdds");
@@ -294,6 +342,10 @@ namespace UniStorm.Utility
             TemperatureTypeProp = serializedObject.FindProperty("TemperatureType");
             LightningStrikesProp = serializedObject.FindProperty("LightningStrikes");
             CloudTypeProp = serializedObject.FindProperty("CloudType");
+            CloudDomeTrisCountXProp = serializedObject.FindProperty("CloudDomeTrisCountX");
+            CloudDomeTrisCountYProp = serializedObject.FindProperty("CloudDomeTrisCountY");
+            ForceLowCloudsProp = serializedObject.FindProperty("ForceLowClouds");
+            LowCloudHeightProp = serializedObject.FindProperty("LowCloudHeight");
             CloudQualityProp = serializedObject.FindProperty("CloudQuality");
             SunAttenuationCurveProp = serializedObject.FindProperty("SunAttenuationCurve");
             StormyHorizonBrightnessProp = serializedObject.FindProperty("StormyHorizonBrightness");
@@ -301,15 +353,23 @@ namespace UniStorm.Utility
             CloudShadowResolutionProp = serializedObject.FindProperty("CloudShadowResolution");
             CloudRenderTypeProp = serializedObject.FindProperty("CloudRenderType");
             LightningColorProp = serializedObject.FindProperty("LightningColor");
-            #if EMERALD_AI_PRESENT
+            LightningLightColorProp = serializedObject.FindProperty("LightningLightColor");
+            FogTypeProp = serializedObject.FindProperty("FogType");
+            FogModeProp = serializedObject.FindProperty("FogMode");
+            CameraFogHeightProp = serializedObject.FindProperty("CameraFogHeight");
+            UseRadialDistantFogProp = serializedObject.FindProperty("UseRadialDistantFog");
+#if EMERALD_AI_PRESENT
             LightningStrikesEmeraldAIProp = serializedObject.FindProperty("LightningStrikesEmeraldAI");
             EmeraldAITagProp = serializedObject.FindProperty("EmeraldAITag");
             EmeraldAIRagdollForceProp = serializedObject.FindProperty("EmeraldAIRagdollForce");
             EmeraldAILightningDamageProp = serializedObject.FindProperty("EmeraldAILightningDamage");
-            #endif
+#endif
 
             //Celestial
+            CelestialUpdateSecondsProp = serializedObject.FindProperty("TimeOfDayUpdateSeconds");
+            CelestialUpdateEnabledProp = serializedObject.FindProperty("UseTimeOfDayUpdateControl");
             SunColorProp = serializedObject.FindProperty("SunColor");
+            SunSpotColorProp = serializedObject.FindProperty("SunSpotColor"); 
             StormySunColorProp = serializedObject.FindProperty("StormySunColor");
             MoonColorProp = serializedObject.FindProperty("MoonColor");
             SkyTintColorProp = serializedObject.FindProperty("SkyTintColor");
@@ -352,8 +412,17 @@ namespace UniStorm.Utility
             SunShadowStrengthProp = serializedObject.FindProperty("SunShadowStrength");
             MoonShadowStrengthProp = serializedObject.FindProperty("MoonShadowStrength");
             LightningShadowStrengthProp = serializedObject.FindProperty("LightningShadowStrength");
-            SunQualityProp = serializedObject.FindProperty("SunQuality");
-            SunSpotIntensityProp = serializedObject.FindProperty("SunSpotIntensity");
+            UseDitheringProp = serializedObject.FindProperty("UseDithering");
+
+            //Light Shafts       
+            SunLightShaftIntensityProp = serializedObject.FindProperty("SunLightShaftIntensity");
+            SunLightShaftsColorProp = serializedObject.FindProperty("SunLightShaftsColor");
+            SunLightShaftsBlurSizeProp = serializedObject.FindProperty("SunLightShaftsBlurSize");
+            SunLightShaftsBlurIterationsProp = serializedObject.FindProperty("SunLightShaftsBlurIterations");
+            MoonLightShaftIntensityProp = serializedObject.FindProperty("MoonLightShaftIntensity");
+            MoonLightShaftsColorProp = serializedObject.FindProperty("MoonLightShaftsColor");
+            MoonLightShaftsBlurSizeProp = serializedObject.FindProperty("MoonLightShaftsBlurSize");
+            MoonLightShaftsBlurIterationsProp = serializedObject.FindProperty("MoonLightShaftsBlurIterations");
 
             //Reorderable lists
             //Put our lists into reorderable lists because Unity allows these lists to be serialized
@@ -564,14 +633,72 @@ namespace UniStorm.Utility
             myFoldoutStyle.onFocused.textColor = Color.black;
             Color myStyleColor = Color.black;
 
+            if (QualitySettings.activeColorSpace == ColorSpace.Gamma && !self.ColorSpaceSuggestionDismissed)
+            {
+                GUI.backgroundColor = new Color(1f, 1, 0.6f, 0.6f);
+                EditorGUILayout.HelpBox("Linear Color Space is highly recommended in order to avoid the lighting from being washed out and to have improved lighting, visuals, and colors. If possible, please switch the Color Space to Linear.", MessageType.Warning);
+                GUI.backgroundColor = Color.white;
+                if (GUILayout.Button("Dismiss"))
+                {
+                    self.ColorSpaceSuggestionDismissed = true;
+                }
+                if (GUILayout.Button("Switch to Linear Color Space"))
+                {
+                    if (EditorUtility.DisplayDialog("Switch to Linear Color Space", "Are you sure you want to switch to Linear Color Space? This will require some assets to be reimported.", "Yes", "Cancel"))
+                    {
+                        PlayerSettings.colorSpace = ColorSpace.Linear;
+                    }
+                }
+                GUILayout.Space(15);
+            }
+
+            if (!self.UpgradedToCurrentVersion)
+            {
+                GUI.backgroundColor = new Color(1f, 1, 0.6f, 0.6f);
+                EditorGUILayout.HelpBox("Please update this UniStorm system to be compatible with the current version by pressing the button below. This is required in order to properly use newly added features. Your custom settings" +
+                    " will not be affected. However, it is recommended that users use the updated UniStorm prefab system going Window>UniStorm>Create UniStorm, if possible.", MessageType.Error);
+                GUI.backgroundColor = Color.white;          
+                if (GUILayout.Button("Update to Current Version"))
+                {
+                    Debug.Log("UniStorm System updated to the current version");
+                    UniStormProfile m_UniStormProfile = Resources.Load("UniStorm Data") as UniStormProfile;
+                    self.SunAtmosphericFogIntensity = new AnimationCurve(m_UniStormProfile.SunAtmosphericFogIntensity.keys);
+                    self.SunControlCurve = new AnimationCurve(m_UniStormProfile.SunControlCurve.keys);
+                    self.MoonAtmosphericFogIntensity = new AnimationCurve(m_UniStormProfile.MoonAtmosphericFogIntensity.keys);
+                    self.MoonObjectFade = new AnimationCurve(m_UniStormProfile.MoonObjectFade.keys);
+                    self.StormyCloudLightColor = UpdateGradient(m_UniStormProfile.StormyCloudLightColor, self.StormyCloudLightColor);
+                    StormyCloudLightColorProp = serializedObject.FindProperty("StormyCloudLightColor").Copy();
+                    self.FogLightColor = UpdateGradient(m_UniStormProfile.FogLightColor, self.FogLightColor);
+                    FogLightColorProp = serializedObject.FindProperty("FogLightColor").Copy();
+                    self.StormyFogLightColor = UpdateGradient(m_UniStormProfile.StormyFogLightColor, self.StormyFogLightColor);
+                    StormyFogLightColorProp = serializedObject.FindProperty("StormyFogLightColor").Copy();
+                    self.SunSpotColor = UpdateGradient(m_UniStormProfile.SunSpotColor, self.SunSpotColor);
+                    SunSpotColorProp = serializedObject.FindProperty("SunSpotColor").Copy();
+
+                    serializedObject.ApplyModifiedProperties();
+
+                    self.UpgradedToCurrentVersion = true;
+                }
+                GUILayout.Space(15);
+            }
+
             var HelpStyle = new GUIStyle(EditorStyles.boldLabel) { alignment = TextAnchor.UpperRight };
 
             GUIContent[] TabButtons = new GUIContent[5] {new GUIContent(" Player & \n Camera", CameraIcon), new GUIContent(" Time", TimeIcon), new GUIContent(" Weather", WeatherIcon),
             new GUIContent(" Celestial", CelestialIcon), new GUIContent(" Settings", SettingsIcon)};
 
+            GUIStyle SelectionGridStyle = new GUIStyle(EditorStyles.miniButton);
+            SelectionGridStyle.fixedHeight = 35;
+
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            TabNumberProp.intValue = GUILayout.SelectionGrid(TabNumberProp.intValue, TabButtons, 5, GUILayout.Height(28), GUILayout.Width(90 * Screen.width / 100));
+
+#if UNITY_2019_3_OR_NEWER
+            TabNumberProp.intValue = GUILayout.SelectionGrid(TabNumberProp.intValue, TabButtons, 5, SelectionGridStyle, GUILayout.Height(32), GUILayout.Width(80 * Screen.width / Screen.dpi));
+#else
+            TabNumberProp.intValue = GUILayout.SelectionGrid(TabNumberProp.intValue, TabButtons, 5, GUILayout.Height(32), GUILayout.Width(EditorGUIUtility.currentViewWidth - 45));
+#endif
+
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
 
@@ -580,11 +707,11 @@ namespace UniStorm.Utility
             {
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
-                EditorGUILayout.BeginVertical("Box", GUILayout.Width(90 * Screen.width / 100));
+                EditorGUILayout.BeginVertical("Box", GUILayout.Width(80 * Screen.width / Screen.dpi));
 
                 if (GUILayout.Button(new GUIContent(HelpIcon), HelpStyle, GUILayout.ExpandWidth(true), GUILayout.Height(22.5f)))
                 {
-                    Application.OpenURL("https://docs.google.com/document/d/1uL_oMqHC_EduRGEnOihifwcpkQmWX9rubGw8qjkZ4b4/edit#heading=h.z5gprdso537b");
+                    Application.OpenURL("https://github.com/Black-Horizon-Studios/UniStorm-Weather-System/wiki/The-UniStorm-Editor#camera--player-settings-tab");
                 }
 
                 var style = new GUIStyle(EditorStyles.boldLabel) { alignment = TextAnchor.MiddleCenter };
@@ -694,7 +821,6 @@ namespace UniStorm.Utility
                         EditorGUILayout.EndHorizontal();
                     }
 
-
                     EditorGUILayout.EndVertical();
                     EditorGUILayout.EndHorizontal();
                 }
@@ -707,11 +833,11 @@ namespace UniStorm.Utility
             {
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
-                EditorGUILayout.BeginVertical("Box", GUILayout.Width(90 * Screen.width / 100));
+                EditorGUILayout.BeginVertical("Box", GUILayout.Width(80 * Screen.width / Screen.dpi));
 
                 if (GUILayout.Button(new GUIContent(HelpIcon), HelpStyle, GUILayout.ExpandWidth(true), GUILayout.Height(22.5f)))
                 {
-                    Application.OpenURL("https://docs.google.com/document/d/1uL_oMqHC_EduRGEnOihifwcpkQmWX9rubGw8qjkZ4b4/edit#heading=h.3fm44ev48fcm");
+                    Application.OpenURL("https://github.com/Black-Horizon-Studios/UniStorm-Weather-System/wiki/The-UniStorm-Editor#unistorm-time-management-tab");
                 }
 
                 var style = new GUIStyle(EditorStyles.boldLabel) { alignment = TextAnchor.MiddleCenter };
@@ -1020,11 +1146,11 @@ namespace UniStorm.Utility
             {
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
-                EditorGUILayout.BeginVertical("Box", GUILayout.Width(90 * Screen.width / 100));
+                EditorGUILayout.BeginVertical("Box", GUILayout.Width(80 * Screen.width / Screen.dpi));
 
                 if (GUILayout.Button(new GUIContent(HelpIcon), HelpStyle, GUILayout.ExpandWidth(true), GUILayout.Height(22.5f)))
                 {
-                    Application.OpenURL("https://docs.google.com/document/d/1uL_oMqHC_EduRGEnOihifwcpkQmWX9rubGw8qjkZ4b4/edit#heading=h.8rkomidbhb1x");
+                    Application.OpenURL("https://github.com/Black-Horizon-Studios/UniStorm-Weather-System/wiki/The-UniStorm-Editor#weather-management-tab");
                 }
 
                 var style = new GUIStyle(EditorStyles.boldLabel) { alignment = TextAnchor.MiddleCenter };
@@ -1096,7 +1222,6 @@ namespace UniStorm.Utility
 
                 CloudsFoldoutProp.boolValue = Foldout(CloudsFoldoutProp.boolValue, "Cloud Settings", true, myFoldoutStyle);
                 GUI.backgroundColor = Color.white;
-                GUILayout.Space(10);
 
                 EditorGUILayout.EndVertical();
                 EditorGUILayout.EndHorizontal();
@@ -1106,9 +1231,11 @@ namespace UniStorm.Utility
                     EditorGUILayout.BeginHorizontal();
                     GUILayout.Space(15);
                     EditorGUILayout.BeginVertical();
+                    GUILayout.Space(10);
 
                     EditorGUILayout.PropertyField(CloudShadowsProp,
                        new GUIContent("Cloud Shadows", "Controls whether UniStorm's clouds will use screen space cloud shadows."));
+                    EditorGUILayout.Space();
 
                     if (self.CloudShadows == UniStormSystem.EnableFeature.Enabled)
                     {
@@ -1135,8 +1262,81 @@ namespace UniStorm.Utility
 
                     EditorGUILayout.PropertyField(CloudQualityProp,
                         new GUIContent("Cloud Quality", "Controls the quality of clouds UniStorm will use when rendering its clouds."));
-                    EditorGUILayout.Space();
 
+                    if (self.CloudQuality == UniStormSystem.CloudQualityEnum.Ultra)
+                    {
+                        EditorGUILayout.Space();
+
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(15);
+                        EditorGUILayout.BeginVertical();
+                        GUILayout.Space(5);
+
+                        EditorGUILayout.PropertyField(CustomizeQualityProp,
+                       new GUIContent("Customize Quality", "Allows users to fine tune the internal cloud settings and qualities. (Limited to only Ultra Cloud Quality)"));
+
+                        if (self.CustomizeQuality == UniStormSystem.CustomizeQualityEnum.Yes)
+                        {
+                            EditorGUILayout.BeginHorizontal();
+                            GUILayout.Space(15);
+                            EditorGUILayout.BeginVertical();
+                            GUILayout.Space(5);
+
+                            EditorGUILayout.Space();
+                            EditorGUILayout.PropertyField(UpdateMarchStepsDuringRuntimeProp,
+                            new GUIContent("Update During Runtime", "Controls if the Customize Quality settings are updated during runtime so the changes made here can be visible in real-time. Enabling this is only recommended for fidning the desired settings then this feature should be disabled."));
+                            EditorGUILayout.Space();
+
+                            CustomIntSlider(new Rect(), new GUIContent(), ConvergenceSpeedProp,
+                            new GUIContent("Convergence Speed", "Controls how quickly the clouds are updated. The higher the value, the quicker they are updated, however, more artifacts will be visible. To counteract this, you can increase the Distant Samples, which will affect performance."), 1, 150);
+                            EditorGUILayout.Space();
+
+                            GUI.backgroundColor = new Color(0.8f, 0.1f, 0.1f, 0.75f);
+                            EditorGUILayout.LabelField("Note: Modifying the samples past the defaults can greatly affect performance so use wisely.", EditorStyles.helpBox);
+                            GUI.backgroundColor = Color.white;
+
+                            if (GUILayout.Button("Reset Quality Settings to Default"))
+                            {
+                                //self.RendersPerFrame = 1;
+                                self.NearMarchSteps = 100;
+                                self.DistantMarchSteps = 10;
+                                self.ConvergenceSpeed = 75;
+                                self.UpdateMarchStepsDuringRuntime = UniStormSystem.EnableFeature.Disabled;
+                            }
+
+                            EditorGUILayout.Space();
+                            CustomIntSlider(new Rect(), new GUIContent(), NearMarchStepsProp,
+                            new GUIContent("Near Samples", "Controls the quality of the clouds nearest to the player by making them higher quality and reducing artifacts."), 100, 200);
+
+                            CustomIntSlider(new Rect(), new GUIContent(), DistantMarchStepsProp,
+                            new GUIContent("Distant Samples", "Controls the quality of the clouds in the distance by making them higher quality and reducing artifacts."), 1, 100);
+
+                            /*
+                            EditorGUILayout.Space();
+                            GUI.backgroundColor = new Color(0.8f, 0.8f, 0.8f, 1);
+                            if (self.RendersPerFrame == 1)
+                                EditorGUILayout.LabelField("The clouds will render 1 time per frame. (Default - Most Performant)", EditorStyles.helpBox);
+                            else if (self.RendersPerFrame == 2)
+                                EditorGUILayout.LabelField("The clouds will render 2 times per frame. (Balanced)", EditorStyles.helpBox);
+                            else if (self.RendersPerFrame == 3)
+                                EditorGUILayout.LabelField("The clouds will render 3 times per frame. (Best Visuals - Less Performant)", EditorStyles.helpBox);
+                            GUI.backgroundColor = Color.white;
+
+                            CustomIntSlider(new Rect(), new GUIContent(), RendersPerFrameProp,
+                            new GUIContent("Renders Per Frame", "Controls how many times the clouds are rendered per frame. By Default, this is 1. UniStorm's clouds are then updated over the cource of 16 frames. " +
+                            "This settings reduces this update time by half for each number increase allowing the clouds to update quicker and be more responsive, at the cost of performance."), 1, 3);
+                            EditorGUILayout.Space();
+                            */
+
+                            EditorGUILayout.EndVertical();
+                            EditorGUILayout.EndHorizontal();
+                        }
+
+                        EditorGUILayout.EndVertical();
+                        EditorGUILayout.EndHorizontal();
+                    }
+
+                    EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(CloudRenderTypeProp,
                        new GUIContent("Cloud Render Type", "Controls whether UniStorm's will clouds render as more opaque or transparent. Some Image Effects can make the sun more " +
                        "visible behind clouds. When this happens, it's best to use the Opaque render type to correct this."));
@@ -1164,67 +1364,154 @@ namespace UniStorm.Utility
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.Space();
 
-                    /*
-                    if (self.CloudType == UniStormSystem.CloudTypeEnum._2D)
+                    CustomIntSlider(new Rect(), new GUIContent(), CloudDomeTrisCountXProp,
+                        new GUIContent("Cloud Dome Tris Count X", "Controls the amount of triangles on UniStorm's Cloud Dome's X axis. Higher value results in less mesh artifacts, but higher overall triangle count for UniStorm's Cloud Dome."), 38, 200);
+                    EditorGUILayout.Space();
+
+                    CustomIntSlider(new Rect(), new GUIContent(), CloudDomeTrisCountYProp,
+                        new GUIContent("Cloud Dome Tris Count Y", "Controls the amount of triangles on UniStorm's Cloud Dome's Y axis. Higher value results in less mesh artifacts, but higher overall triangle count for UniStorm's Cloud Dome."), 16, 50);
+                    EditorGUILayout.Space();
+
+                    EditorGUILayout.PropertyField(ForceLowCloudsProp,
+                       new GUIContent("Force Low Clouds", "Forces all Weather Types to ignore their cloud height and render low clouds. These can visually look and perform better, but this depends on preference."));
+                    EditorGUILayout.Space();
+
+                    if (self.ForceLowClouds == UniStormSystem.EnableFeature.Enabled)
                     {
-                        GUI.backgroundColor = new Color(1f, 1, 0.5f, 0.5f);
-                        EditorGUILayout.LabelField("Cloud Style is only supported by the Volumetric Cloud Type.", EditorStyles.helpBox);
-                        GUI.backgroundColor = Color.white;
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(15);
+                        EditorGUILayout.BeginVertical();
+                        CustomIntSlider(new Rect(), new GUIContent(), LowCloudHeightProp,
+                            new GUIContent("Low Cloud Height", "Controls the low cloud height."), 200, 800);
+                        EditorGUILayout.EndVertical();
+                        EditorGUILayout.EndHorizontal();
+                        EditorGUILayout.Space();
                     }
-                    EditorGUI.BeginDisabledGroup(self.CloudType == UniStormSystem.CloudTypeEnum._2D);
-                    EditorGUILayout.PropertyField(CloudStyleProp,
-                        new GUIContent("Cloud Style", "Controls the style of clouds UniStorm will use when rendering its clouds."));
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(CloudBaseColorProp,
+                        new GUIContent("Cloud Color", "A gradient that controls the base color of UniStorm's clouds during non-precipitation Weather Types  (Unless being driven by the Cloud Color Override on Weather Types). " +
+                        "Each element is a transition into the next time of day."));
+                    EditorGUILayout.Space();
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(CloudStormyBaseColorProp,
+                        new GUIContent("Stormy Cloud Color", "A gradient that controls the base color of UniStorm's clouds during precipitation Weather Types. " +
+                        "Each element is a transition into the next time of day."));
+                    EditorGUILayout.Space();
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(CloudLightColorProp,
+                        new GUIContent("Cloud Light Color", "A gradient that controls the light color of UniStorm's clouds when the clouds are receiving light during non-precipitation weather types. " +
+                        "Each element is a transition into the next time of day."));
+                    EditorGUILayout.Space();
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(StormyCloudLightColorProp,
+                        new GUIContent("Stormy Cloud Light Color", "A gradient that controls the light color of UniStorm's clouds when the clouds are receiving light during precipitation weather types. " +
+                        "Each element is a transition into the next time of day."));
+                    EditorGUILayout.Space();
+
+                    EditorGUILayout.EndVertical();
+                    EditorGUILayout.EndHorizontal();
+                }
+
+                EditorGUILayout.EndVertical();
+                GUI.backgroundColor = Color.white;
+
+                //Fog Settings
+                if (!FogFoldoutProp.boolValue)
+                {
+                    GUI.backgroundColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+                }
+
+                EditorGUILayout.BeginVertical("Box");
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(10);
+                EditorGUILayout.BeginVertical();
+
+                FogFoldoutProp.boolValue = Foldout(FogFoldoutProp.boolValue, "Fog Settings", true, myFoldoutStyle);
+                GUI.backgroundColor = Color.white;
+
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.EndHorizontal();
+
+                if (FogFoldoutProp.boolValue)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.Space(15);
+                    EditorGUILayout.BeginVertical();
+                    GUILayout.Space(10);
+
+                    EditorGUILayout.PropertyField(FogTypeProp,
+                        new GUIContent("Fog Type", "Controls the type of fog UniStorm will use."));
 
                     EditorGUILayout.BeginHorizontal();
                     GUILayout.Space(15);
                     EditorGUILayout.BeginVertical();
-                    if (self.CloudStyle == UniStormSystem.CloudStyleEnum.Detailed)
+
+                    if (self.FogType == UniStormSystem.FogTypeEnum.UnityFog)
                     {
                         GUI.backgroundColor = new Color(0.8f, 0.8f, 0.8f, 1);
-                        EditorGUILayout.LabelField("Detailed 1 - Detailed 1 Clouds offer the most detail and are more crisp and clear in appearance.", EditorStyles.helpBox);
+                        EditorGUILayout.LabelField("Unity Fog - Uses Unity's built-in fog. This option doesn't allow the clouds to match with the horizon color, but is slightly less intensive. It is recommened to use the UniStorm Fog Type.", EditorStyles.helpBox);
                         GUI.backgroundColor = Color.white;
                     }
-                    else if (self.CloudStyle == UniStormSystem.CloudStyleEnum.Clean)
+                    else if (self.FogType == UniStormSystem.FogTypeEnum.UnistormFog)
                     {
                         GUI.backgroundColor = new Color(0.8f, 0.8f, 0.8f, 1);
-                        EditorGUILayout.LabelField("Clean - Clean Clouds offer the most crips and detailed clouds.", EditorStyles.helpBox);
+                        EditorGUILayout.LabelField("UniStorm Fog - Uses UniStorm's custom Atmospheric Fog that uses the sunlight's and moonlight's color and blends it perfectly with the horizon and UniStorm's clouds.", EditorStyles.helpBox);
                         GUI.backgroundColor = Color.white;
+
+                        EditorGUILayout.Space();
+
+                        CustomFloatSlider(new Rect(), new GUIContent(), CameraFogHeightProp,
+                        new GUIContent("Skybox Fog Height", "Controls how much UniStorm's Fog affects the skybox. The higher far clipping plane your camera uses, the higher this value will need to be set. " +
+                        "Note: This setting has an option to be overridden within each Weather Type for futher customization, if desired."), 0, 1);
+                        EditorGUILayout.Space();
+
+                        EditorGUILayout.PropertyField(UseRadialDistantFogProp,
+                         new GUIContent("Use Radial Distance", "Allows UniStorm's Fog to be applied consistently around the player in the distance mainly near the outer edges of the camera."));
+                        EditorGUILayout.Space();
+
+                        EditorGUILayout.PropertyField(UseDitheringProp,
+                         new GUIContent("Use Dithering", "Applies Dithering to UniStorm's fog, clouds, and sky to greatly reduce banding."));
                     }
-                    else if (self.CloudStyle == UniStormSystem.CloudStyleEnum.Soft1)
-                    {
-                        GUI.backgroundColor = new Color(0.8f, 0.8f, 0.8f, 1);
-                        EditorGUILayout.LabelField("Soft 1 - Soft 1 Clouds have a balance between detail and softness.", EditorStyles.helpBox);
-                        GUI.backgroundColor = Color.white;
-                    }
-                    else if (self.CloudStyle == UniStormSystem.CloudStyleEnum.Soft2)
-                    {
-                        GUI.backgroundColor = new Color(0.8f, 0.8f, 0.8f, 1);
-                        EditorGUILayout.LabelField("Soft 2 - Soft 2 Clouds have a balance between detail and softness.", EditorStyles.helpBox);
-                        GUI.backgroundColor = Color.white;
-                    }
-                    else if (self.CloudStyle == UniStormSystem.CloudStyleEnum.Fluffy1)
-                    {
-                        GUI.backgroundColor = new Color(0.8f, 0.8f, 0.8f, 1);
-                        EditorGUILayout.LabelField("Fluffy 1 - Fluffy Clouds have less detail, but are more smooth and fluffy in appearance.", EditorStyles.helpBox);
-                        GUI.backgroundColor = Color.white;
-                    }
-                    else if (self.CloudStyle == UniStormSystem.CloudStyleEnum.Fluffy2)
-                    {
-                        GUI.backgroundColor = new Color(0.8f, 0.8f, 0.8f, 1);
-                        EditorGUILayout.LabelField("Fluffy 2 - Fluffy Clouds have less detail, but are more smooth and fluffy in appearance.", EditorStyles.helpBox);
-                        GUI.backgroundColor = Color.white;
-                    }
-                    else if (self.CloudStyle == UniStormSystem.CloudStyleEnum.Stylized)
-                    {
-                        GUI.backgroundColor = new Color(0.8f, 0.8f, 0.8f, 1);
-                        EditorGUILayout.LabelField("Stylized - Stylized Clouds have little detail, but are very crisp, clear, and round.", EditorStyles.helpBox);
-                        GUI.backgroundColor = Color.white;
-                    }
+                    EditorGUILayout.Space();
                     EditorGUILayout.EndVertical();
                     EditorGUILayout.EndHorizontal();
+
+                    if (self.FogType == UniStormSystem.FogTypeEnum.UnityFog)
+                    {
+                        CustomFloatSlider(new Rect(), new GUIContent(), StormyHorizonBrightnessProp,
+                            new GUIContent("Stormy Horizon Brightness", "Controls the brightness of UniStom's horizon during precipiation weather types. " +
+                            "This can be useful to allow better blending with the terrain and the clouds."), 1, 2.25f);
+                        EditorGUILayout.Space();
+                    }
+
                     EditorGUILayout.Space();
-                    EditorGUI.EndDisabledGroup();
-                    */
+                    EditorGUILayout.PropertyField(FogModeProp,
+                        new GUIContent("Fog Mode", "Controls the mode of fog UniStorm will use."));
+                    EditorGUILayout.Space();
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(FogColorProp,
+                        new GUIContent("Fog Color", "A gradient that controls the fog color during non-precipitation Weather Types (Unless being driven by the Fog Color Override on Weather Types). Each element is a transition into the next time of day."));
+                    EditorGUILayout.Space();                   
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(FogStormyColorProp,
+                        new GUIContent("Stormy Fog Color", "A gradient that controls the fog color during precipitation Weather Types (Unless being driven by the Fog Color Override on Weather Types). Each element is a transition into the next time of day."));
+                    EditorGUILayout.Space();
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(FogLightColorProp,
+                        new GUIContent("Fog Light Color", "A gradient that controls the color of the fog light during non-precipitation Weather Types. Each element is a transition into the next time of day."));
+                    EditorGUILayout.Space();
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(StormyFogLightColorProp,
+                        new GUIContent("Stormy Fog Light Color", "A gradient that controls the color of the fog light during precipitation Weather Types. Each element is a transition into the next time of day."));
+                    EditorGUILayout.Space();
 
                     EditorGUILayout.EndVertical();
                     EditorGUILayout.EndHorizontal();
@@ -1320,39 +1607,6 @@ namespace UniStorm.Utility
                     EditorGUILayout.Space();
                     EditorGUILayout.Space();
 
-                    CustomFloatSlider(new Rect(), new GUIContent(), StormyHorizonBrightnessProp,
-                        new GUIContent("Stormy Horizon Brightness", "Controls the brightness of UniStom's horizon during precipiation weather types. " +
-                        "This can be useful to allow better blending with the terrain and the clouds."), 1, 2.25f);
-                    EditorGUILayout.Space();
-
-                    EditorGUILayout.Space();
-                    EditorGUILayout.PropertyField(FogColorProp,
-                        new GUIContent("Fog Color", "A gradient that controls the fog color during non-precipitation Weather Types. Each element is a transition into the next time of day."));
-                    EditorGUILayout.Space();
-
-                    EditorGUILayout.Space();
-                    EditorGUILayout.PropertyField(FogStormyColorProp,
-                        new GUIContent("Fog Color (Stormy)", "A gradient that controls the fog color during precipitation Weather Types. Each element is a transition into the next time of day."));
-                    EditorGUILayout.Space();
-
-                    EditorGUILayout.Space();
-                    EditorGUILayout.PropertyField(CloudBaseColorProp,
-                        new GUIContent("Cloud Color", "A gradient that controls the base color of UniStorm's clouds during non-precipitation Weather Types. " +
-                        "Each element is a transition into the next time of day."));
-                    EditorGUILayout.Space();
-
-                    EditorGUILayout.Space();
-                    EditorGUILayout.PropertyField(CloudStormyBaseColorProp,
-                        new GUIContent("Cloud Color (Stormy)", "A gradient that controls the base color of UniStorm's clouds during precipitation Weather Types. " +
-                        "Each element is a transition into the next time of day."));
-                    EditorGUILayout.Space();
-
-                    EditorGUILayout.Space();
-                    EditorGUILayout.PropertyField(CloudLightColorProp,
-                        new GUIContent("Cloud Light Color", "A gradient that controls the light color of UniStorm's clouds when the clouds are receiving light. " +
-                        "Each element is a transition into the next time of day."));
-                    EditorGUILayout.Space();
-
                     EditorGUILayout.EndVertical();
                     EditorGUILayout.EndHorizontal();
                 }
@@ -1384,6 +1638,10 @@ namespace UniStorm.Utility
                     EditorGUILayout.BeginVertical();
 
                     EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(LightningLightColorProp,
+                            new GUIContent("Lightning Light Color", "Controls the color of UniStorm's lightning light color."));
+                    EditorGUILayout.Space();
+
                     EditorGUILayout.PropertyField(LightningShadowTypeProp,
                         new GUIContent("Lightning Shadow Type", "Controls the type of shadow UniStorm's lightning will use."));
 
@@ -1524,6 +1782,7 @@ namespace UniStorm.Utility
                 }
 
                 EditorGUILayout.EndVertical();
+                EditorGUILayout.Space();
                 GUI.backgroundColor = Color.white;
             }
 
@@ -1532,11 +1791,11 @@ namespace UniStorm.Utility
             {
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
-                EditorGUILayout.BeginVertical("Box", GUILayout.Width(90 * Screen.width / 100));
+                EditorGUILayout.BeginVertical("Box", GUILayout.Width(80 * Screen.width / Screen.dpi));
 
                 if (GUILayout.Button(new GUIContent(HelpIcon), HelpStyle, GUILayout.ExpandWidth(true), GUILayout.Height(22.5f)))
                 {
-                    Application.OpenURL("https://docs.google.com/document/d/1uL_oMqHC_EduRGEnOihifwcpkQmWX9rubGw8qjkZ4b4/edit#heading=h.g75asyk1ag9n");
+                    Application.OpenURL("https://github.com/Black-Horizon-Studios/UniStorm-Weather-System/wiki/The-UniStorm-Editor#celestial-settings-tab");
                 }
 
                 var style = new GUIStyle(EditorStyles.boldLabel) { alignment = TextAnchor.MiddleCenter };
@@ -1556,9 +1815,6 @@ namespace UniStorm.Utility
                 EditorGUILayout.EndVertical();
                 GUILayout.FlexibleSpace();
                 EditorGUILayout.EndHorizontal();
-
-                EditorGUILayout.Space();
-                EditorGUILayout.Space();
 
                 //Sun Settings
                 if (!SunFoldoutProp.boolValue)
@@ -1583,12 +1839,8 @@ namespace UniStorm.Utility
                     EditorGUILayout.BeginVertical();
 
                     EditorGUILayout.Space();
-                    EditorGUILayout.PropertyField(SunQualityProp,
-                        new GUIContent("Sun Spot Quality", "Controls the quality of UniStorm's rendered sun."));
-
-                    EditorGUILayout.Space();
-                    CustomFloatSlider(new Rect(), new GUIContent(), SunSpotIntensityProp,
-                            new GUIContent("Sun Spot Intensity", "Controls the intensity of UniStorm's rendered sun."), 1, 6);
+                    EditorGUILayout.PropertyField(SunSpotColorProp,
+                        new GUIContent("Sun Object Color", "An HDR gradient that controls UniStorm's sun object color. Each element is a transition into the next time of day."));
 
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(SunShadowTypeProp,
@@ -1616,11 +1868,46 @@ namespace UniStorm.Utility
                     EditorGUILayout.PropertyField(SunShaftsEffectProp,
                         new GUIContent("Sun Shafts Effect", "Controls whether or not UniStorm will automatically create and use a Sun Shafts Image Effect for the sun."));
 
+                    if (self.SunShaftsEffect == UniStormSystem.EnableFeature.Enabled)
+                    {
+                        GUILayout.Space(5);
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(15);
+                        EditorGUILayout.BeginVertical();
+
+                        EditorGUILayout.PropertyField(SunLightShaftIntensityProp,
+                            new GUIContent("Sun Shafts Intensity", "Controls the light shafts for UniStorm's sun for each time of day. X represents the hour and Y represents the intensity."));
+                        EditorGUILayout.Space();
+                        EditorGUILayout.PropertyField(SunLightShaftsColorProp,
+                            new GUIContent("Sun Shafts Color", "A gadient that controls the color of the light shafts for UniStorm's sun. Each element is a transition into the next time of day."));
+                        EditorGUILayout.Space();
+                        CustomFloatSlider(new Rect(), new GUIContent(), SunLightShaftsBlurSizeProp,
+                            new GUIContent("Sun Shafts Blur Size", "Controls the size of the light shafts' blurring for UniStorm's sun."), 0.1f, 10);
+                        EditorGUILayout.Space();
+                        CustomIntSlider(new Rect(), new GUIContent(), SunLightShaftsBlurIterationsProp,
+                            new GUIContent("Sun Shafts Blur Iterations", "Controls the amount of iterations used for the blurring of the sun shafts for UniStorm's sun."), 1, 3);
+
+                        EditorGUILayout.EndHorizontal();
+                        EditorGUILayout.EndVertical();
+                        EditorGUILayout.Space();
+                    }
+
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(SunColorProp,
                         new GUIContent("Sun Color", "A gradient that controls UniStorm's sun color during non-precipitation weather types. Each element is a transition into the next time of day."));
                     EditorGUILayout.PropertyField(StormySunColorProp,
                         new GUIContent("Stormy Sun Color", "A gradient that controls UniStorm's sun color during precipitation weather types. Each element is a transition into the next time of day."));
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(CelestialUpdateEnabledProp,
+                        new GUIContent("Use Celestial Light Update", "Controls whether or not UniStorm's sun and moon are updated based on second intervals rather than continuously. This allows for cleaner shadows at the cost of a brief visible update to celestial light sources every update interval. (Recommended for days lengths of 25 or greater)"));
+
+                    if (self.UseTimeOfDayUpdateControl == UniStormSystem.UseTimeOfDayUpdateSeconds.Yes)
+                    {
+                        EditorGUILayout.Space();
+                        CustomIntSlider(new Rect(), new GUIContent(), CelestialUpdateSecondsProp,
+                                new GUIContent("Celestial Update Seconds", "Controls, in seconds, how often both the sun and moon's positions are updated. This allows for cleaner shadows at the cost of a brief visible update to celestial shadows every update interval. (Recommended for days lengths of 25 or greater)"), 0, 15);
+                    }                   
 
                     EditorGUILayout.Space();
                     CustomIntSlider(new Rect(), new GUIContent(), SunAngleProp,
@@ -1637,7 +1924,7 @@ namespace UniStorm.Utility
 
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(SunAttenuationCurveProp,
-                        new GUIContent("Sun Attentuation Curve", "Controls the intensity of the clouds' sun light attentuation (How much the clouds are affected by the light of the sun). " +
+                        new GUIContent("Sun Attenuation Curve", "Controls the intensity of the clouds' sun light attenuation (How much the clouds are affected by the light of the sun). " +
                         "X represents the hour and Y represents the intensity."));
                     EditorGUILayout.Space();
 
@@ -1704,6 +1991,30 @@ namespace UniStorm.Utility
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(MoonShaftsEffectProp,
                         new GUIContent("Moon Shafts Effect", "Controls whether or not UniStorm will automatically create and use a Moon Shafts Image Effect for the moon."));
+
+                    if (self.MoonShaftsEffect == UniStormSystem.EnableFeature.Enabled)
+                    {
+                        GUILayout.Space(5);
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(15);
+                        EditorGUILayout.BeginVertical();
+
+                        EditorGUILayout.PropertyField(MoonLightShaftIntensityProp,
+                            new GUIContent("Moon Shafts Intensity", "Controls the light shafts for UniStorm's moon for each time of day. X represents the hour and Y represents the intensity."));
+                        EditorGUILayout.Space();
+                        EditorGUILayout.PropertyField(MoonLightShaftsColorProp,
+                            new GUIContent("Moon Shafts Color", "A gadient that controls the color of the light shafts for UniStorm's moon. Each element is a transition into the next time of day."));
+                        EditorGUILayout.Space();
+                        CustomFloatSlider(new Rect(), new GUIContent(), MoonLightShaftsBlurSizeProp,
+                            new GUIContent("Moon Shafts Blur Size", "Controls the size of the light shafts' blurring for UniStorm's moon."), 0.1f, 10);
+                        EditorGUILayout.Space();
+                        CustomIntSlider(new Rect(), new GUIContent(), MoonLightShaftsBlurIterationsProp,
+                            new GUIContent("Moon Shafts Blur Iterations", "Controls the amount of iterations used for the blurring of the moon shafts for UniStorm's moon."), 1, 3);
+
+                        EditorGUILayout.EndHorizontal();
+                        EditorGUILayout.EndVertical();
+                        EditorGUILayout.Space();
+                    }
 
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(MoonColorProp,
@@ -1884,11 +2195,11 @@ namespace UniStorm.Utility
             {
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
-                EditorGUILayout.BeginVertical("Box", GUILayout.Width(90 * Screen.width / 100));
+                EditorGUILayout.BeginVertical("Box", GUILayout.Width(80 * Screen.width / Screen.dpi));
 
                 if (GUILayout.Button(new GUIContent(HelpIcon), HelpStyle, GUILayout.ExpandWidth(true), GUILayout.Height(22.5f)))
                 {
-                    Application.OpenURL("https://docs.google.com/document/d/1uL_oMqHC_EduRGEnOihifwcpkQmWX9rubGw8qjkZ4b4/edit#heading=h.abpb6eb0nbfc");
+                    Application.OpenURL("https://github.com/Black-Horizon-Studios/UniStorm-Weather-System/wiki/The-UniStorm-Editor#settings-tab");
                 }
 
                 var style = new GUIStyle(EditorStyles.boldLabel) { alignment = TextAnchor.MiddleCenter };
@@ -1938,7 +2249,7 @@ namespace UniStorm.Utility
                     EditorGUILayout.Space();
                     GUI.backgroundColor = new Color(1f, 1, 0.5f, 0.5f);
                     EditorGUILayout.LabelField("This setting allows UniStorm to automatically set the optimal settings for the Mobile or Desktop platforms. " +
-                        "However, be aware that this will overwrite the quality settings you have set to related to the clouds, as well as some other settings within the UniStorm Editor.", EditorStyles.helpBox);
+                        "However, be aware that this will overwrite the quality settings you have set to related to the clouds, as well as some other settings within the UniStorm Editor (excluding color settings and weather types).", EditorStyles.helpBox);
                     EditorGUILayout.LabelField("Note: You are free to modify these values after they have been applied.", EditorStyles.helpBox);
                     GUI.backgroundColor = Color.white;
                     EditorGUILayout.PropertyField(PlatformTypeProp,
@@ -1953,7 +2264,6 @@ namespace UniStorm.Utility
                             if (self.PlatformType == UniStormSystem.PlatformTypeEnum.Desktop)
                             {
                                 self.LightningStrikes = UniStormSystem.EnableFeature.Enabled;
-                                self.SunQuality = UniStormSystem.SunQualityEnum.High;
                                 self.SunShadowType = LightShadows.Soft;
                                 self.SunShadowResolution = UnityEngine.Rendering.LightShadowResolution.Medium;
                                 self.MoonShadowType = LightShadows.Soft;
@@ -1963,37 +2273,47 @@ namespace UniStorm.Utility
                                 self.CloudQuality = UniStormSystem.CloudQualityEnum.High;
                                 self.CloudType = UniStormSystem.CloudTypeEnum.Volumetric;
                                 self.SunShaftsEffect = UniStormSystem.EnableFeature.Enabled;
+                                self.MoonShaftsEffect = UniStormSystem.EnableFeature.Enabled;
                                 self.CloudShadows = UniStormSystem.EnableFeature.Enabled;
                                 self.CloudShadowResolution = UniStormSystem.CloudShadowResolutionEnum._512x512;
+                                self.UseTimeOfDayUpdateControl = UniStormSystem.UseTimeOfDayUpdateSeconds.No;
+                                self.CloudDomeTrisCountX = 48;
+                                self.CloudDomeTrisCountY = 32;
                             }
                             else if (self.PlatformType == UniStormSystem.PlatformTypeEnum.VR)
                             {
-                                self.LightningStrikes = UniStormSystem.EnableFeature.Enabled;
-                                self.SunQuality = UniStormSystem.SunQualityEnum.High;
+                                self.LightningStrikes = UniStormSystem.EnableFeature.Disabled;
                                 self.SunShadowType = LightShadows.Soft;
                                 self.SunShadowResolution = UnityEngine.Rendering.LightShadowResolution.Medium;
                                 self.MoonShadowType = LightShadows.Soft;
                                 self.MoonShadowResolution = UnityEngine.Rendering.LightShadowResolution.Medium;
-                                self.LightningShadowType = LightShadows.Soft;
+                                self.LightningShadowType = LightShadows.None;
                                 self.LightningShadowResolution = UnityEngine.Rendering.LightShadowResolution.Low;
                                 self.CloudQuality = UniStormSystem.CloudQualityEnum.Medium;
                                 self.CloudType = UniStormSystem.CloudTypeEnum.Volumetric;
                                 self.SunShaftsEffect = UniStormSystem.EnableFeature.Disabled;
+                                self.MoonShaftsEffect = UniStormSystem.EnableFeature.Disabled;
                                 self.CloudShadows = UniStormSystem.EnableFeature.Disabled;
                                 self.CloudShadowResolution = UniStormSystem.CloudShadowResolutionEnum._256x256;
+                                self.UseTimeOfDayUpdateControl = UniStormSystem.UseTimeOfDayUpdateSeconds.No;
+                                self.CloudDomeTrisCountX = 48;
+                                self.CloudDomeTrisCountY = 32;
                             }
                             else if (self.PlatformType == UniStormSystem.PlatformTypeEnum.Mobile)
                             {
                                 self.LightningStrikes = UniStormSystem.EnableFeature.Disabled;
-                                self.SunQuality = UniStormSystem.SunQualityEnum.Low;
                                 self.SunShadowType = LightShadows.None;
                                 self.MoonShadowType = LightShadows.None;
                                 self.LightningShadowType = LightShadows.None;
                                 self.CloudQuality = UniStormSystem.CloudQualityEnum.Low;
                                 self.CloudType = UniStormSystem.CloudTypeEnum._2D;
                                 self.SunShaftsEffect = UniStormSystem.EnableFeature.Disabled;
+                                self.MoonShaftsEffect = UniStormSystem.EnableFeature.Disabled;
                                 self.CloudShadows = UniStormSystem.EnableFeature.Disabled;
                                 self.CloudShadowResolution = UniStormSystem.CloudShadowResolutionEnum._256x256;
+                                self.UseTimeOfDayUpdateControl = UniStormSystem.UseTimeOfDayUpdateSeconds.No;
+                                self.CloudDomeTrisCountX = 44;
+                                self.CloudDomeTrisCountY = 16;
                             }
                         }
                     }
@@ -2089,6 +2409,18 @@ namespace UniStorm.Utility
                                 self.CloudLightColor = UpdateGradient(Temp_UniStormProfile.CloudLightColor, self.CloudLightColor);
                                 CloudLightColorProp = serializedObject.FindProperty("CloudLightColor").Copy();
 
+                                self.StormyCloudLightColor = UpdateGradient(Temp_UniStormProfile.StormyCloudLightColor, self.StormyCloudLightColor);
+                                StormyCloudLightColorProp = serializedObject.FindProperty("StormyCloudLightColor").Copy();
+
+                                self.FogLightColor = UpdateGradient(Temp_UniStormProfile.FogLightColor, self.FogLightColor);
+                                FogLightColorProp = serializedObject.FindProperty("FogLightColor").Copy();
+
+                                self.StormyFogLightColor = UpdateGradient(Temp_UniStormProfile.StormyFogLightColor, self.StormyFogLightColor);
+                                StormyFogLightColorProp = serializedObject.FindProperty("StormyFogLightColor").Copy();
+
+                                self.SunSpotColor = UpdateGradient(Temp_UniStormProfile.SunSpotColor, self.SunSpotColor);
+                                SunSpotColorProp = serializedObject.FindProperty("SunSpotColor").Copy();
+
                                 self.CloudBaseColor = UpdateGradient(Temp_UniStormProfile.CloudBaseColor, self.CloudBaseColor);
                                 CloudBaseColorProp = serializedObject.FindProperty("CloudBaseColor").Copy();
 
@@ -2106,6 +2438,26 @@ namespace UniStorm.Utility
 
                                 self.SunAttenuationCurve = new AnimationCurve(Temp_UniStormProfile.SunAttenuationCurve.keys);
                                 SunAttenuationCurveProp = serializedObject.FindProperty("SunAttenuationCurve").Copy();
+
+                                self.EnvironmentReflections = new AnimationCurve(Temp_UniStormProfile.EnvironmentReflections.keys);
+                                EnvironmentReflectionsProp = serializedObject.FindProperty("EnvironmentReflections").Copy();
+
+                                self.AmbientIntensityCurve = new AnimationCurve(Temp_UniStormProfile.AmbientIntensityCurve.keys);
+                                AmbientIntensityProp = serializedObject.FindProperty("AmbientIntensityCurve").Copy();
+
+                                self.SunAtmosphericFogIntensity = new AnimationCurve(Temp_UniStormProfile.SunAtmosphericFogIntensity.keys);
+
+                                self.SunControlCurve = new AnimationCurve(Temp_UniStormProfile.SunControlCurve.keys);
+
+                                self.MoonAtmosphericFogIntensity = new AnimationCurve(Temp_UniStormProfile.MoonAtmosphericFogIntensity.keys);
+
+                                self.MoonObjectFade = new AnimationCurve(Temp_UniStormProfile.MoonObjectFade.keys);
+
+                                self.FogType = (UniStormSystem.FogTypeEnum)Temp_UniStormProfile.FogType;
+                                FogTypeProp = serializedObject.FindProperty("FogType").Copy();
+
+                                self.FogMode = (UniStormSystem.FogModeEnum)Temp_UniStormProfile.FogMode;
+                                FogModeProp = serializedObject.FindProperty("FogMode").Copy();
 
                                 serializedObject.ApplyModifiedProperties();
                                 Importing = true;
@@ -2146,12 +2498,24 @@ namespace UniStorm.Utility
                             Temp_UniStormProfile.FogColor = UpdateGradient(self.FogColor, Temp_UniStormProfile.FogColor);
                             Temp_UniStormProfile.FogStormyColor = UpdateGradient(self.FogStormyColor, Temp_UniStormProfile.FogStormyColor);
                             Temp_UniStormProfile.CloudLightColor = UpdateGradient(self.CloudLightColor, Temp_UniStormProfile.CloudLightColor);
+                            Temp_UniStormProfile.StormyCloudLightColor = UpdateGradient(self.StormyCloudLightColor, Temp_UniStormProfile.StormyCloudLightColor); 
+                            Temp_UniStormProfile.FogLightColor = UpdateGradient(self.FogLightColor, Temp_UniStormProfile.FogLightColor); 
+                            Temp_UniStormProfile.StormyFogLightColor = UpdateGradient(self.StormyFogLightColor, Temp_UniStormProfile.StormyFogLightColor); 
+                            Temp_UniStormProfile.SunSpotColor = UpdateGradient(self.SunSpotColor, Temp_UniStormProfile.SunSpotColor); 
                             Temp_UniStormProfile.CloudBaseColor = UpdateGradient(self.CloudBaseColor, Temp_UniStormProfile.CloudBaseColor);
                             Temp_UniStormProfile.CloudStormyBaseColor = UpdateGradient(self.CloudStormyBaseColor, Temp_UniStormProfile.CloudStormyBaseColor);
                             Temp_UniStormProfile.SunIntensityCurve = new AnimationCurve(Temp_UniStormSystem.SunIntensityCurve.keys);
                             Temp_UniStormProfile.MoonIntensityCurve = new AnimationCurve(Temp_UniStormSystem.MoonIntensityCurve.keys);
                             Temp_UniStormProfile.AtmosphereThickness = new AnimationCurve(Temp_UniStormSystem.AtmosphereThickness.keys);
                             Temp_UniStormProfile.SunAttenuationCurve = new AnimationCurve(Temp_UniStormSystem.SunAttenuationCurve.keys);
+                            Temp_UniStormProfile.EnvironmentReflections = new AnimationCurve(Temp_UniStormSystem.EnvironmentReflections.keys);
+                            Temp_UniStormProfile.AmbientIntensityCurve = new AnimationCurve(Temp_UniStormSystem.AmbientIntensityCurve.keys);
+                            Temp_UniStormProfile.SunAtmosphericFogIntensity = new AnimationCurve(Temp_UniStormSystem.SunAtmosphericFogIntensity.keys);
+                            Temp_UniStormProfile.SunControlCurve = new AnimationCurve(Temp_UniStormSystem.SunControlCurve.keys);
+                            Temp_UniStormProfile.MoonAtmosphericFogIntensity = new AnimationCurve(Temp_UniStormSystem.MoonAtmosphericFogIntensity.keys);
+                            Temp_UniStormProfile.MoonObjectFade = new AnimationCurve(Temp_UniStormSystem.MoonObjectFade.keys);
+                            Temp_UniStormProfile.FogType = (UniStormProfile.FogTypeEnum)Temp_UniStormSystem.FogType;
+                            Temp_UniStormProfile.FogMode = (UniStormProfile.FogModeEnum)Temp_UniStormSystem.FogMode;
 
                             AssetDatabase.CreateAsset(Temp_UniStormProfile, self.FilePath);
                         }

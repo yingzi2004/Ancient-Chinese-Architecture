@@ -27,6 +27,7 @@ namespace UniStorm.Example
 
         private void Start()
         {
+            //Screen.SetResolution(1280, 720, false);
             QualityDropdown = GameObject.Find("Cloud Quality Dropdown").GetComponent<Dropdown>();
             QualityDropdown.onValueChanged.AddListener(delegate {UpdateCloudQuality();});
 

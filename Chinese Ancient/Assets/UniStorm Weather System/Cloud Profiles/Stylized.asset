@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -12,9 +13,9 @@ MonoBehaviour:
   m_Name: Stylized
   m_EditorClassIdentifier: 
   ProfileName: Clean
-  EdgeSoftness: 0.02
-  BaseSoftness: 0.02
-  DetailStrength: 0.045
-  Density: 0.9
+  EdgeSoftness: 0.025
+  BaseSoftness: 0.1
+  DetailStrength: 0.04
+  Density: 1
   CoverageBias: -0.05
   DetailScale: 730

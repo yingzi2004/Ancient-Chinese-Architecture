@@ -1,7 +1,7 @@
 Shader "UniStorm/Celestial/Moon" {
 Properties {
 	_MoonColor ("Moon Color", Color) = (0.5,0.5,0.5,0.5)
-	_MoonBrightness ("Moon Brightness", Range(0.25,0.75)) = 0.7
+	_MoonBrightness ("Moon Brightness", Range(0.0,0.75)) = 0.7
 	_MainTex ("Moon Texture", 2D) = "white" {}
 	_InvFade ("Soft Particles Factor", Range(0.01,3.0)) = 1.0
 }

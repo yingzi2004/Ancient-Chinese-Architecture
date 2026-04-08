@@ -5,7 +5,7 @@ using UnityEngine;
 namespace UniStorm.Effects
 {
     [CustomEditor (typeof(UniStormSunShafts))]
-    class SunShaftsEditor : Editor
+    class UniStormSunShaftsEditor : Editor
     {
         SerializedObject serObj;
 

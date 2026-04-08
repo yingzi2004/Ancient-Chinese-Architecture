@@ -2,7 +2,7 @@ Shader "UniStorm/Celestial/Skybox" {
 Properties {
 	[KeywordEnum(None, Simple, High Quality)] _SunDisk ("Sun", Int) = 2
 	_SunSize ("Sun Size", Range(0,1)) = 0.04
-	_SunBrightness("Sun Brightness", Range(1,6)) = 1.5
+	_SunBrightness("Sun Brightness", Range(0,6)) = 1.5
 	_SunColor("Sun Color", Color) = (.5, .5, .5, 1)
 	
 	_AtmosphereThickness ("Atmosphere Thickness", Range(0,5)) = 1.0
@@ -199,11 +199,34 @@ SubShader {
 			float far = 0.0;
 			half3 cIn, cOut;
 
-			if(eyeRay.y >= 0.0)
-			{
+			
 				// Sky
 				// Calculate the length of the "atmosphere"
+			/*
+			if (eyeRay.y >= 0.0)
+			{
 				far = sqrt(kOuterRadius2 + kInnerRadius2 * eyeRay.y * eyeRay.y - kInnerRadius2) - kInnerRadius * eyeRay.y;
+			}
+			else
+			{
+				//Combination between above and this:
+				far = (-kCameraHeight) / (min(-0.001, eyeRay.y));
+			}
+			*/
+
+			if (eyeRay.y >= 0.0)
+			{
+				far = sqrt(kOuterRadius2 + kInnerRadius2 * eyeRay.y * eyeRay.y - kInnerRadius2) - kInnerRadius * eyeRay.y;
+			}
+			else
+			{
+				//far = sqrt(kOuterRadius2 + kInnerRadius2 * eyeRay.y * eyeRay.y - kInnerRadius2) - kInnerRadius * eyeRay.y;
+				//Combination between above and this:
+				//far = sqrt(kOuterRadius2 + kInnerRadius2 * min(0.5, eyeRay.y/5) - kInnerRadius2);
+				//far = (-kCameraHeight) / (min(-0.001, eyeRay.y));
+				//far = sqrt(kOuterRadius2 + kInnerRadius2 * eyeRay.y * eyeRay.y - kInnerRadius2) - kInnerRadius * eyeRay.y;
+				//far = (-kCameraHeight) / eyeRay.y;
+			}
 
 				float3 pos = cameraPos + far * eyeRay;
 
@@ -250,50 +273,31 @@ SubShader {
 					samplePoint += sampleRay;
 				}
 
+				//Added
+				if (eyeRay.y < 0.0)
+				{
+					//cIn += _GroundColor;
+					//cOut = frontColor * kKmESun;
+				}
+				//Added
 
 
 				// Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader
 				cIn = frontColor * (kInvWavelength * kKrESun);
 				cOut = frontColor * kKmESun;
-			}
-			else
-			{
-				// Ground
-				far = (-kCameraHeight) / (min(-0.001, eyeRay.y));
 
-				float3 pos = cameraPos + far * eyeRay;
-
-				// Calculate the ray's starting position, then calculate its scattering offset
-				float depth = exp((-kCameraHeight) * (1.0/kScaleDepth));
-				float cameraAngle = dot(-eyeRay, pos);
-				float lightAngle = dot(_WorldSpaceLightPos0.xyz, pos);
-				float cameraScale = scale(cameraAngle);
-				float lightScale = scale(lightAngle);
-				float cameraOffset = depth*cameraScale;
-				float temp = (lightScale + cameraScale);
-
-				// Initialize the scattering loop variables
-				float sampleLength = far / kSamples;
-				float scaledLength = sampleLength * kScale;
-				float3 sampleRay = eyeRay * sampleLength;
-				float3 samplePoint = cameraPos + sampleRay * 0.5;
-
-				// Now loop through the sample rays
-				float3 frontColor = float3(0.0, 0.0, 0.0);
-				float3 attenuate;
-//				for(int i=0; i<int(kSamples); i++) // Loop removed because we kept hitting SM2.0 temp variable limits. Doesn't affect the image too much.
+				float lightAngle = dot(_WorldSpaceLightPos0.xyz, samplePoint) / height;
+				//Added
+				if (lightAngle*2 > 0 && eyeRay.y < 0.0)
 				{
-					float height = length(samplePoint);
-					float depth = exp(kScaleOverScaleDepth * (kInnerRadius - height));
-					float scatter = depth*temp - cameraOffset;
-					attenuate = exp(-clamp(scatter, 0.0, kMAX_SCATTER) * (kInvWavelength * kKr4PI + kKm4PI));
-					frontColor += attenuate * (depth * scaledLength);
-					samplePoint += sampleRay;
+					//cIn = frontColor * (kInvWavelength * kKrESun) + _GroundColor;
+					//cIn += _GroundColor;					
+					//cIn = frontColor * (kInvWavelength * kKrESun);
+					//cOut = frontColor * kKmESun;
+					cIn = lerp(cIn, COLOR_2_LINEAR(_GroundColor + _NightSkyTint * 0.1), lightAngle * 2);
+					//cIn = lerp(cIn, _Exposure * (cIn * getRayleighPhase(_WorldSpaceLightPos0.xyz, -eyeRay)) + _GroundColor * kInvWavelength, lightAngle * 2);
 				}
-
-				cIn = frontColor * (kInvWavelength * kKrESun + kKmESun);
-				cOut = clamp(attenuate, 0.0, 1.0);
-			}
+				//Added
 
 		#if SKYBOX_SUNDISK == SKYBOX_SUNDISK_HQ
 			OUT.vertex 			= -v.vertex;
@@ -306,10 +310,9 @@ SubShader {
 			// if we want to calculate color in vprog:
 			// 1. in case of linear: multiply by _Exposure in here (even in case of lerp it will be common multiplier, so we can skip mul in fshader)
 			// 2. in case of gamma and SKYBOX_COLOR_IN_TARGET_COLOR_SPACE: do sqrt right away instead of doing that in fshader
-
-			OUT.groundColor	= _Exposure * (cIn + COLOR_2_LINEAR(_GroundColor) * cOut);
-			//OUT.groundColor	= _Exposure * cOut;
-			OUT.skyColor	= _Exposure * (cIn * getRayleighPhase(_WorldSpaceLightPos0.xyz, -eyeRay));
+			OUT.groundColor	= _Exposure * (cIn * getRayleighPhase(_WorldSpaceLightPos0.xyz, -eyeRay));
+			OUT.skyColor = _Exposure * (cIn * getRayleighPhase(_WorldSpaceLightPos0.xyz, -eyeRay));
+			//OUT.groundColor = OUT.skyColor;
 
 		#if SKYBOX_SUNDISK != SKYBOX_SUNDISK_NONE
 			OUT.sunColor	= _SunBrightness * (cOut * _SunColor);
@@ -360,7 +363,7 @@ SubShader {
 		// if y < 0 [eyeRay.y > 0] - sky
 		#if SKYBOX_SUNDISK == SKYBOX_SUNDISK_HQ
 			half3 ray = normalize(mul((float3x3)unity_ObjectToWorld, IN.vertex));
-			half y = ray.y / SKY_GROUND_THRESHOLD;
+			half y = ray.y / SKY_GROUND_THRESHOLD;			
 		#elif SKYBOX_SUNDISK == SKYBOX_SUNDISK_SIMPLE
 			half3 ray = IN.rayDir.xyz;
 			half y = ray.y / SKY_GROUND_THRESHOLD;
@@ -372,7 +375,7 @@ SubShader {
 			col = lerp(IN.skyColor, IN.groundColor, saturate(y));
 
 		#if SKYBOX_SUNDISK != SKYBOX_SUNDISK_NONE
-			if(y < 0.0)
+			if(y < 1.5) //Edited from 0.0
 			{
 			#if SKYBOX_SUNDISK == SKYBOX_SUNDISK_SIMPLE
 				half mie = calcSunSpot(_WorldSpaceLightPos0.xyz, -ray);

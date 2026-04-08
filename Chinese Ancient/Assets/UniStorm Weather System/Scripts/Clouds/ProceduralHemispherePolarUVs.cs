@@ -41,17 +41,13 @@ namespace UniStorm.Utility
             _hemisphereInv = new Mesh() { name = "procedurally_created_inverted_hemisphere" };
             _hemisphereInv.Clear();
 
-            // Longitude |||
-            int nbLong = 48; //48 //24
-                             // Latitude ---
-            int nbLat = 32; //32 //16
+            // Longitude
+            int nbLong = 48;
+            // Latitude
+            int nbLat = 32;
 
-            //Added
-            if (UniStormSystem.Instance.CloudType == UniStormSystem.CloudTypeEnum._2D)
-            {
-                nbLong = 38;
-                nbLat = 16;
-            }
+            nbLong = UniStormSystem.Instance.CloudDomeTrisCountX;
+            nbLat = UniStormSystem.Instance.CloudDomeTrisCountY;
 
             #region Vertices and UVs
             Vector3[] vertices = new Vector3[(nbLong + 1) * (nbLat + 1) + 1];

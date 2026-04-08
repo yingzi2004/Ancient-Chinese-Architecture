@@ -9,7 +9,7 @@ static const int CLOUD_SELF_SHADOW_STEPS = 1;
 #else
 
 #if defined (ULTRA)
-static const int CLOUD_MARCH_STEPS = 100;
+uniform int CLOUD_MARCH_STEPS = 100;
 static const int CLOUD_SELF_SHADOW_STEPS = 5;
 #elif defined (HIGH)
 static const int CLOUD_MARCH_STEPS = 80;
@@ -28,6 +28,7 @@ static const int CLOUD_SELF_SHADOW_STEPS = 5;
 uniform float4 _uSunColor; // sun color
 uniform float4 _uSunDir; // sun direction (forward vector)
 uniform float _uAttenuation; // not used as attenuation - used as light intensity
+uniform float DISTANT_CLOUD_MARCH_STEPS;
 
 uniform float4 _uMoonDir;
 uniform float4 _uMoonColor;
@@ -68,6 +69,7 @@ uniform float _uCloudsMovementSpeed; // movement speed - meters per second
 uniform float _uCloudsTurbulenceSpeed; // movement speed of the turbulence - meters per second
 uniform float _uBaseCloudOffset;
 uniform float _uDetailCloudOffset;
+uniform float _uCloudNoiseScale;
 
 uniform float _uRaymarchOffset; // offset for the raymarching
 uniform float2 _uJitter; // Used so that the clouds can be rendered at a lower resolution
@@ -199,8 +201,9 @@ float getFogAmount(float dist)
 float cloudMapBase(float3 p, float norY)
 {
     float3 offset = float3(cos(_uCloudsBearing), 0.0f, sin(_uCloudsBearing)) * (_uBaseCloudOffset);
-    
+
     float3 uv = (p + offset) * (0.00005f * _uCloudsBaseScale);
+	float distance = length(uv.xz);
 
 #ifdef IS_COMPUTE_SHADER
     float3 cloud = _uBaseNoise.SampleLevel(_TrilinearRepeat, uv.xz, 0).rgb - float3(0.0f, 1.0f, 0.0f);
@@ -209,15 +212,14 @@ float cloudMapBase(float3 p, float norY)
 #endif
 
     float n = norY * norY;
-    n *= cloud.b;
-    n += pow(1.0f - norY, 16.0f);
-    return remap(cloud.r - n, cloud.g, 1.0f);
+	n += pow(1.0f - norY, 36);
+	return remap(cloud.r - n, cloud.g - n, 1.0f);
 }
 
 // map the cloud noise
-float3 cloudMapDetail(float3 p, float norY)
+float3 cloudMapDetail(float3 p, float norY, float speed)
 {
-    float3 offset = float3(cos(_uCloudsBearing), 1.0f, sin(_uCloudsBearing)) * (_uDetailCloudOffset);
+    float3 offset = float3(cos(_uCloudsBearing), 1.0f, sin(_uCloudsBearing)) * (_uDetailCloudOffset) * speed;
 
 #if defined(ULTRA)
     float2 curl_noise = tex2Dlod(_uCurlNoise, float4(p.xz / _uCurlScale, 0.0, 1.0)).rg;
@@ -241,59 +243,67 @@ float cloudGradient(float norY)
 // map the cloud with details
 float cloudMap(float3 pos, float3 rd, float norY)
 {
-    float m = cloudMapBase(pos, norY);
-    m *= cloudGradient(norY);
+	float fade2 = sqrt((_uEarthRadius) * (_uEarthRadius)-_uEarthRadius * _uEarthRadius +
+		(_uEarthRadius + _uCloudsBottom) * (_uEarthRadius + _uCloudsBottom) - _uEarthRadius * _uEarthRadius);
+	float d2 = length(pos.xz);
+	fade2 = smoothstep(0, fade2, d2 * 2);
 
-    float dstrength = smoothstep(1.0f, 0.5f, m);
+#if defined(TWOD)
+	float m = cloudMapBase(pos, norY);
+	m *= cloudGradient(norY);
+#else
+    float m = cloudMapBase(pos, lerp(norY*0.8, norY * 8, fade2 * 0.25));
+	m *= cloudGradient(norY);
+#endif
+    
+	//float dstrength = smoothstep(1.0f, 0.5f, m);
+	float dstrength = smoothstep(1.0f, 0.5f, fade2 * 0.6);
 
 #if defined(MEDIUM) || defined(HIGH) || defined(ULTRA)
     // erode with detail
-    if (dstrength > 0.) 
-    {
-        float3 detail = cloudMapDetail(pos, norY) * dstrength * _uCloudsDetailStrength;
-        float detailSampleResult = (detail.r * 0.625f) + (detail.g * 0.25f) + (detail.b * 0.125f);
-
+    if (dstrength > 0.)
+    {		
+        float3 detail = cloudMapDetail(pos, norY, 1) * dstrength * _uCloudsDetailStrength;
+        float detailSampleResult = (detail.r * 0.625f) + (detail.g * 0.2f) + (detail.b * 0.125f);
         m -= detailSampleResult;
     }
 #else
     m -= dstrength * _uCloudsDetailStrength * 0.5f;
 #endif
-
-    /*float fade = sqrt((_uWorldSpaceCameraPos.y + _uEarthRadius) * (_uWorldSpaceCameraPos.y + _uEarthRadius) - _uEarthRadius * _uEarthRadius +
-        (_uEarthRadius + _uCloudsBottom) * (_uEarthRadius + _uCloudsBottom) - _uEarthRadius * _uEarthRadius);*/
     float fade = sqrt((_uEarthRadius) * (_uEarthRadius) - _uEarthRadius * _uEarthRadius +
         (_uEarthRadius + _uCloudsBottom) * (_uEarthRadius + _uCloudsBottom) - _uEarthRadius * _uEarthRadius);
     
     float d = length(pos.xz);
-    //float d = length(pos.xz);
 
-    //float fade = 1.0f;
-    fade = smoothstep(fade * 4.5f, 0, d);
+	fade = smoothstep(fade * 6, 0, d);
 
 #if defined(TWOD)
     m = smoothstep(0.0f, lerp(25.0f, _uCloudsBaseEdgeSoftness, fade), m + (lerp(_uCloudsCoverage + _uCloudsCoverageBias + 0.7f, _uCloudsCoverage + _uCloudsCoverageBias + 0.05, fade) - 1.));
 #else
-    m = smoothstep(0.0f, lerp(25.0f, _uCloudsBaseEdgeSoftness, fade), m + (lerp(_uCloudsCoverage + _uCloudsCoverageBias + 0.2f, _uCloudsCoverage + _uCloudsCoverageBias, fade) - 1.));
+    m = smoothstep(0.0f, lerp(2.5f, _uCloudsBaseEdgeSoftness, fade), m + (lerp(_uCloudsCoverage + _uCloudsCoverageBias - 1.0f, _uCloudsCoverage + _uCloudsCoverageBias , fade) - 1.));
 #endif
 
-    m *= linearstep0(_uCloudsBottomSoftness, norY);
-
+	//Controls fading softness distance
+	m *= linearstep0(_uCloudsBottomSoftness, norY);
 
     return clamp(m * _uCloudsDensity * (1.0f + max((d - 7000.0f)*0.0005f, 0.0f)), 0.0f, 1.0f);
 }
 
 float volumetricShadow(in float3 from, in float sundotrd, in float3 sunDir) {
-    float dd = 10.0f;
+
+	float sundotup = max(0.0f, dot(float3(0, 1, 0), -_uSunDir));
+
+    float dd = 12;
     float3 rd = -sunDir;
-    float d = dd * 0.5f;
-    float shadow = 1.0f;
+    float d = dd * 2.0f;
+	float shadow = 1.0 * lerp(1.5, 1, sundotup);
 
 #if defined(TWOD)
     UNITY_UNROLL
 #else
     UNITY_LOOP
 #endif
-    for (int s = 0; s < CLOUD_SELF_SHADOW_STEPS; s++) 
+    for (int s = 0; s < CLOUD_SELF_SHADOW_STEPS; s++)
     {
         float3 pos = from + rd * d;
         float norY = (length(pos) - (_uEarthRadius + _uCloudsBottom)) * (1.0f / ((_uCloudsBottom + _uCloudsHeight) - _uCloudsBottom));
@@ -301,9 +311,9 @@ float volumetricShadow(in float3 from, in float sundotrd, in float3 sunDir) {
         if (norY > 1.0f) return shadow;
 
         float muE = cloudMap(pos, rd, norY);
-        shadow *= exp(-muE * dd);
+        shadow *= exp(-muE * dd / 8);
 
-        dd *= 1.3f;
+        dd *= 1.0 * lerp(1.8, 1, sundotup);
         d += dd;
     }
     return shadow;
@@ -317,6 +327,7 @@ float4 renderCloudsInternal(float3 ro, float3 rd, inout float dist)
 
     start = intersectCloudSphereInner(ro, rd, _uEarthRadius + _uCloudsBottom);
     end = intersectCloudSphereInner(ro, rd, _uEarthRadius + (_uCloudsBottom + _uCloudsHeight));
+	float Fade = length(end);
 
     float sundotrd = dot(rd, _uSunDir);
     float sundotup = max(0.0f, dot(float3(0, 1, 0), -_uSunDir));
@@ -326,8 +337,10 @@ float4 renderCloudsInternal(float3 ro, float3 rd, inout float dist)
 
 #if defined(TWOD)
     int nSteps = CLOUD_MARCH_STEPS; // 2D is always the same
-#elif defined(ULTRA) || defined(HIGH)
-    int nSteps = lerp(20, CLOUD_MARCH_STEPS, dot(rd, float3(0, 1, 0))); // 20 samples for the distant clouds
+#elif defined(ULTRA)
+    int nSteps = lerp(DISTANT_CLOUD_MARCH_STEPS, CLOUD_MARCH_STEPS, dot(rd, float3(0, 1, 0))); // Samples are applied through UniStormSystem. If Customize Quality is enabled, these are controlled through the UniStorm Editor. 
+#elif defined(HIGH)
+	int nSteps = lerp(10, CLOUD_MARCH_STEPS, dot(rd, float3(0, 1, 0))); // 10 samples for the distant clouds
 #elif defined(MEDIUM)
     int nSteps = lerp(10, CLOUD_MARCH_STEPS, dot(rd, float3(0, 1, 0))); // 10 samples for the distant clouds
 #else
@@ -337,17 +350,17 @@ float4 renderCloudsInternal(float3 ro, float3 rd, inout float dist)
     // raymarch
 #if defined(TWOD)
     float d = start + ((end - start) * 0.4f);
-    float dD = 20.0f;
+    float dD = 7.0f;
 #else
-    float d = start;
-    float dD = min(500.0f, (end - start) / float(nSteps));
+	float d = start;
+	float dD = min(100.0f, (end - start) / float(nSteps));
 #endif
 
     float h = frac(_uRaymarchOffset);
     d -= dD * h;
 
     float scattering = lerp(HenyeyGreenstein(sundotrd, 0.8f),
-        HenyeyGreenstein(sundotrd, -0.2f), 0.5f);
+        HenyeyGreenstein(sundotrd, -0.35f), 0.65f);	
 
     float moonScattering = lerp(HenyeyGreenstein(moondotrd, 0.3f),
         HenyeyGreenstein(moondotrd, 0.75f), 0.5f);
@@ -356,7 +369,6 @@ float4 renderCloudsInternal(float3 ro, float3 rd, inout float dist)
     float3 scatteredLight = 0.0f;
 
     dist = _uEarthRadius;
-
 
     UNITY_LOOP
     for (int s = 0; s < nSteps; s++)
@@ -367,53 +379,58 @@ float4 renderCloudsInternal(float3 ro, float3 rd, inout float dist)
 
         float alpha = cloudMap(p, rd, norY);
 
-        if (alpha > 0.0f) 
+        if (alpha > 0.005f)
         {
-            dist = min(dist, d);
-            float3 ambientLight = lerp(
-                lerp(_uCloudsAmbientColorBottom, 0.0f, saturate(_uLightning * 3.0f)),
-                lerp(_uCloudsAmbientColorTop, _uLightningColor * 3.0f, saturate(_uLightning * 3.0f)),
-                norY) * _uCloudsColor;
+			float3 detail2 = cloudMapDetail(p * 0.35, norY, 1.0);
+			float3 detail3 = cloudMapDetail(p * 1, norY, 1.0);
+			
+			dist = min(dist, d);
+
+			float3 ambientLight = lerp(
+				lerp(_uCloudsAmbientColorBottom - (detail2.r * lerp(0.25, 0.75, sundotup)) * (lerp(0.2, 0.05, (_uCloudsCoverage)) * _uAttenuation * 0.4f), 0.0f, saturate(_uLightning * 3.0f)),
+				lerp(_uCloudsAmbientColorTop - detail2.r * lerp(1, 4, sundotup) * (0.1 * _uAttenuation * 0.9), _uCloudsAmbientColorTop + (_uLightningColor * lerp(0.35f, 0.75f, sundotup)), saturate(_uLightning * 10.0f)),
+				norY) * _uCloudsColor;
 
 #if defined(TWOD)
-            float3 light = _uSunColor * _uAttenuation * 0.6f;// *smoothstep(0.01, 0.05, sundotup);
+            float3 light = _uSunColor * _uAttenuation * 0.6f;
             light *= smoothstep(-0.03f, 0.075f, sundotup);
 			light *= lerp(smoothstep(0.9f, 0.4f, sundotrd), 1.0f, smoothstep(0.01, 0.65f, sundotup));
 
             float3 moonLight = _uMoonColor * _uMoonAttenuation * 0.6f;
             moonLight *= smoothstep(-0.03f, 0.075f, moondotup);
 #else
-            float3 light = _uSunColor * _uAttenuation * 0.6f * smoothstep(0.11, 0.35, sundotup);
-            light *= smoothstep(-0.03f, 0.075f, sundotup);
+			float3 light = _uSunColor * _uAttenuation * 1.5 * smoothstep(0.04, 0.055, sundotup);
+#if UNITY_COLORSPACE_GAMMA
+			light *= smoothstep(-0.03f, 0.075f, sundotup) - lerp(clamp(lerp(detail2.r * 1.6, detail3.r * 1.6, norY), 1.25, 0.9), clamp(detail3.r * 1.3, 0, 1.25), norY * 4);
+#else
+			light *= smoothstep(-0.03f, 0.075f, sundotup) - lerp(clamp(lerp(detail2.r * 1.6, detail3.r * 1.6, norY ), 0.75, 0.9), clamp(detail3.r * 1.3, 0, 0.8), norY * 4);
+#endif           
 			//Smooth opposite clouds
-			//Edited
-			light *= lerp(smoothstep(0.9f, 0.4f, sundotrd), 1.0f, smoothstep(0.01, 0.65f, sundotup));
+			light *= lerp(smoothstep(0.99f, 0.55f, sundotrd), 1.0f, smoothstep(0.1, 0.99f, sundotup));
 
             float3 moonLight = _uMoonColor * _uMoonAttenuation * 0.6f *smoothstep(0.11, 0.35, moondotup);
             moonLight *= smoothstep(-0.03f, 0.075f, moondotup);
 #endif
 
             float3 S = (
-                ambientLight +
+                ambientLight + 
                 light * (scattering * volumetricShadow(p, sundotrd, _uSunDir)) +
                 moonLight * (moonScattering * volumetricShadow(p, moondotrd, _uMoonDir)))
-                * alpha;
+                * alpha;	
 
             float dTrans = exp(-alpha * dD);
-            float3 Sint = (S - S * dTrans) * (1.0f / alpha);
+            float3 Sint = (S - (S * dTrans)) * (1.0f / alpha);
+
             scatteredLight += transmittance * Sint;
-            transmittance *= dTrans;
+            transmittance *= dTrans;		
         }
 
-        if (transmittance <= 0.1f) break;
+        if (transmittance <= 0.035f) break;
 
         d += dD;
     }
 
-    // float fade = sqrt((_uEarthRadius + _uCloudsBottom) * (_uEarthRadius + _uCloudsBottom) - _uEarthRadius * _uEarthRadius);
-    // fade = smoothstep(0.0f, fade, length(rd * start));
-
-    return float4(scatteredLight, transmittance);// lerp(transmittance, 2.5f, fade));
+    return float4(scatteredLight, transmittance);
 }
 
 void renderClouds(out float4 fragColor, in float3 ro, in float3 rd)

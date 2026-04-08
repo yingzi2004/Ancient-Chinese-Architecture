@@ -5,10 +5,6 @@ Shader "UniStorm/Celestial/Aurora" {
         _XSegments ("X Segment", Float ) = 3.7
         _YSegments ("Y Segments", Float ) = 1
         _ColorBalance ("Color Balance", Range(0, 2)) = 1.25
-        //_OuterColor ("Outer Color", Color) = (0.1,0.8,1,1)
-        //_InnerColor ("Inner Color", Color) = (1,0,0.7,1)
-        //_LightIntensity ("Light Intensity", Float ) = 0.2
-
 		_AmplitudeX("Amplitude X", Float) = 0.02
 		_AmplitudeY("Amplitude Y", Float) = 0.02
 		_AmplitudeZ("Amplitude Z", Float) = 0.02
@@ -30,7 +26,7 @@ Shader "UniStorm/Celestial/Aurora" {
         Pass {
             Name "FORWARD"
             Tags {
-                "LightMode"="ForwardBase" "DisableBatching" = "True"
+                "DisableBatching" = "True"
             }
 
             Blend One One
@@ -40,7 +36,7 @@ Shader "UniStorm/Celestial/Aurora" {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            #define UNITY_PASS_FORWARDBASE
+            //#define UNITY_PASS_FORWARDBASE
             #include "UnityCG.cginc"
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

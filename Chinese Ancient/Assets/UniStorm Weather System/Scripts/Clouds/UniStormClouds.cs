@@ -14,7 +14,7 @@ namespace UniStorm.Utility
         [HideInInspector]
         public Material shadowsMaterial;
         [HideInInspector]
-        private Material shadowsBuildingMaterial;
+        public Material shadowsBuildingMaterial;
         [HideInInspector]
         public Transform cloudShadows;
         [HideInInspector]
@@ -47,7 +47,8 @@ namespace UniStorm.Utility
         [Range(0, 6)] public int shadowBlurIterations;
         [HideInInspector]
         public CommandBuffer cloudsCommBuff;
-
+        //[HideInInspector]
+        //public int numRendersPerFrame = 1;
         private int frameCount = 0;
 
         private void Start()
@@ -89,7 +90,14 @@ namespace UniStorm.Utility
 
             if (UniStormSystem.Instance.UseRuntimeDelay == UniStormSystem.EnableFeature.Disabled && UniStormSystem.Instance.PlayerCamera != null)
             {
-                UniStormSystem.Instance.PlayerCamera.AddCommandBuffer(CameraEvent.AfterSkybox, cloudsCommBuff);
+                if (UniStormSystem.Instance.VRStateData.VREnabled && UniStormSystem.Instance.VRStateData.StereoRenderingMode == VRState.StereoRenderingModes.SinglePass)
+                {
+                    UniStormSystem.Instance.PlayerCamera.AddCommandBuffer(CameraEvent.BeforeImageEffects, cloudsCommBuff);
+                }
+                else
+                {
+                    UniStormSystem.Instance.PlayerCamera.AddCommandBuffer(CameraEvent.AfterSkybox, cloudsCommBuff);
+                }
             }
             else if (UniStormSystem.Instance.UseRuntimeDelay == UniStormSystem.EnableFeature.Disabled && UniStormSystem.Instance.PlayerCamera == null)
             {
@@ -100,7 +108,15 @@ namespace UniStorm.Utility
         IEnumerator InitializeClouds ()
         {          
             yield return new WaitUntil(()=> UniStormSystem.Instance.UniStormInitialized);
-            UniStormSystem.Instance.PlayerCamera.AddCommandBuffer(CameraEvent.AfterSkybox, cloudsCommBuff);
+
+            if (UniStormSystem.Instance.VRStateData.VREnabled && UniStormSystem.Instance.VRStateData.StereoRenderingMode == VRState.StereoRenderingModes.SinglePass)
+            {
+                UniStormSystem.Instance.PlayerCamera.AddCommandBuffer(CameraEvent.BeforeImageEffects, cloudsCommBuff);
+            }
+            else
+            {
+                UniStormSystem.Instance.PlayerCamera.AddCommandBuffer(CameraEvent.AfterSkybox, cloudsCommBuff);
+            }
         }
 
         #region Helper Functions and Variables
@@ -246,9 +262,9 @@ namespace UniStorm.Utility
             float offsetY = offset[frameIndex, 1];
 
             frameCount++;
-            if (frameCount < 16)
+            if (frameCount < 32)
                 skyMaterial.EnableKeyword("PREWARM");
-            else if (frameCount == 16)
+            else if (frameCount == 32)
                 skyMaterial.DisableKeyword("PREWARM");
 
             int size = presetResolutions[(int)performance];
@@ -259,6 +275,7 @@ namespace UniStorm.Utility
             EnsureRenderTarget(ref fullCloudsBuffer[1], size, size, RenderTextureFormat.ARGBHalf, FilterMode.Bilinear, "fullCloudBuff1");
             EnsureRenderTarget(ref cloudShadowsBuffer[0], CloudShadowResolutionValue, CloudShadowResolutionValue, RenderTextureFormat.ARGBHalf, FilterMode.Bilinear, "cloudShadowBuff0");
             EnsureRenderTarget(ref cloudShadowsBuffer[1], size, size, RenderTextureFormat.ARGBHalf, FilterMode.Bilinear, "cloudShadowBuff1");
+
             EnsureRenderTarget(ref lowResCloudsBuffer, size / 4, size / 4, RenderTextureFormat.ARGBFloat, FilterMode.Point, "quarterCloudBuff");
 
             skyMaterial.SetTexture("_uBaseNoise", GenerateNoise.baseNoiseTexture);
@@ -329,8 +346,6 @@ namespace UniStorm.Utility
 
             // 3. Set to material for the sky (not in the command buffer)
             cloudsMaterial.SetTexture("_MainTex", fullCloudsBuffer[fullBufferIndex ^ 1]);
-            shadowsMaterial.color = new Color(1, 1, 1, 1.0f - cloudTransparency);
-            shadowsMaterial.SetTexture("_MainTex", fullCloudsBuffer[fullBufferIndex ^ 1]);
         }
     }
 }

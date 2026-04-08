@@ -46,30 +46,44 @@ namespace UniStorm.Utility
         {
             GenerateNoise.EditorGeneratePrecomputedBaseCloudNoise();
         }
-        */
+        
 
-        [MenuItem("Window/UniStorm/Documentation", false, 200)]
-        static void Documentation()
+        [MenuItem("Window/UniStorm/Regenerate Base Noise Textures", false, 100)]
+        static void RegenerateBaseNoiseTextures()
         {
-            Application.OpenURL("https://docs.google.com/document/d/1uL_oMqHC_EduRGEnOihifwcpkQmWX9rubGw8qjkZ4b4/edit");
+            GenerateNoise.EditorGenerateBaseCloudNoise();
         }
 
-        [MenuItem("Window/UniStorm/Tutorial Videos", false, 200)]
-        static void TutorialVideos()
+        
+        [MenuItem("Window/UniStorm/Regenerate Detail Noise Textures", false, 100)]
+        static void RegenerateDetailNoiseTextures()
         {
-            Application.OpenURL("https://www.youtube.com/playlist?list=PLlyiPBj7FznYmPW9NR6U0WKudaeFuAgKL");
+            GenerateNoise.EditorGenerateCloudDetailNoise();
+        }
+
+        [MenuItem("Window/UniStorm/Regenerate Curl Noise Textures", false, 100)]
+        static void RegenerateDetailCurlTextures()
+        {
+            GenerateNoise.EditorGenerateCloudCurlNoise();
+        }
+        */
+
+        [MenuItem("Window/UniStorm/Documentation and Tutorials", false, 200)]
+        static void Documentation()
+        {
+            Application.OpenURL("https://github.com/Black-Horizon-Studios/UniStorm-Weather-System/wiki");
         }
 
         [MenuItem("Window/UniStorm/UniStorm API", false, 200)]
         static void UniStormAPI()
         {
-            Application.OpenURL("https://docs.google.com/document/d/1uL_oMqHC_EduRGEnOihifwcpkQmWX9rubGw8qjkZ4b4/edit#heading=h.wdi1uoeswdyw");
+            Application.OpenURL("https://github.com/Black-Horizon-Studios/UniStorm-Weather-System/wiki/UniStorm-API");
         }
 
-        [MenuItem("Window/UniStorm/Report a Bug or Request a Feature", false, 200)]
+        [MenuItem("Window/UniStorm/Contact", false, 200)]
         static void ReportABug()
         {
-            Application.OpenURL("https://docs.google.com/forms/d/e/1FAIpQLSfx-7HTghi6ZUNaaat2pMXH46d71X6FhSnJPq6mr8uHRbXpwQ/viewform?usp=sf_link");
+            Application.OpenURL("https://blackhorizonstudios.com/contact/");
         }
     }
 }
