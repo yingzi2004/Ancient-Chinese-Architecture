@@ -4,6 +4,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("--- 移动设置 ---")]
     public float moveSpeed = 5.0f;
+    public float runSpeed = 8.0f; // 跑步速度
     public float jumpHeight = 1.2f;
     public float gravity = -20f; 
     
@@ -153,7 +154,10 @@ public class PlayerController : MonoBehaviour
         float z = Input.GetAxisRaw("Vertical");
 
         Vector3 move = (transform.right * x + transform.forward * z).normalized;
-        controller.Move(move * moveSpeed * Time.deltaTime);
+
+        // 如果按住键盘左侧的Shift键，则使用跑步速度，否则使用正常移动速度
+        float currentSpeed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : moveSpeed;
+        controller.Move(move * currentSpeed * Time.deltaTime);
 
         if (Input.GetButtonDown("Jump") && isGrounded)
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
