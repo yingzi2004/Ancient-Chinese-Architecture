@@ -53,14 +53,28 @@ public class F1AIChatUI : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // 每次场景加载完，重新获取新场景里的玩家，防止旧引用变成 Null 导致报错卡死 UI
-        playerController = FindFirstObjectByType<PlayerController>();
+        // 更优雅的写法：不使用协程延迟，直接精准找出并绑定“当前新场景”里的真实主角
+        // 防止代码错误抓取到由于过图还没来得及销毁的旧场景主角
+        PlayerController[] players = FindObjectsByType<PlayerController>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var p in players)
+        {
+            if (p.gameObject.scene == scene)
+            {
+                playerController = p;
+                break;
+            }
+        }
         
         // 如果过图时聊天框是开着的，强制再刷回鼠标焦点
         if (isOpen)
         {
             UpdateCursorState();
-            if (inputField != null) inputField.ActivateInputField();
+            
+            if (inputField != null) 
+            {
+                inputField.text = string.Empty;
+                inputField.ActivateInputField();
+            }
         }
     }
 
