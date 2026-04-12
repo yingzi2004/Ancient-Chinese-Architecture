@@ -11,6 +11,10 @@ public class DialogueManager : MonoBehaviour
 {
     public static DialogueManager Instance { get; private set; }
 
+    [Header("玩家引用")]
+    [Tooltip("玩家控制器（如果为空则自动查找）")]
+    public PlayerController playerController;
+
     [Header("UI引用")]
     [Tooltip("对话面板")]
     public GameObject dialoguePanel;
@@ -69,6 +73,20 @@ public class DialogueManager : MonoBehaviour
     {
         // 强制设置按键为L键
         advanceKey = KeyCode.L;
+
+        // 查找玩家控制器
+        if (playerController == null)
+        {
+            playerController = FindObjectOfType<PlayerController>();
+            if (playerController != null)
+            {
+                Debug.Log("DialogueManager: 自动找到PlayerController");
+            }
+            else
+            {
+                Debug.LogWarning("DialogueManager: 未找到PlayerController，对话时将无法锁定玩家移动");
+            }
+        }
 
         // 自动查找UI元素（如果没有手动赋值）
         AutoFindUIElements();
@@ -268,6 +286,9 @@ public class DialogueManager : MonoBehaviour
 
         isDialogueActive = true;
 
+        // 锁定玩家移动
+        LockPlayerMovement();
+
         // 显示对话面板
         if (dialoguePanel != null)
         {
@@ -303,6 +324,9 @@ public class DialogueManager : MonoBehaviour
         Debug.Log($"DialogueManager: 开始自动对话序列 - NPC: {npcName}, 对话数量: {dialogueSequence?.Length ?? 0}");
 
         isDialogueActive = true;
+
+        // 锁定玩家移动
+        LockPlayerMovement();
 
         // 显示对话面板
         if (dialoguePanel != null)
@@ -748,6 +772,9 @@ public class DialogueManager : MonoBehaviour
         isTyping = false;
         waitingForContinue = false;
 
+        // 解锁玩家移动
+        UnlockPlayerMovement();
+
         // 重置对话序列状态
         currentDialogueSequence = null;
         currentDialogueIndex = 0;
@@ -778,4 +805,36 @@ public class DialogueManager : MonoBehaviour
     /// 对话是否处于活动状态
     /// </summary>
     public bool IsDialogueActive => isDialogueActive;
+
+    /// <summary>
+    /// 锁定玩家移动（对话时使用）
+    /// </summary>
+    private void LockPlayerMovement()
+    {
+        if (playerController != null)
+        {
+            playerController.isInspecting = true;
+            Debug.Log("DialogueManager: 已锁定玩家移动");
+        }
+        else
+        {
+            Debug.LogWarning("DialogueManager: 无法锁定玩家移动 - playerController为空");
+        }
+    }
+
+    /// <summary>
+    /// 解锁玩家移动（对话结束时使用）
+    /// </summary>
+    private void UnlockPlayerMovement()
+    {
+        if (playerController != null)
+        {
+            playerController.isInspecting = false;
+            Debug.Log("DialogueManager: 已解锁玩家移动");
+        }
+        else
+        {
+            Debug.LogWarning("DialogueManager: 无法解锁玩家移动 - playerController为空");
+        }
+    }
 }
