@@ -53,23 +53,22 @@ public class F1AIChatUI : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // 更优雅的写法：不使用协程延迟，直接精准找出并绑定“当前新场景”里的真实主角
-        // 防止代码错误抓取到由于过图还没来得及销毁的旧场景主角
-        PlayerController[] players = FindObjectsByType<PlayerController>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        foreach (var p in players)
-        {
-            if (p.gameObject.scene == scene)
-            {
-                playerController = p;
-                break;
-            }
-        }
+        // 还是换回实用至上的“延迟一帧”大法
+        // 因为必须等新场景里的 PlayerController 走完它的 Start() 锁死鼠标后，我们再出手把它抢回来！
+        StartCoroutine(DelayRestoreState());
+    }
+
+    private IEnumerator DelayRestoreState()
+    {
+        yield return null; // 延迟一帧，这是制胜关键
         
-        // 如果过图时聊天框是开着的，强制再刷回鼠标焦点
+        // 找回玩家
+        playerController = FindFirstObjectByType<PlayerController>();
+        
+        // 恢复鼠标控制权
         if (isOpen)
         {
             UpdateCursorState();
-            
             if (inputField != null) 
             {
                 inputField.text = string.Empty;
@@ -249,7 +248,15 @@ public class F1AIChatUI : MonoBehaviour
                     Debug.Log("AI执行传送到场景：" + targetSceneName);
                     if (!string.IsNullOrEmpty(targetSceneName))
                     {
-                        SceneManager.LoadScene(targetSceneName);
+                        // 【传送修复】跟AI说完话传送走，要保证游戏不在暂停状态或者死锁
+                        Time.timeScale = 1f;
+                        Cursor.visible = true;
+                        Cursor.lockState = CursorLockMode.None;
+
+                        // 【致命 Bug 修复】：必须等待当前一帧(可能是UI或者网络事件帧)彻底执行完，
+                        // 让旧的 EventSystem 收尾结束，然后再销毁旧场景！
+                        // 不然会导致新场景的 UI 事件被永久卡死而“点不动”。
+                        StartCoroutine(DeferredLoadScene(targetSceneName));
                     }
                 }
                 else
@@ -260,6 +267,12 @@ public class F1AIChatUI : MonoBehaviour
             }
         }
         return finalReply;
+    }
+
+    private IEnumerator DeferredLoadScene(string targetScene)
+    {
+        yield return null; // 核心：等这帧里所有后续代码跟UI输入流安全收发完毕！
+        SceneManager.LoadScene(targetScene);
     }
 
     private void OnClearClicked()
@@ -315,12 +328,22 @@ public class F1AIChatUI : MonoBehaviour
 
     private IEnumerator ScrollToBottom()
     {
-        // 等待UI布局重建完成
-        yield return null;
-        if (scrollRect != null)
+        // 关键修复：TextMeshPro在跨场景或频繁更新时，有时自身的重绘没跟上Canvas的生命周期
+        // 等待UI布局完全重建，必须通过等待帧的末尾，而不是随便一帧
+        yield return new WaitForEndOfFrame();
+        
+        if (scrollRect != null && scrollRect.gameObject != null && scrollRect.gameObject.activeInHierarchy)
         {
-            Canvas.ForceUpdateCanvases();
-            scrollRect.verticalNormalizedPosition = 0f;
+            // 在强制更新前稍作等待防御，并捕获因TMP内部资源被意外销毁产生的报错
+            try
+            {
+                Canvas.ForceUpdateCanvases();
+                scrollRect.verticalNormalizedPosition = 0f;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning("[聊天UI] 拦截到一个因为切场景引起的Canvas/TMP底层刷新冲突，已安全跳过报错: " + e.Message);
+            }
         }
     }
 

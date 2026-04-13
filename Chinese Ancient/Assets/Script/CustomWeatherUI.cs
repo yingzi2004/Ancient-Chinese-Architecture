@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement; // 新增场景管理
 using UniStorm; // 必须引入 UniStorm 才能切换天气
 
 public class CustomWeatherUI : MonoBehaviour
@@ -9,6 +10,31 @@ public class CustomWeatherUI : MonoBehaviour
     public GameObject weatherPanel;       // 把你做的天气面板拖进来
 
     private PlayerController playerController;
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // 过图时重新抓取新场景的玩家引用
+        playerController = FindFirstObjectByType<PlayerController>();
+
+        // 如果天气系统这时候还在开着，保证切场景鼠标控制权正常
+        if (weatherPanel != null && weatherPanel.activeSelf)
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            if (playerController != null)
+                playerController.isInspecting = true;
+        }
+    }
 
     void Start()
     {
@@ -32,6 +58,10 @@ public class CustomWeatherUI : MonoBehaviour
 
         bool isOpening = !weatherPanel.activeSelf;
         weatherPanel.SetActive(isOpening);
+        
+        // 每次开关都防打拳再次获取当前的控制权（防止空指针卡死）
+        if (playerController == null)
+            playerController = FindFirstObjectByType<PlayerController>();
 
         // 如果你平时游戏里是锁定隐藏鼠标的，打开面板时记得解锁并显示鼠标
         Cursor.visible = isOpening;

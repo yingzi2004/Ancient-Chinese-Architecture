@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement; // 引入场景管理
 
 public class PlayerController : MonoBehaviour
 {
@@ -31,6 +32,13 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        // === 光照修复核心逻辑 ===
+        // 在玩家主角降生到新场景的一瞬间，强制把当前场景设为了主力烘焙场景，
+        // 并一巴掌拍醒全局光照刷新（解决传送后土楼/外面漆黑停电的问题）
+        SceneManager.SetActiveScene(gameObject.scene);
+        DynamicGI.UpdateEnvironment();
+        // =======================
+
         controller = GetComponent<CharacterController>();
         if (cameraTransform == null && Camera.main != null) 
             cameraTransform = Camera.main.transform;
