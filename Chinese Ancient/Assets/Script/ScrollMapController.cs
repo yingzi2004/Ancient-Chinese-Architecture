@@ -738,17 +738,25 @@ public class ScrollMapController : MonoBehaviour
     private void StartSceneTransition(string sceneName)
     {
         isTransitioning = true;
+        Time.timeScale = 1f; // 修复：切换场景前强制恢复时间比例
         if (fadeOverlay != null)
         {
             fadeOverlay.blocksRaycasts = true;
             fadeOverlay.DOFade(1f, sceneFadeDuration)
                 .SetEase(Ease.InQuad)
-                .OnComplete(() => SceneManager.LoadScene(sceneName));
+                .OnComplete(() => StartCoroutine(DeferredLoadScene(sceneName)));
         }
         else
         {
-            SceneManager.LoadScene(sceneName);
+            StartCoroutine(DeferredLoadScene(sceneName));
         }
+    }
+
+    // 核心修复：给EventSystem一个处理回调闭环的延迟时间（1帧），防止新场景EventSystem卡死
+    private System.Collections.IEnumerator DeferredLoadScene(string targetScene)
+    {
+        yield return null; 
+        SceneManager.LoadScene(targetScene);
     }
 
     public void SkipAnimation()

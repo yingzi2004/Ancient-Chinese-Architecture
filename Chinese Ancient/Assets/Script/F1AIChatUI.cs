@@ -1,8 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
+using UniStorm;
 
 public class F1AIChatUI : MonoBehaviour
 {
@@ -37,6 +40,42 @@ public class F1AIChatUI : MonoBehaviour
     private bool isOpen;
     private readonly List<string> lines = new List<string>();
     private PlayerController playerController;
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // 还是换回实用至上的“延迟一帧”大法
+        // 因为必须等新场景里的 PlayerController 走完它的 Start() 锁死鼠标后，我们再出手把它抢回来！
+        StartCoroutine(DelayRestoreState());
+    }
+
+    private IEnumerator DelayRestoreState()
+    {
+        yield return null; // 延迟一帧，这是制胜关键
+        
+        // 找回玩家
+        playerController = FindFirstObjectByType<PlayerController>();
+        
+        // 恢复鼠标控制权
+        if (isOpen)
+        {
+            UpdateCursorState();
+            if (inputField != null) 
+            {
+                inputField.text = string.Empty;
+                inputField.ActivateInputField();
+            }
+        }
+    }
 
     private void Awake()
     {
@@ -112,13 +151,16 @@ public class F1AIChatUI : MonoBehaviour
         }
 
         lines.Add("[我] " + message);
-        lines.Add("[AI] ...");
+        lines.Add("[小微] ...");
         RefreshChatDisplay();
 
         chatClient.SendUserMessage(
             message,
             onSuccess: reply =>
             {
+                // 拦截并处理隐藏指令
+                reply = ProcessAICommands(reply);
+
                 ReplaceLastAiPlaceholder(reply);
                 RefreshChatDisplay();
                 
@@ -133,6 +175,104 @@ public class F1AIChatUI : MonoBehaviour
                 ReplaceLastAiPlaceholder("[错误] " + err);
                 RefreshChatDisplay();
             });
+    }
+
+    private string ProcessAICommands(string rawReply)
+    {
+        if (string.IsNullOrEmpty(rawReply)) return rawReply;
+        
+        string finalReply = rawReply;
+        string pattern = @"\[CMD:([^\]]+)\]";
+        MatchCollection matches = Regex.Matches(rawReply, pattern);
+
+        foreach (Match match in matches)
+        {
+            string cmd = match.Groups[1].Value.Trim();
+            // 把这个暗号从对话文本里删掉，免得让玩家看到
+            finalReply = finalReply.Replace(match.Value, "").Trim();
+
+            // 1. 处理天气相关指令
+            if (cmd.StartsWith("Weather_"))
+            {
+                string weatherType = cmd.Substring(8);
+                Debug.Log("AI触发切换天气：" + weatherType);
+                
+                if (UniStormSystem.Instance != null && UniStormSystem.Instance.AllWeatherTypes != null)
+                {
+                    int weatherIndex = -1;
+                    if (weatherType.Contains("Clear") || weatherType.Contains("晴")) weatherIndex = 0; // 假设0是晴
+                    else if (weatherType.Contains("Rain") || weatherType.Contains("雨")) weatherIndex = 1; // 假设1是雨
+                    else if (weatherType.Contains("Snow") || weatherType.Contains("雪")) weatherIndex = 2; // 假设2是雪
+                    
+                    if (weatherIndex >= 0 && weatherIndex < UniStormSystem.Instance.AllWeatherTypes.Count)
+                    {
+                        UniStormSystem.Instance.ChangeWeather(UniStormSystem.Instance.AllWeatherTypes[weatherIndex]);
+                    }
+                }
+            }
+            // 2. 处理传送相关指令
+            else if (cmd.StartsWith("Teleport_"))
+            {
+                string location = cmd.Substring(9);
+                Debug.Log("AI准备传送到：" + location);
+                
+                bool isUnlocked = false;
+                int buildingIndex = -1;
+
+                // 根据地名判断应该是哪个场馆 (0=土楼, 1=苏州, 2=京派, 3=晋商)
+                if (location.Contains("土楼") || location.Contains("福建")) buildingIndex = 0;
+                else if (location.Contains("苏州") || location.Contains("园林")) buildingIndex = 1;
+                else if (location.Contains("京派") || location.Contains("北京") || location.Contains("天坛") || location.Contains("故宫")) buildingIndex = 2;
+                else if (location.Contains("晋商") || location.Contains("山西") || location.Contains("窑洞")) buildingIndex = 3;
+
+                string targetSceneName = "";
+                PopupMapController mapController = FindFirstObjectByType<PopupMapController>();
+                
+                if (mapController != null && buildingIndex >= 0 && buildingIndex < mapController.unlockedArray.Length)
+                {
+                    isUnlocked = mapController.unlockedArray[buildingIndex];
+                    if (buildingIndex < mapController.buildings.Count)
+                    {
+                        targetSceneName = mapController.buildings[buildingIndex].targetSceneName;
+                    }
+                }
+                else
+                {
+                    // 如果地图控制器没找到，默认算已解锁（或者根据你的游戏逻辑默认不给传）
+                    isUnlocked = true; 
+                    targetSceneName = "Scene_" + location; // 降级处理
+                }
+
+                if (isUnlocked)
+                {
+                    Debug.Log("AI执行传送到场景：" + targetSceneName);
+                    if (!string.IsNullOrEmpty(targetSceneName))
+                    {
+                        // 【传送修复】跟AI说完话传送走，要保证游戏不在暂停状态或者死锁
+                        Time.timeScale = 1f;
+                        Cursor.visible = true;
+                        Cursor.lockState = CursorLockMode.None;
+
+                        // 【致命 Bug 修复】：必须等待当前一帧(可能是UI或者网络事件帧)彻底执行完，
+                        // 让旧的 EventSystem 收尾结束，然后再销毁旧场景！
+                        // 不然会导致新场景的 UI 事件被永久卡死而“点不动”。
+                        StartCoroutine(DeferredLoadScene(targetSceneName));
+                    }
+                }
+                else
+                {
+                    // 如果没解锁，我们直接篡改 AI 的回答
+                    finalReply = $"哎呀，[{location}] 还没有解锁哦！需要先通关前面的场景才能去那里呢~";
+                }
+            }
+        }
+        return finalReply;
+    }
+
+    private IEnumerator DeferredLoadScene(string targetScene)
+    {
+        yield return null; // 核心：等这帧里所有后续代码跟UI输入流安全收发完毕！
+        SceneManager.LoadScene(targetScene);
     }
 
     private void OnClearClicked()
@@ -165,13 +305,13 @@ public class F1AIChatUI : MonoBehaviour
     {
         for (int i = lines.Count - 1; i >= 0; i--)
         {
-            if (lines[i] == "[AI] ...")
+            if (lines[i] == "[小微] ...")
             {
-                lines[i] = "[AI] " + content;
+                lines[i] = "[小微] " + content;
                 return;
             }
         }
-        lines.Add("[AI] " + content);
+        lines.Add("[小微] " + content);
     }
 
     private void RefreshChatDisplay()
@@ -188,12 +328,22 @@ public class F1AIChatUI : MonoBehaviour
 
     private IEnumerator ScrollToBottom()
     {
-        // 等待UI布局重建完成
-        yield return null;
-        if (scrollRect != null)
+        // 关键修复：TextMeshPro在跨场景或频繁更新时，有时自身的重绘没跟上Canvas的生命周期
+        // 等待UI布局完全重建，必须通过等待帧的末尾，而不是随便一帧
+        yield return new WaitForEndOfFrame();
+        
+        if (scrollRect != null && scrollRect.gameObject != null && scrollRect.gameObject.activeInHierarchy)
         {
-            Canvas.ForceUpdateCanvases();
-            scrollRect.verticalNormalizedPosition = 0f;
+            // 在强制更新前稍作等待防御，并捕获因TMP内部资源被意外销毁产生的报错
+            try
+            {
+                Canvas.ForceUpdateCanvases();
+                scrollRect.verticalNormalizedPosition = 0f;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning("[聊天UI] 拦截到一个因为切场景引起的Canvas/TMP底层刷新冲突，已安全跳过报错: " + e.Message);
+            }
         }
     }
 

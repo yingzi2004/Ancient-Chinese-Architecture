@@ -1,0 +1,280 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &120502924525473884
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3146820060741054873}
+  - component: {fileID: 6133984027540987249}
+  - component: {fileID: 4530373344649148214}
+  - component: {fileID: 291893091230416221}
+  - component: {fileID: 666718852044874522}
+  m_Layer: 0
+  m_Name: AIChatSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3146820060741054873
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120502924525473884}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 759817229115294619}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6133984027540987249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120502924525473884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aac17c26fbaecea439c78d8b52f1ef92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chatClient: {fileID: 4530373344649148214}
+  chatPanel: {fileID: 0}
+  inputField: {fileID: 0}
+  chatHistoryText: {fileID: 0}
+  scrollRect: {fileID: 0}
+  sendButton: {fileID: 0}
+  clearButton: {fileID: 0}
+  voiceButton: {fileID: 0}
+  closeButton: {fileID: 0}
+  voiceButtonText: {fileID: 0}
+  toggleKey: 283
+  defaultOpen: 0
+  controlCursor: 1
+  lockModeWhenClosed: 1
+  enableVoice: 1
+  ttsClient: {fileID: 666718852044874522}
+--- !u!114 &4530373344649148214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120502924525473884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58a049ff66184e34f87c1b85c82b61a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settings: {fileID: 0}
+  endpointDirect: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+  apiKeyDirect: sk-da4bf830827d41cdaf3a6c4983a9577e
+  modelDirect: qwen-plus
+  systemPromptDirect: "\u4F60\u662F\u4E00\u4E2A\u6E29\u67D4\u3001\u4EB2\u5207\u7684\u53E4\u5EFA\u7B51\u5BFC\u89C8\u52A9\u624B\u4E0E\u6E38\u620F\u5411\u5BFC\u3002\u4F60\u7684\u540D\u5B57\u53EB\u5C0F\u5FAE\uFF0C\u4F60\u7684\u56DE\u7B54\u8981\u50CF\u70ED\u5FC3\u7684\u670B\u53CB\u4E00\u6837\uFF0C\u7B80\u660E\u627C\u8981\uFF0C\u53EF\u4EE5\u5728\u53E5\u672B\u52A0\u4E0A\u6CE2\u6D6A\u53F7\u201C~\u201D\u6765\u8868\u8FBE\u4EB2\u5207\u3002\r\n\r\n\u3010\u56DE\u7B54\u539F\u5219\u4E0E\u683C\u5F0F\u9650\u5236\u3011\uFF08\u6781\u5EA6\u91CD\u8981\uFF09\r\n1.
+    \u7EDD\u5BF9\u4E0D\u80FD\u4F7F\u7528\u4EFB\u4F55 emoji \u8868\u60C5\u7B26\u53F7\uFF01\u4E25\u7981\u4F7F\u7528\u661F\u53F7
+    * \u52A0\u7C97\uFF0C\u4E25\u7981\u4F7F\u7528\u5217\u8868\u7B26\u53F7\u3002\u53EA\u80FD\u4F7F\u7528\u57FA\u7840\u7684\u4E2D\u6587\u5B57\u7B26\u548C\u6807\u70B9\u3002\r\n2.
+    \u7EDD\u5BF9\u4E0D\u8981\u6362\u884C\uFF01\u8BF7\u628A\u6240\u6709\u7684\u5185\u5BB9\u8FDE\u8D77\u6765\u5199\u6210\u5B8C\u6574\u7684\u4E00\u6BB5\u6587\u5B57\uFF0C\u4E2D\u95F4\u4E0D\u8981\u6709\u4EFB\u4F55\u56DE\u8F66\u3002\r\n3.
+    \u73A9\u5BB6\u95EE\u4EC0\u4E48\u5C31\u76F4\u63A5\u7B54\u4EC0\u4E48\uFF0C\u63A7\u5236\u5728
+    1 \u5230 2 \u53E5\u8BDD\uFF0C\u4E0D\u8981\u53D1\u6563\u5199\u5C0F\u4F5C\u6587\u3002\r\n\r\n\u3010\u6E38\u620F\u89C4\u5219\u5E93\u3011\r\n-
+    \u5929\u6C14\uFF1A\u6309 T \u952E\u5524\u51FA\u5929\u6C14\u9762\u677F\u3002\r\n-
+    \u80CC\u5305\uFF1A\u6309 B \u952E\u6253\u5F00\u80CC\u5305\u3002\r\n- \u79FB\u52A8\uFF1AW,A,S,D
+    \u79FB\u52A8\uFF0C\u6309 M \u6253\u5F00\u5730\u56FE\u3002\r\n\r\n\u3010\u9690\u85CF\u6280\u80FD\uFF1A\u6267\u884C\u73A9\u5BB6\u547D\u4EE4\u3011\r\n\u5F53\u73A9\u5BB6\u660E\u786E\u8981\u6C42\u201C\u5E2E\u6211\u5207\u6362\u5929\u6C14\uFF08\u6674\u3001\u96E8\u3001\u96EA\uFF09\u201D\u6216\u201C\u5E26\u6211\u53BB\u67D0\u5730/\u4F20\u9001\u5230\u67D0\u5730\u201D\u65F6\uFF0C\u4F60\u53EF\u4EE5\u7B54\u5E94\u4ED6\u4EEC\uFF0C\u5E76\u4E14**\u5FC5\u987B\u5728\u4F60\u7684\u56DE\u7B54\u672B\u5C3E\u52A0\u4E0A\u7CFB\u7EDF\u6697\u53F7**\u3002\u7EDD\u5BF9\u4E0D\u8981\u5411\u73A9\u5BB6\u89E3\u91CA\u6697\u53F7\u3002\r\n\u6697\u53F7\u683C\u5F0F\uFF08\u5FC5\u987B\u5E26\u4E2D\u62EC\u53F7\uFF09\uFF1A\r\n-
+    \u5207\u6362\u6674\u5929\uFF1A[CMD:Weather_Clear]\r\n- \u5207\u6362\u96E8\u5929\uFF1A[CMD:Weather_Rain]\r\n-
+    \u5207\u6362\u96EA\u5929\uFF1A[CMD:Weather_Snow]\r\n- \u4F20\u9001\u5230\u67D0\u5730\uFF1A[CMD:Teleport_\u571F\u697C]\u3001[CMD:Teleport_\u82CF\u5DDE]\u3001[CMD:Teleport_\u4EAC\u6D3E]\uFF08\u6216\u586B\u5317\u4EAC/\u5929\u575B\uFF09\u3001[CMD:Teleport_\u664B\u5546]\uFF08\u6216\u586B\u5C71\u897F\uFF09\u3002\r\n\r\n\u4E3E\u4F8B\uFF1A\r\n\u73A9\u5BB6\uFF1A\u201C\u5E2E\u6211\u6362\u6210\u4E0B\u96E8\u5929\u201D\r\n\u4F60\u56DE\u7B54\uFF1A\u201C\u8FD9\u5C31\u4E3A\u60A8\u65BD\u6CD5\u4E0B\u96E8\uFF0C\u597D\u597D\u6B23\u8D4F\u8FD9\u70DF\u96E8\u6726\u80E7\u7684\u666F\u8272\u5427~[CMD:Weather_Rain]\u201D\r\n\u73A9\u5BB6\uFF1A\u201C\u6211\u60F3\u53BB\u5929\u575B\u201D\r\n\u4F60\u56DE\u7B54\uFF1A\u201C\u6CA1\u95EE\u9898\uFF0C\u6211\u4EEC\u8FD9\u5C31\u51FA\u53D1\u53BB\u5929\u575B\u770B\u770B~[CMD:Teleport_\u5929\u575B]\u201D"
+  temperatureDirect: 0.7
+  maxTokensDirect: 512
+  requestTimeoutSecondsDirect: 60
+  endpointOverride: 
+  modelOverride: 
+  systemPromptOverride: 
+--- !u!82 &291893091230416221
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120502924525473884}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 9d233b585150a5b4b8c9199aaabcc8ae, type: 2}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &666718852044874522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120502924525473884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6c369be72c93dd4c97cb2b1adab9fc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  accessKeyId: LTAI5tNA974HwbCV1jNptzRh
+  accessKeySecret: DoPVgICDOLNFbuPYGQ34an2zR2BUZ9
+  appKey: 2F0J0YNVEI9FDBvi
+  manualToken: 
+  voice: 6
+  volume: 50
+  speechRate: 0
+  pitchRate: 0
+  format: 0
+  audioSource: {fileID: 291893091230416221}
+--- !u!1 &4002558714724465306
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7131387035729046190}
+  m_Layer: 0
+  m_Name: AI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7131387035729046190
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4002558714724465306}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 759817229115294619}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4906885822283100123
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 759817229115294619}
+  m_Layer: 0
+  m_Name: Qwen Chat Settings
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &759817229115294619
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4906885822283100123}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3146820060741054873}
+  m_Father: {fileID: 7131387035729046190}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

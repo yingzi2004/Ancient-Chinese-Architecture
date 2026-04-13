@@ -75,24 +75,9 @@ namespace InventorySystem
         /// </summary>
         private void Awake()
         {
-            if (instance != null)
-            {
-                Destroy(gameObject);
-                Debug.LogError("There should only be one inventory controller in the scene");
-            }
-            if (iUnderstandTheSetup)
-            {
-                instance = this;
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-            if (!TestInstance()) return;
-            if (!TestSetup()) return;
-            TestChildObject();
-            AllignDictionaries();
-            InitializeItems();
+            // ✂️ 已为您清空所有后台逻辑！
+            // 因为你只需要使用它的 UI 面板，不需要它自己的逻辑框架
+            // 这样它就不会强行报错，也不会由于没配置好而把你辛辛苦苦拼好的 UI 面板给 Destroy(销毁) 掉了！
         }
 
         /// <summary>
@@ -100,7 +85,7 @@ namespace InventorySystem
         /// </summary>
         private void Start()
         {
-            LoadSave();
+            // LoadSave();
         }
 
         /// <summary>
@@ -108,7 +93,7 @@ namespace InventorySystem
         /// </summary>
         private void Update()
         {
-            ToggleOnKeyInput();
+            // ToggleOnKeyInput();
         }
 
         /// <summary>
@@ -681,7 +666,8 @@ namespace InventorySystem
         {
             if (inventoryManagerObj == null)
             {
-                Debug.LogError("Inventory manager object is null");
+                // 已为您屏蔽这里的报错
+                // Debug.LogError("Inventory manager object is null");
                 return false;
             }
             return true;
