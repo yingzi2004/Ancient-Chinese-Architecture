@@ -189,7 +189,27 @@ public class PopupMapController : MonoBehaviour
     {
         if (string.IsNullOrWhiteSpace(sceneName)) return;
         Debug.Log($"【地图】正在前往场景: {sceneName}");
-        SceneManager.LoadScene(sceneName.Trim());
+        
+        // 【关键修复】如果是从地图UI点击的传送，这意味着地图当前是打开的。
+        // 如果地图打开时有暂停时间(Time.timeScale=0)或者锁死鼠标的逻辑没有复原，
+        // 会导致新场景生出来后一直被判定为“暂停”或鼠标“仍被某个旧UI掌控”
+        Time.timeScale = 1f;
+
+        // 这里建议顺手重置一下当前的鼠标，虽然新场景的PlayerController会做，但双保险更稳
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        // 【致命 Bug 修复】：绝对不能在 UI 按钮的 OnClick 里直接同步 LoadScene！
+        // 会导致旧的 EventSystem 在执行点击事件中途被强行切断并销毁，
+        // 从而永久卡死新场景的 EventSystem，导致之后任何 UI 都无法点击。
+        // 必须启动协程，等当前帧的 UI 事件彻底结算完了，下一帧再切换场景！
+        StartCoroutine(DeferredLoadScene(sceneName.Trim()));
+    }
+
+    private System.Collections.IEnumerator DeferredLoadScene(string targetScene)
+    {
+        yield return null; // 核心：等这一帧走完，EventSystem 闭环
+        SceneManager.LoadScene(targetScene);
     }
 
     /// <summary>
