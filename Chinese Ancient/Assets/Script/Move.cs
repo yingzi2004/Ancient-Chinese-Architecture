@@ -58,7 +58,8 @@ public class PlayerController : MonoBehaviour
         }
 
         // 处理点击动作（准星交互核心）
-        if (Input.GetMouseButtonDown(0))
+        // 只有在不检视UI时才处理交互（避免拦截UI点击）
+        if (Input.GetMouseButtonDown(0) && !isInspecting)
         {
             HandleInteraction();
         }
