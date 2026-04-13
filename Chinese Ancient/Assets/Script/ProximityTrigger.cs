@@ -124,6 +124,7 @@ public class ProximityTrigger : MonoBehaviour
         else if (!withinRange && isInsideRange)
         {
             isInsideRange = false;
+            StopVideoAndShowCover(); // 停止视频并显示封面
             onExitRange?.Invoke();
         }
     }
@@ -136,6 +137,17 @@ public class ProximityTrigger : MonoBehaviour
         if (videoRenderTexture != null && targetRenderer != null)
             targetRenderer.material.mainTexture = videoRenderTexture;
         videoPlayer.Play();
+    }
+
+    private void StopVideoAndShowCover()
+    {
+        if (videoPlayer != null && isVideoPlaying)
+        {
+            isVideoPlaying = false;
+            videoPlayer.Stop();
+            videoPlayer.enabled = false;
+        }
+        ShowCover();
     }
 
     public void ShowCover()
