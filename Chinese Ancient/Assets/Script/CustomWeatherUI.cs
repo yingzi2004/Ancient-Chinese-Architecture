@@ -72,6 +72,9 @@ public class CustomWeatherUI : MonoBehaviour
 
     void Start()
     {
+        // 先找到玩家，以免被后面漏掉
+        playerController = FindFirstObjectByType<PlayerController>();
+
         // 游戏一开始，隐藏你的天气面板
         if (weatherPanel != null) 
         {
@@ -81,7 +84,12 @@ public class CustomWeatherUI : MonoBehaviour
             InitializeUISystem();
         }
         
-        playerController = FindObjectOfType<PlayerController>();
+        // 关键修复：如果在 OnSceneLoaded 时由 activeSelf=true 错误地把玩家锁死了，这里一定要强行解锁
+        if (playerController != null)
+        {
+            playerController.isInspecting = false;
+            playerController.SetCursorState(true);
+        }
     }
 
     /// <summary>
@@ -220,6 +228,17 @@ public class CustomWeatherUI : MonoBehaviour
         Cursor.visible = isOpening;
         Cursor.lockState = isOpening ? CursorLockMode.None : CursorLockMode.Locked;
 
+        // 告诉玩家控制器：停下移动和转视角，把鼠标让给UI！
+        if (playerController != null)
+        {
+            playerController.isInspecting = isOpening;
+            if (!isOpening)
+            {
+                playerController.SetCursorState(true); // 恢复视角的锁定状态，保证可以转视角
+            }
+            Debug.Log($"[天气UI] ToggleWeatherPanel -> isInspecting={isOpening}");
+        }
+
         // 确保CanvasGroup允许交互 ← 这是关键！
         if (canvasGroup != null)
         {
@@ -233,13 +252,6 @@ public class CustomWeatherUI : MonoBehaviour
         {
             weatherCanvas.sortingOrder = 999;
             Debug.Log($"[天气UI] 打开面板 -> Canvas Sort Order 强制设置为 999");
-        }
-
-        // 告诉玩家控制器：停下移动和转视角，把鼠标让给UI！
-        if (playerController != null)
-        {
-            playerController.isInspecting = isOpening;
-            Debug.Log($"[天气UI] ToggleWeatherPanel -> isInspecting={isOpening}");
         }
     }
 
