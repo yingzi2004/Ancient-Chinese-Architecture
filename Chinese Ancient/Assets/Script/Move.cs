@@ -142,7 +142,7 @@ public class PlayerController : MonoBehaviour
         if (!isCursorLocked && Input.GetMouseButtonDown(1)) SetCursorState(true);
     }
 
-    void SetCursorState(bool locked)
+    public void SetCursorState(bool locked)
     {
         isCursorLocked = locked;
         
