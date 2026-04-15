@@ -92,8 +92,6 @@ public class TypewriterTrigger : MonoBehaviour
 
     private void CheckCrosshairHover()
     {
-        if (closeButton == null) return;
-
         PointerEventData eventData = new PointerEventData(EventSystem.current);
         eventData.position = new Vector2(Screen.width / 2f, Screen.height / 2f);
 
