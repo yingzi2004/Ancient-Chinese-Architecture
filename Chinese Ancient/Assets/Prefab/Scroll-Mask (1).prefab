@@ -511,32 +511,51 @@ MonoBehaviour:
     buildingRect: {fileID: 6438280238653906704}
     targetSceneName: Min Exhibition
     appearDelay: 1
+    bwSprite: {fileID: 0}
+    runtimeBWGroup: {fileID: 0}
   - buildingName: "\u82CF\u5DDE\u56ED\u6797"
     buildingRect: {fileID: 4926563883029638307}
     targetSceneName: Su Exhibition
     appearDelay: 1
+    bwSprite: {fileID: 0}
+    runtimeBWGroup: {fileID: 0}
   - buildingName: "\u664B\u5546\u5927\u9662"
     buildingRect: {fileID: 5066670219608278058}
     targetSceneName: "\u664BExhibition"
     appearDelay: 1
+    bwSprite: {fileID: 0}
+    runtimeBWGroup: {fileID: 0}
   - buildingName: "\u5929\u575B"
     buildingRect: {fileID: 874030747544686033}
     targetSceneName: "\u664BExhibition"
     appearDelay: 1
+    bwSprite: {fileID: 0}
+    runtimeBWGroup: {fileID: 0}
   buildingGlobalStartTime: 4
   buildingScaleDuration: 0.6
   buildingFadeDuration: 0.4
   buildingInterval: 0
+  lockedBuildingColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
+  lockedColorFadeDuration: 1
   titleGroup: {fileID: 0}
   titleFadeDuration: 0.8
   guideTargetIndex: 0
   guidePulseScale: 1.08
   enableGuide: 1
-  fadeOverlay: {fileID: 0}
+  fadeOverlayImage: {fileID: 0}
   sceneFadeDuration: 0.5
+  dialoguePanel: {fileID: 0}
+  dialogueText: {fileID: 0}
+  dialogueTypingSpeed: 0.08
+  dialoguePauseDuration: 1.5
+  mapDialoguePanel: {fileID: 0}
+  mapDialogueText: {fileID: 0}
   audioSource: {fileID: 5511879863851454266}
   scrollOpenClip: {fileID: 8300000, guid: 7109ae2afb850fd4aac3095cc9390e16, type: 3}
   buildingAppearClip: {fileID: 8300000, guid: e238cb2071dad5541b67a992e5b18600, type: 3}
+  windBlowClip: {fileID: 0}
+  playOpenAnimation: 1
+  overrideAsFirstLevel: 1
 --- !u!82 &5511879863851454266
 AudioSource:
   m_ObjectHideFlags: 0
