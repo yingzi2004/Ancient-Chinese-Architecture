@@ -13,6 +13,7 @@ public class GuideDialogueAutoSetup : MonoBehaviour
     [Header("导游信息")]
     [SerializeField] private string guideName = "古建筑讲解员";
     [SerializeField] private bool useDefaultPortrait = true;
+    [SerializeField] private Sprite customPortrait; // 自定义立绘图片
 
     [Header("对话内容")]
     [TextArea(3, 10)]
@@ -30,6 +31,7 @@ public class GuideDialogueAutoSetup : MonoBehaviour
     [SerializeField] private bool triggerOnce = true;
 
     private GuideDialogueUI guideUI;
+    private Sprite loadedPortraitSprite; // 存储已加载的立绘图片
 
     void Start()
     {
@@ -97,15 +99,21 @@ public class GuideDialogueAutoSetup : MonoBehaviour
         // 添加GuideDialogueUI脚本
         guideUI = panelObj.AddComponent<GuideDialogueUI>();
 
-        // 创建立绘图片 - 缩小并调整位置
+        // 创建立绘图片
         GameObject portraitObj = CreateUIElement("PortraitImage", panelObj.transform,
-            new Vector2(0, 0.5f), new Vector2(15, 0), new Vector2(120, 160)); // 缩小到120x160
+            new Vector2(0, 0.5f), new Vector2(20, 0), new Vector2(280, 400)); // 立绘尺寸280x400
         Image portraitImage = portraitObj.AddComponent<Image>();
 
-        if (useDefaultPortrait)
+        // 确定要使用的立绘图片
+        Sprite portraitSprite = null;
+        if (customPortrait != null)
+        {
+            portraitSprite = customPortrait;
+        }
+        else if (useDefaultPortrait)
         {
             // 尝试加载立绘图片
-            Sprite portraitSprite = Resources.Load<Sprite>("UIdesign/AIChat/立绘/1-1");
+            portraitSprite = Resources.Load<Sprite>("UIdesign/AIChat/立绘/1-1");
             if (portraitSprite == null)
             {
                 // 如果Resources文件夹没有，尝试直接从Assets加载
@@ -113,17 +121,19 @@ public class GuideDialogueAutoSetup : MonoBehaviour
                 portraitSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/UIdesign/AIChat/立绘/1-1.png");
                 #endif
             }
+        }
 
-            if (portraitSprite != null)
-            {
-                portraitImage.sprite = portraitSprite;
-                Debug.Log("GuideDialogueAutoSetup: 成功加载立绘图片");
-            }
-            else
-            {
-                Debug.LogWarning("GuideDialogueAutoSetup: 未找到立绘图片，使用默认颜色");
-                portraitImage.color = new Color(0.3f, 0.3f, 0.3f, 0.5f);
-            }
+        // 设置立绘图片
+        if (portraitSprite != null)
+        {
+            portraitImage.sprite = portraitSprite;
+            loadedPortraitSprite = portraitSprite; // 保存以便在对话中使用
+            Debug.Log("GuideDialogueAutoSetup: 成功加载立绘图片");
+        }
+        else
+        {
+            Debug.LogWarning("GuideDialogueAutoSetup: 未找到立绘图片，使用默认颜色");
+            portraitImage.color = new Color(0.3f, 0.3f, 0.3f, 0.5f);
         }
         portraitImage.preserveAspect = true;
 
@@ -251,7 +261,7 @@ public class GuideDialogueAutoSetup : MonoBehaviour
     {
         if (guideUI != null && welcomeDialogue != null && welcomeDialogue.Length > 0)
         {
-            guideUI.StartGuideDialogue(guideName, null, welcomeDialogue);
+            guideUI.StartGuideDialogue(guideName, loadedPortraitSprite, welcomeDialogue);
             Debug.Log("GuideDialogueAutoSetup: 触发欢迎对话");
         }
     }
@@ -264,7 +274,7 @@ public class GuideDialogueAutoSetup : MonoBehaviour
     {
         if (guideUI != null)
         {
-            guideUI.StartGuideDialogue(guideName, null, welcomeDialogue);
+            guideUI.StartGuideDialogue(guideName, loadedPortraitSprite, welcomeDialogue);
         }
     }
 }
