@@ -24591,6 +24591,60 @@ MonoBehaviour:
   returnDuration: 0.4
   pourTarget: {fileID: 1161973459}
   yawAlignDuration: 0.15
+--- !u!1 &1296943597
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1296943599}
+  - component: {fileID: 1296943598}
+  m_Layer: 0
+  m_Name: GuideDialogueAutoSetup
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1296943598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296943597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0290fc04e8f229c4d9bf1bb7a43a581b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  guideName: "\u5C0F\u5FAE"
+  useDefaultPortrait: 1
+  welcomeDialogue:
+  - "\u6B22\u8FCE\u6765\u5230\u5FAE\u578B\u53E4\u5EFA\u7B51\u5C55\u89C8\u9986\uFF01"
+  - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u53E4\u4EE3\u5EFA\u7B51\u7684\u7CBE\u9AD3\uFF0C\u4ECE\u798F\u5EFA\u571F\u697C\u5230\u82CF\u5DDE\u56ED\u6797\uFF0C\u6BCF\u4E00\u5EA7\u5EFA\u7B51\u90FD\u627F\u8F7D\u7740\u6DF1\u539A\u7684\u5386\u53F2\u6587\u5316\u3002"
+  - "\u6211\u662F\u8FD9\u91CC\u7684\u8BB2\u89E3\u5458\uFF0C\u5C06\u7531\u6211\u5E26\u9886\u60A8\u53C2\u89C2\u8FD9\u4E2A\u7CBE\u5F69\u7684\u5C55\u89C8\u3002"
+  - "\u8BF7\u81EA\u7531\u53C2\u89C2\uFF0C\u5982\u679C\u9700\u8981\u4E86\u89E3\u66F4\u591A\u4FE1\u606F\uFF0C\u968F\u65F6\u53EF\u4EE5\u5411\u6211\u63D0\u95EE\u3002"
+  - "\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
+  triggerDelay: 1
+  triggerOnce: 1
+--- !u!4 &1296943599
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296943597}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 263.5608, y: 164.57382, z: -3.3878784}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1308447509
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -31795,3 +31849,4 @@ SceneRoots:
   - {fileID: 1509890459}
   - {fileID: 219145564}
   - {fileID: 452921736}
+  - {fileID: 1296943599}
