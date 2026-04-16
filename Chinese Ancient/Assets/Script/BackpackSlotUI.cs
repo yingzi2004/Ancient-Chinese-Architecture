@@ -86,6 +86,19 @@ public class BackpackSlotUI : MonoBehaviour
             if (hasItem)
             {
                 displayImage.color = Color.white;
+                
+                // 强制修正由于预制体或者布局组件导致的图片位置偏移
+                RectTransform rect = displayImage.GetComponent<RectTransform>();
+                if (rect != null)
+                {
+                    // 设置锚点为完全伸展(撑满父物体)，并带有一点边距
+                    rect.anchorMin = new Vector2(0.1f, 0.1f);
+                    rect.anchorMax = new Vector2(0.9f, 0.9f);
+                    rect.anchoredPosition3D = Vector3.zero;
+                    rect.sizeDelta = Vector2.zero;
+                    rect.localRotation = Quaternion.identity;
+                    rect.localScale = Vector3.one;
+                }
             }
         }
 
@@ -120,6 +133,9 @@ public class BackpackSlotUI : MonoBehaviour
             iconRect.anchorMax = new Vector2(0.85f, 0.85f);
             iconRect.offsetMin = Vector2.zero;
             iconRect.offsetMax = Vector2.zero;
+            iconRect.localScale = Vector3.one;
+            iconRect.anchoredPosition3D = Vector3.zero;
+            iconRect.localPosition = new Vector3(iconRect.localPosition.x, iconRect.localPosition.y, 0);
 
             runtimeItemIconImage = iconObject.GetComponent<Image>();
             runtimeItemIconImage.raycastTarget = false;
