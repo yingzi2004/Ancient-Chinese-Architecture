@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [System.Serializable]
 public class BackpackInitialItem
@@ -180,6 +181,18 @@ public class BackpackUIController : MonoBehaviour
         for (int i = 0; i < slotCount; i++)
         {
             GameObject slotObject = Instantiate(slotPrefab, slotContainer);
+            
+            // 确保克隆出来的格子缩放为 1，解决在某些 Canvas 环境下缩放变成 0 的问题
+            slotObject.transform.localScale = Vector3.one;
+            
+            // 禁用克隆物体上所有 GridLayoutGroup 组件，防止干扰格子显示
+            // (因为 SlotContainer 本身已经有 GridLayoutGroup 了，子物体不应该再有)
+            GridLayoutGroup[] gridLayouts = slotObject.GetComponents<GridLayoutGroup>();
+            foreach (GridLayoutGroup gl in gridLayouts)
+            {
+                gl.enabled = false;
+            }
+
             BackpackSlotUI slotUI = EnsureSlotComponent(slotObject, true);
             slotUIs.Add(slotUI);
         }
