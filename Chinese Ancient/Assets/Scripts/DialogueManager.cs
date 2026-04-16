@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// 对话管理器
@@ -21,9 +22,51 @@ public class DialogueManager : MonoBehaviour
 
     [Tooltip("NPC名称文本")]
     public Text npcNameText;
+    public TMP_Text npcNameTextTMP;
 
     [Tooltip("对话内容文本")]
     public Text dialogueText;
+    public TMP_Text dialogueTextTMP;
+
+    [Header("说话人区分")]
+    [Tooltip("玩家在对话框里的显示名字")]
+    public string playerName = "我";
+
+    [Tooltip("是否解析前缀来切换说话人。示例：'我：你好' 或 '小谷：欢迎'；不写前缀默认算NPC说")]
+    public bool parseSpeakerPrefix = true;
+
+    [Tooltip("NPC说话时的文字颜色")]
+    public Color npcDialogueColor = Color.white;
+
+    [Tooltip("玩家说话时的文字颜色")]
+    public Color playerDialogueColor = new Color(0.8f, 0.95f, 1f, 1f);
+
+    [Tooltip("玩家说话时名字栏是否强制显示为 playerName")]
+    public bool forcePlayerName = true;
+
+    [Tooltip("当识别到 'NPC:' 前缀时，是否替换成当前NPC名字")]
+    public bool replaceNpcTagWithCurrentNpcName = true;
+
+    [Tooltip("当识别到 '玩家:' 前缀时，是否替换成 playerName")]
+    public bool replacePlayerTagWithPlayerName = true;
+
+    [Tooltip("前缀最大长度（例如 '小谷：'）")]
+    public int maxSpeakerPrefixLength = 8;
+
+    [Tooltip("分隔符（支持 ':' 或 '：'）")]
+    public string speakerSeparators = ":：";
+
+    [Tooltip("如果不写前缀，默认使用这个NPC名字（由StartDialogue/StartAutoDialogue传入）")]
+    public string defaultNpcName = "NPC";
+
+    [Tooltip("NPC说话时名字栏颜色")]
+    public Color npcNameColor = Color.white;
+
+    [Tooltip("玩家说话时名字栏颜色")]
+    public Color playerNameColor = Color.white;
+
+    [Tooltip("是否也改变名字栏颜色")]
+    public bool tintNameColor = false;
 
     [Tooltip("选项按钮容器")]
     public Transform optionsContainer;
@@ -37,6 +80,9 @@ public class DialogueManager : MonoBehaviour
 
     [Tooltip("自动关闭延迟（对话结束后）")]
     public float autoCloseDelay = 3f;
+
+    [Tooltip("是否显示‘按键继续’提示文本")]
+    public bool showContinuePrompt = true;
 
     [Tooltip("继续提示文本")]
     public Text continuePromptText;
@@ -54,6 +100,12 @@ public class DialogueManager : MonoBehaviour
     private int currentDialogueIndex = 0;
     private bool isTyping = false;
     private bool waitingForContinue = false;
+
+    // 当前上下文
+    private string currentNpcName;
+    private string currentPreparedText;
+    private bool currentPreparedIsPlayer;
+    private string currentPreparedSpeaker;
 
     void Awake()
     {
@@ -134,7 +186,14 @@ public class DialogueManager : MonoBehaviour
         if (continuePromptText != null)
         {
             continuePromptText.gameObject.SetActive(false);
+            if (!showContinuePrompt)
+            {
+                continuePromptText.text = string.Empty;
+            }
         }
+
+        // 默认开启说话人前缀解析（我：/NPC：/小谷：）
+        parseSpeakerPrefix = true;
     }
 
     void Update()
@@ -166,15 +225,22 @@ public class DialogueManager : MonoBehaviour
             typingCoroutine = null;
         }
 
-        if (dialogueText != null && currentDialogueSequence != null && currentDialogueIndex < currentDialogueSequence.Length)
+        if ((dialogueText != null || dialogueTextTMP != null) && currentDialogueSequence != null && currentDialogueIndex < currentDialogueSequence.Length)
         {
-            dialogueText.text = currentDialogueSequence[currentDialogueIndex];
+            // 使用已准备好的文本（已去掉前缀并设置过说话人）
+            if (string.IsNullOrEmpty(currentPreparedText))
+            {
+                PrepareLine(currentDialogueSequence[currentDialogueIndex]);
+            }
+
+            if (dialogueText != null) dialogueText.text = currentPreparedText;
+            if (dialogueTextTMP != null) dialogueTextTMP.text = currentPreparedText;
             isTyping = false;
 
             Debug.Log("DialogueManager: 跳过打字效果，立即显示全部文本");
 
             // 显示继续提示
-            if (continuePromptText != null)
+            if (showContinuePrompt && continuePromptText != null)
             {
                 continuePromptText.gameObject.SetActive(true);
             }
@@ -205,30 +271,78 @@ public class DialogueManager : MonoBehaviour
         }
 
         // 查找NPCName Text
-        if (npcNameText == null)
+        if (npcNameText == null && npcNameTextTMP == null && dialoguePanel != null)
         {
             Transform nameTransform = dialoguePanel.transform.Find("NPCName");
+            if (nameTransform == null) nameTransform = dialoguePanel.transform.Find("GuideNameText");
+            
+            // 尝试深度查找
+            if (nameTransform == null)
+            {
+                foreach (Text t in dialoguePanel.GetComponentsInChildren<Text>(true))
+                {
+                    if (t.name.Contains("NPCName") || t.name.Contains("GuideNameText") || t.name.Contains("NameText"))
+                    {
+                        npcNameText = t;
+                        break;
+                    }
+                }
+                foreach (TMP_Text t in dialoguePanel.GetComponentsInChildren<TMP_Text>(true))
+                {
+                    if (t.name.Contains("NPCName") || t.name.Contains("GuideNameText") || t.name.Contains("NameText"))
+                    {
+                        npcNameTextTMP = t;
+                        break;
+                    }
+                }
+            }
+
             if (nameTransform != null)
             {
-                npcNameText = nameTransform.GetComponent<Text>();
-                if (npcNameText != null)
-                {
-                    Debug.Log("DialogueManager: 自动找到NPCName文本");
-                }
+                if (npcNameText == null) npcNameText = nameTransform.GetComponent<Text>();
+                if (npcNameTextTMP == null) npcNameTextTMP = nameTransform.GetComponent<TMP_Text>();
+            }
+
+            if (npcNameText != null || npcNameTextTMP != null)
+            {
+                Debug.Log("DialogueManager: 自动找到NPCName文本");
             }
         }
 
         // 查找DialogueText Text
-        if (dialogueText == null)
+        if (dialogueText == null && dialogueTextTMP == null && dialoguePanel != null)
         {
             Transform textTransform = dialoguePanel.transform.Find("DialogueText");
+            
+            if (textTransform == null)
+            {
+                foreach (Text t in dialoguePanel.GetComponentsInChildren<Text>(true))
+                {
+                    if (t.name.Contains("DialogueText") || t.name.Contains("ContentText"))
+                    {
+                        dialogueText = t;
+                        break;
+                    }
+                }
+                foreach (TMP_Text t in dialoguePanel.GetComponentsInChildren<TMP_Text>(true))
+                {
+                    if (t.name.Contains("DialogueText") || t.name.Contains("ContentText"))
+                    {
+                        dialogueTextTMP = t;
+                        break;
+                    }
+                }
+            }
+
             if (textTransform != null)
             {
-                dialogueText = textTransform.GetComponent<Text>();
-                if (dialogueText != null)
-                {
-                    Debug.Log("DialogueManager: 自动找到DialogueText");
-                }
+                if (dialogueText == null) dialogueText = textTransform.GetComponent<Text>();
+                if (dialogueTextTMP == null) dialogueTextTMP = textTransform.GetComponent<TMP_Text>();
+            }
+
+            if (dialogueText != null || dialogueTextTMP != null)
+            {
+                Debug.Log("DialogueManager: 自动找到DialogueText");
             }
         }
 
@@ -258,22 +372,48 @@ public class DialogueManager : MonoBehaviour
         }
 
         // 查找继续提示文本
-        if (continuePromptText == null)
+        if (continuePromptText == null && dialoguePanel != null)
         {
             Transform promptTransform = dialoguePanel.transform.Find("ContinuePrompt");
-            if (promptTransform != null)
+            if (promptTransform == null) promptTransform = dialoguePanel.transform.Find("ContinuePromptText");
+            
+            // 尝试深度查找
+            if (promptTransform == null)
             {
-                continuePromptText = promptTransform.GetComponent<Text>();
-                if (continuePromptText != null)
+                foreach (Text t in dialoguePanel.GetComponentsInChildren<Text>(true))
                 {
-                    Debug.Log("DialogueManager: 自动找到ContinuePrompt文本");
-                    // 设置默认提示文本
-                    if (string.IsNullOrEmpty(continuePromptText.text))
+                    if (t.name.Contains("ContinuePrompt") || t.text.Contains("按L键继续") || t.text.Contains("按 L 键继续"))
                     {
-                        continuePromptText.text = "按 L 键继续...";
+                        continuePromptText = t;
+                        break;
                     }
                 }
             }
+
+            if (promptTransform != null && continuePromptText == null)
+            {
+                continuePromptText = promptTransform.GetComponent<Text>();
+            }
+
+            if (continuePromptText != null)
+            {
+                Debug.Log("DialogueManager: 自动找到ContinuePrompt文本");
+                if (!showContinuePrompt)
+                {
+                    continuePromptText.text = string.Empty;
+                    continuePromptText.gameObject.SetActive(false);
+                }
+            }
+        }
+        
+        // 暴力清理场景中不该带 "按 L 键继续" 的 NPC_NameText，以防残留
+        if (npcNameText != null && npcNameText.text.Contains("按L键继续"))
+        {
+            npcNameText.text = npcNameText.text.Replace("按L键继续", "").Replace("按 L 键继续", "").Trim();
+        }
+        if (npcNameTextTMP != null && npcNameTextTMP.text.Contains("按L键继续"))
+        {
+            npcNameTextTMP.text = npcNameTextTMP.text.Replace("按L键继续", "").Replace("按 L 键继续", "").Trim();
         }
     }
 
@@ -283,6 +423,13 @@ public class DialogueManager : MonoBehaviour
     public void StartDialogue(string npcName, string greeting, DialogueOption[] options)
     {
         Debug.Log($"DialogueManager: 开始对话 - NPC: {npcName}");
+
+        if (!string.IsNullOrEmpty(npcName))
+        {
+            npcName = npcName.Replace("按L键继续", "").Replace("按 L 键继续", "").Replace("...", "").Trim();
+        }
+
+        currentNpcName = string.IsNullOrEmpty(npcName) ? defaultNpcName : npcName;
 
         isDialogueActive = true;
 
@@ -301,16 +448,10 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        // 设置NPC名称
-        if (npcNameText != null)
-        {
-            npcNameText.text = npcName;
-            Debug.Log($"DialogueManager: 设置NPC名称: {npcName}");
-        }
-        else
-        {
-            Debug.LogError("DialogueManager: npcNameText 为空！");
-        }
+        // 默认先显示NPC名（如果欢迎语带前缀，会在PrepareLine里覆盖）
+        if (npcNameText != null) npcNameText.text = currentNpcName;
+        if (npcNameTextTMP != null) npcNameTextTMP.text = currentNpcName;
+
 
         // 显示欢迎语
         ShowDialogue(greeting, options);
@@ -322,6 +463,13 @@ public class DialogueManager : MonoBehaviour
     public void StartAutoDialogue(string npcName, string[] dialogueSequence)
     {
         Debug.Log($"DialogueManager: 开始自动对话序列 - NPC: {npcName}, 对话数量: {dialogueSequence?.Length ?? 0}");
+
+        if (!string.IsNullOrEmpty(npcName))
+        {
+            npcName = npcName.Replace("按L键继续", "").Replace("按 L 键继续", "").Replace("...", "").Trim();
+        }
+
+        currentNpcName = string.IsNullOrEmpty(npcName) ? defaultNpcName : npcName;
 
         isDialogueActive = true;
 
@@ -421,7 +569,9 @@ public class DialogueManager : MonoBehaviour
         {
             StopCoroutine(typingCoroutine);
         }
-        typingCoroutine = StartCoroutine(TypeTextWithContinue(currentDialogueSequence[currentDialogueIndex]));
+
+        PrepareLine(currentDialogueSequence[currentDialogueIndex]);
+        typingCoroutine = StartCoroutine(TypeTextWithContinue(currentPreparedText));
     }
 
     /// <summary>
@@ -431,31 +581,27 @@ public class DialogueManager : MonoBehaviour
     {
         isTyping = true;
 
-        if (dialogueText == null)
-        {
-            Debug.LogError("DialogueManager: dialogueText 为空，无法显示打字机效果！");
-            yield break;
-        }
-
-        dialogueText.text = "";
+        if (dialogueText != null) dialogueText.text = "";
+        if (dialogueTextTMP != null) dialogueTextTMP.text = "";
 
         // 逐字显示文本
         foreach (char c in text)
         {
-            dialogueText.text += c;
+            if (dialogueText != null) dialogueText.text += c;
+            if (dialogueTextTMP != null) dialogueTextTMP.text += c;
             yield return new WaitForSeconds(typingSpeed);
         }
 
         isTyping = false;
-        Debug.Log("DialogueManager: 打字机效果完成，等待玩家按空格键");
+        Debug.Log("DialogueManager: 打字机效果完成，等待玩家按 L 键");
 
         // 显示继续提示
-        if (continuePromptText != null)
+        if (showContinuePrompt && continuePromptText != null)
         {
             continuePromptText.gameObject.SetActive(true);
         }
 
-        // 等待玩家按空格键
+        // 等待玩家按 L 键
         waitingForContinue = true;
     }
 
@@ -498,22 +644,142 @@ public class DialogueManager : MonoBehaviour
     {
         Debug.Log($"DialogueManager: TypeTextSingle 开始，文本长度: {text?.Length ?? 0}");
 
-        if (dialogueText == null)
-        {
-            Debug.LogError("DialogueManager: dialogueText 为空，无法显示打字机效果！");
-            yield break;
-        }
-
-        dialogueText.text = "";
+        if (dialogueText != null) dialogueText.text = "";
+        if (dialogueTextTMP != null) dialogueTextTMP.text = "";
 
         // 逐字显示文本
         foreach (char c in text)
         {
-            dialogueText.text += c;
+            if (dialogueText != null) dialogueText.text += c;
+            if (dialogueTextTMP != null) dialogueTextTMP.text += c;
             yield return new WaitForSeconds(typingSpeed);
         }
 
         Debug.Log("DialogueManager: 单句打字机效果完成");
+    }
+
+    private void PrepareLine(string raw)
+    {
+        // 清空上一次缓存
+        currentPreparedText = string.Empty;
+        currentPreparedSpeaker = string.Empty;
+        currentPreparedIsPlayer = false;
+
+        string npc = !string.IsNullOrEmpty(currentNpcName) ? currentNpcName : defaultNpcName;
+        string input = raw ?? string.Empty;
+
+        string speaker;
+        string content;
+        bool isPlayer;
+
+        if (parseSpeakerPrefix && TryParseSpeakerPrefix(input, npc, out speaker, out content, out isPlayer))
+        {
+            // 已解析
+        }
+        else
+        {
+            speaker = npc;
+            content = input;
+            isPlayer = false;
+        }
+
+        if (forcePlayerName && isPlayer)
+        {
+            speaker = playerName;
+        }
+
+        currentPreparedSpeaker = speaker;
+        currentPreparedText = content;
+        currentPreparedIsPlayer = isPlayer;
+
+        if (npcNameText != null)
+        {
+            npcNameText.text = speaker;
+            if (tintNameColor) npcNameText.color = isPlayer ? playerNameColor : npcNameColor;
+        }
+        if (npcNameTextTMP != null)
+        {
+            npcNameTextTMP.text = speaker;
+            if (tintNameColor) npcNameTextTMP.color = isPlayer ? playerNameColor : npcNameColor;
+        }
+
+        if (dialogueText != null)
+        {
+            dialogueText.color = isPlayer ? playerDialogueColor : npcDialogueColor;
+        }
+        if (dialogueTextTMP != null)
+        {
+            dialogueTextTMP.color = isPlayer ? playerDialogueColor : npcDialogueColor;
+        }
+    }
+
+    private bool TryParseSpeakerPrefix(string raw, string npcName, out string speaker, out string content, out bool isPlayer)
+    {
+        speaker = npcName;
+        content = raw;
+        isPlayer = false;
+
+        if (string.IsNullOrEmpty(raw))
+        {
+            return false;
+        }
+
+        string s = raw.TrimStart();
+
+        // 找到最早出现的分隔符（支持 ':' 或 '：' 等）
+        int sepIndex = -1;
+        for (int i = 0; i < s.Length; i++)
+        {
+            string separators = string.IsNullOrEmpty(speakerSeparators) ? ":：﹕∶" : speakerSeparators;
+            if (separators.IndexOf(s[i]) >= 0)
+            {
+                sepIndex = i;
+                break;
+            }
+
+            // 前缀过长就不再认为是说话人前缀
+            if (i >= maxSpeakerPrefixLength)
+            {
+                return false;
+            }
+        }
+
+        if (sepIndex <= 0)
+        {
+            return false;
+        }
+
+        string label = s.Substring(0, sepIndex).Trim();
+        if (string.IsNullOrEmpty(label) || label.Length > maxSpeakerPrefixLength)
+        {
+            return false;
+        }
+
+        string rest = s.Substring(sepIndex + 1).TrimStart();
+
+        // 规范化一些常见标签
+        if (replacePlayerTagWithPlayerName && (label == "玩家" || label.Equals("player", System.StringComparison.OrdinalIgnoreCase) || label.Equals("me", System.StringComparison.OrdinalIgnoreCase) || label == "我"))
+        {
+            speaker = playerName;
+            isPlayer = true;
+        }
+        else if (replaceNpcTagWithCurrentNpcName && (label == "NPC" || label.Equals("npc", System.StringComparison.OrdinalIgnoreCase)))
+        {
+            speaker = npcName;
+            isPlayer = false;
+        }
+        else
+        {
+            speaker = label;
+            // 如果写的是“我：”，也识别为玩家
+            if (label == "我" || label == playerName)
+            {
+                isPlayer = true;
+            }
+        }
+
+        content = rest;
+        return true;
     }
 
     /// <summary>
@@ -522,6 +788,8 @@ public class DialogueManager : MonoBehaviour
     private void ShowDialogue(string text, DialogueOption[] options)
     {
         Debug.Log($"DialogueManager: ShowDialogue 被调用，文本: '{text}'，选项数量: {(options != null ? options.Length : 0)}");
+
+        PrepareLine(text);
 
         // 清除之前的自动关闭
         if (autoCloseCoroutine != null)
@@ -536,7 +804,7 @@ public class DialogueManager : MonoBehaviour
         }
 
         // 开始新的打字机效果
-        typingCoroutine = StartCoroutine(TypeText(text, options));
+        typingCoroutine = StartCoroutine(TypeText(currentPreparedText, options));
 
         Debug.Log("DialogueManager: 打字机协程已启动");
     }
@@ -548,19 +816,15 @@ public class DialogueManager : MonoBehaviour
     {
         Debug.Log($"DialogueManager: TypeText 开始，文本长度: {text?.Length ?? 0}，选项数量: {(options != null ? options.Length : 0)}");
 
-        if (dialogueText == null)
-        {
-            Debug.LogError("DialogueManager: dialogueText 为空，无法显示打字机效果！");
-            yield break;
-        }
-
-        dialogueText.text = "";
+        if (dialogueText != null) dialogueText.text = "";
+        if (dialogueTextTMP != null) dialogueTextTMP.text = "";
         int charCount = 0;
 
         // 逐字显示文本
         foreach (char c in text)
         {
-            dialogueText.text += c;
+            if (dialogueText != null) dialogueText.text += c;
+            if (dialogueTextTMP != null) dialogueTextTMP.text += c;
             charCount++;
 
             // 每10个字符输出一次进度

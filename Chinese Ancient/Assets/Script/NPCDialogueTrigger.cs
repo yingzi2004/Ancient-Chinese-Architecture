@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
@@ -128,6 +129,24 @@ public class NPCDialogueTrigger : MonoBehaviour
     [Tooltip("触发距离（米）")]
     public float triggerDistance = 3f;
 
+    [Tooltip("按键触发对话")]
+    public KeyCode interactKey = KeyCode.L;
+
+    [Tooltip("NPC的Animator（用于控制动画）")]
+    public Animator npcAnimator;
+
+    [Tooltip("使用 Bool 参数切换动画（否则使用 Trigger）")]
+    public bool useBoolParameter = false;
+
+    [Tooltip("触发对话时的动画触发器名称（useBoolParameter=false时使用）")]
+    public string waveAnimationTrigger = "Wave";
+
+    [Tooltip("挥手的 Bool 参数名称（useBoolParameter=true时使用）")]
+    public string waveAnimationBool = "Wave";
+
+    [Tooltip("使用 Bool 时，按键触发后多久自动把 Bool 复位为 false（秒）。用于避免一直满足条件导致反复切换")]
+    public float waveBoolAutoResetSeconds = 0.15f;
+
     [Tooltip("是否只触发一次")]
     public bool triggerOnce = true;
 
@@ -152,6 +171,7 @@ public class NPCDialogueTrigger : MonoBehaviour
     private bool isInsideRange = false;
     private float exitDistance;
     private float debugLogTimer = 0f;
+    private Coroutine waveResetCoroutine;
 
     private void Start()
     {
@@ -159,6 +179,12 @@ public class NPCDialogueTrigger : MonoBehaviour
 
         // 计算离开距离（触发距离 + 偏移量）
         exitDistance = triggerDistance + exitDistanceOffset;
+
+        // 如果未绑定Animator，尝试自动获取
+        if (npcAnimator == null)
+        {
+            npcAnimator = GetComponentInChildren<Animator>();
+        }
 
         // 查找玩家
         if (player == null)
@@ -287,25 +313,43 @@ public class NPCDialogueTrigger : MonoBehaviour
             Debug.Log($"<color=green>[NPC对话触发器]</color> 玩家进入触发范围！距离: {distance:F2}米");
             isInsideRange = true;
 
-            // 检查是否可以触发
-            if (!triggerOnce || !hasTriggeredOnce)
-            {
-                Debug.Log($"<color=green>[NPC对话触发器]</color> 准备触发对话... (0.5秒后)");
-                // 延迟一小段时间后触发对话，让玩家有时间注意到NPC
-                Invoke(nameof(TriggerDialogue), 0.5f);
-                hasTriggeredOnce = true;
-            }
-            else if (triggerOnce && hasTriggeredOnce)
-            {
-                Debug.Log($"<color=yellow>[NPC对话触发器]</color> 已触发过一次，不再触发（Trigger Once = true）");
-            }
-
             // 显示提示面板
             if (showPromptUI && promptPanel != null)
             {
                 promptPanel.SetActive(true);
             }
         }
+
+        // 按下互动键：对话推进由 DialogueManager 自己处理；这里仅负责“开启对话”
+        if (Input.GetKeyDown(interactKey))
+        {
+            if (DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueActive)
+            {
+                // 对话已开启时不重复触发；继续/下一句由 DialogueManager.Update() 处理
+            }
+            else if (isInsideRange)
+            {
+                if (!triggerOnce || !hasTriggeredOnce)
+                {
+                    Debug.Log($"<color=green>[NPC对话触发器]</color> 玩家按下 {interactKey}，开始对话！");
+
+                    // 转向玩家
+                    FacePlayer();
+
+                    // 播放挥手动画
+                    PlayWaveAnimation();
+
+                    // 触发对话
+                    TriggerDialogue();
+                    hasTriggeredOnce = true;
+                }
+                else if (triggerOnce && hasTriggeredOnce)
+                {
+                    Debug.Log($"<color=yellow>[NPC对话触发器]</color> 已对话过一次，不再触发");
+                }
+            }
+        }
+
         // 离开触发范围（需要离开更远一点才能重置）
         else if (!withinRange && isInsideRange)
         {
@@ -328,6 +372,75 @@ public class NPCDialogueTrigger : MonoBehaviour
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 让NPC转向玩家
+    /// </summary>
+    private void FacePlayer()
+    {
+        if (player != null)
+        {
+            Vector3 direction = (player.position - transform.position).normalized;
+            // 忽略Y轴（防止NPC仰头或低头）
+            direction.y = 0;
+            if (direction != Vector3.zero)
+            {
+                Quaternion lookRotation = Quaternion.LookRotation(direction);
+                // 瞬间转向玩家（如果需要自然转，可以用Slerp或者放到协程里面做平滑旋转）
+                transform.rotation = lookRotation;
+            }
+        }
+    }
+
+    private void PlayWaveAnimation()
+    {
+        if (npcAnimator == null)
+        {
+            return;
+        }
+
+        if (useBoolParameter)
+        {
+            if (string.IsNullOrEmpty(waveAnimationBool))
+            {
+                return;
+            }
+
+            npcAnimator.SetBool(waveAnimationBool, true);
+
+            if (waveBoolAutoResetSeconds > 0f)
+            {
+                if (waveResetCoroutine != null)
+                {
+                    StopCoroutine(waveResetCoroutine);
+                }
+                waveResetCoroutine = StartCoroutine(ResetWaveBoolAfterDelay(waveBoolAutoResetSeconds));
+            }
+        }
+        else
+        {
+            if (string.IsNullOrEmpty(waveAnimationTrigger))
+            {
+                return;
+            }
+
+            // 防止连续触发时丢触发
+            npcAnimator.ResetTrigger(waveAnimationTrigger);
+            npcAnimator.SetTrigger(waveAnimationTrigger);
+        }
+    }
+
+    private IEnumerator ResetWaveBoolAfterDelay(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+
+        if (npcAnimator != null && !string.IsNullOrEmpty(waveAnimationBool))
+        {
+            npcAnimator.SetBool(waveAnimationBool, false);
+        }
+
+        waveResetCoroutine = null;
     }
 
     /// <summary>
