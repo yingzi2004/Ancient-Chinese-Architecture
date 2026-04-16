@@ -1,14 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// 导游对话自动设置脚本
+/// 导游对话自动设置脚本 - 使用Legacy UI Text（支持中文）
 /// 将此脚本添加到Min Exhibition场景的任何GameObject上
-/// 运行时会自动创建导游对话UI和触发器
 /// </summary>
-public class GuideDialogueAutoSetup : MonoBehaviour
+public class GuideDialogueAutoSetup_Legacy : MonoBehaviour
 {
     [Header("导游信息")]
     [SerializeField] private string guideName = "古建筑讲解员";
@@ -33,23 +31,14 @@ public class GuideDialogueAutoSetup : MonoBehaviour
 
     void Start()
     {
-        // 检查当前场景
         Scene currentScene = SceneManager.GetActiveScene();
         if (currentScene.name != "Min Exhibition")
         {
-            Debug.Log($"GuideDialogueAutoSetup: 当前场景是 '{currentScene.name}'，不是 Min Exhibition，跳过自动创建");
             return;
         }
 
-        Debug.Log("GuideDialogueAutoSetup: 开始在 Min Exhibition 场景中创建导游对话系统");
-
-        // 查找或创建Canvas
         Canvas canvas = FindOrCreateCanvas();
-
-        // 创建导游对话UI
         CreateGuideDialogueUI(canvas);
-
-        // 延迟触发对话
         Invoke(nameof(TriggerWelcomeDialogue), triggerDelay);
     }
 
@@ -64,111 +53,97 @@ public class GuideDialogueAutoSetup : MonoBehaviour
             canvasObj.AddComponent<CanvasScaler>();
             canvasObj.AddComponent<GraphicRaycaster>();
 
-            // 添加EventSystem
             if (FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
             {
                 GameObject eventSystemObj = new GameObject("EventSystem");
                 eventSystemObj.AddComponent<UnityEngine.EventSystems.EventSystem>();
                 eventSystemObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
             }
-
-            Debug.Log("GuideDialogueAutoSetup: 创建了新的Canvas");
         }
-
         return canvas;
     }
 
     void CreateGuideDialogueUI(Canvas canvas)
     {
-        // 创建主面板 - 缩小并放在中下方
+        // 主面板 - 中下方，小尺寸
         GameObject panelObj = new GameObject("GuideDialoguePanel");
         panelObj.transform.SetParent(canvas.transform, false);
 
         RectTransform panelRect = panelObj.AddComponent<RectTransform>();
-        panelRect.anchorMin = new Vector2(0.5f, 0); // 从底部中心开始
+        panelRect.anchorMin = new Vector2(0.5f, 0);
         panelRect.anchorMax = new Vector2(0.5f, 0);
         panelRect.pivot = new Vector2(0.5f, 0);
-        panelRect.anchoredPosition = new Vector2(0, 80); // 距离底部80像素
-        panelRect.sizeDelta = new Vector2(800, 180); // 缩小到800x180
+        panelRect.anchoredPosition = new Vector2(0, 80);
+        panelRect.sizeDelta = new Vector2(800, 180);
 
         Image panelImage = panelObj.AddComponent<Image>();
         panelImage.color = new Color(0.1f, 0.1f, 0.1f, 0.95f);
 
-        // 添加GuideDialogueUI脚本
         guideUI = panelObj.AddComponent<GuideDialogueUI>();
 
-        // 创建立绘图片 - 缩小并调整位置
+        // 立绘 - 左侧，小尺寸
         GameObject portraitObj = CreateUIElement("PortraitImage", panelObj.transform,
-            new Vector2(0, 0.5f), new Vector2(15, 0), new Vector2(120, 160)); // 缩小到120x160
+            new Vector2(0, 0.5f), new Vector2(15, 0), new Vector2(120, 160));
         Image portraitImage = portraitObj.AddComponent<Image>();
 
         if (useDefaultPortrait)
         {
-            // 尝试加载立绘图片
-            Sprite portraitSprite = Resources.Load<Sprite>("UIdesign/AIChat/立绘/1-1");
-            if (portraitSprite == null)
-            {
-                // 如果Resources文件夹没有，尝试直接从Assets加载
-                #if UNITY_EDITOR
-                portraitSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/UIdesign/AIChat/立绘/1-1.png");
-                #endif
-            }
-
+            #if UNITY_EDITOR
+            Sprite portraitSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/UIdesign/AIChat/立绘/1-1.png");
             if (portraitSprite != null)
             {
                 portraitImage.sprite = portraitSprite;
-                Debug.Log("GuideDialogueAutoSetup: 成功加载立绘图片");
             }
             else
             {
-                Debug.LogWarning("GuideDialogueAutoSetup: 未找到立绘图片，使用默认颜色");
                 portraitImage.color = new Color(0.3f, 0.3f, 0.3f, 0.5f);
             }
+            #endif
         }
         portraitImage.preserveAspect = true;
 
-        // 创建导游名称 - 调整位置和大小
+        // 导游名称 - 使用Legacy Text
         GameObject guideNameObj = CreateUIElement("GuideNameText", panelObj.transform,
             new Vector2(0, 1), new Vector2(150, -10), new Vector2(400, 35));
-        TextMeshProUGUI guideNameText = guideNameObj.AddComponent<TextMeshProUGUI>();
+        Text guideNameText = guideNameObj.AddComponent<Text>();
         guideNameText.text = guideName;
+        guideNameText.font = Resources.GetBuiltinResource<Font>("Arial.ttf"); // 使用内置字体
         guideNameText.fontSize = 24;
         guideNameText.color = Color.white;
-        guideNameText.fontStyle = FontStyles.Bold;
-        guideNameText.alignment = TextAlignmentOptions.Left;
-        // 尝试设置支持中文的字体
-        SetChineseFont(guideNameText);
+        guideNameText.fontStyle = FontStyle.Bold;
+        guideNameText.alignment = TextAnchor.MiddleLeft;
 
-        // 创建对话内容 - 调整位置和大小
+        // 对话内容 - 使用Legacy Text
         GameObject dialogueObj = CreateUIElement("DialogueText", panelObj.transform,
-            new Vector2(0.5f, 0.5f), new Vector2(60, 0), new Vector2(550, 100)); // 缩小并居中
-        TextMeshProUGUI dialogueText = dialogueObj.AddComponent<TextMeshProUGUI>();
+            new Vector2(0.5f, 0.5f), new Vector2(60, 0), new Vector2(550, 100));
+        Text dialogueText = dialogueObj.AddComponent<Text>();
         dialogueText.text = "对话内容将在这里显示...";
-        dialogueText.fontSize = 20; // 减小字体
+        dialogueText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        dialogueText.fontSize = 20;
         dialogueText.color = new Color(0.95f, 0.95f, 0.95f);
-        dialogueText.alignment = TextAlignmentOptions.TopLeft;
-        // 尝试设置支持中文的字体
-        SetChineseFont(dialogueText);
+        dialogueText.alignment = TextAnchor.UpperLeft;
+        dialogueText.horizontalOverflow = HorizontalWrapMode.Wrap;
+        dialogueText.verticalOverflow = VerticalWrapMode.Overflow;
 
-        // 创建继续提示 - 调整位置
+        // 继续提示 - 使用Legacy Text
         GameObject continuePromptObj = CreateUIElement("ContinuePromptText", panelObj.transform,
             new Vector2(1, 0), new Vector2(-20, 10), new Vector2(300, 30));
-        TextMeshProUGUI continuePromptText = continuePromptObj.AddComponent<TextMeshProUGUI>();
+        Text continuePromptText = continuePromptObj.AddComponent<Text>();
         continuePromptText.text = "按 L 键继续";
+        continuePromptText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
         continuePromptText.fontSize = 16;
         continuePromptText.color = new Color(0.7f, 0.7f, 0.7f);
-        continuePromptText.alignment = TextAlignmentOptions.Right;
+        continuePromptText.alignment = TextAnchor.MiddleRight;
         continuePromptText.gameObject.SetActive(false);
-        SetChineseFont(continuePromptText);
 
-        // 创建继续按钮 - 缩小
+        // 继续按钮
         GameObject continueButtonObj = CreateUIElement("ContinueButton", panelObj.transform,
-            new Vector2(0.5f, 1), new Vector2(320, -8), new Vector2(120, 28)); // 右上角
+            new Vector2(0.5f, 1), new Vector2(320, -8), new Vector2(120, 28));
         Image continueButtonImage = continueButtonObj.AddComponent<Image>();
         continueButtonImage.color = new Color(0.3f, 0.5f, 0.8f);
         Button continueButton = continueButtonObj.AddComponent<Button>();
 
-        // 按钮文字
+        // 按钮文字 - 使用Legacy Text
         GameObject buttonTextObj = new GameObject("Text");
         buttonTextObj.transform.SetParent(continueButtonObj.transform, false);
         RectTransform buttonTextRect = buttonTextObj.AddComponent<RectTransform>();
@@ -176,17 +151,14 @@ public class GuideDialogueAutoSetup : MonoBehaviour
         buttonTextRect.anchorMax = Vector2.one;
         buttonTextRect.sizeDelta = Vector2.zero;
 
-        TextMeshProUGUI buttonText = buttonTextObj.AddComponent<TextMeshProUGUI>();
+        Text buttonText = buttonTextObj.AddComponent<Text>();
         buttonText.text = "继续";
+        buttonText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
         buttonText.fontSize = 16;
         buttonText.color = Color.white;
-        buttonText.alignment = TextAlignmentOptions.Center;
-        SetChineseFont(buttonText);
+        buttonText.alignment = TextAnchor.MiddleCenter;
 
-        // 绑定所有UI组件到GuideDialogueUI脚本
-        guideUI.SetUIComponents(panelObj, portraitImage, guideNameText, dialogueText, continuePromptText, continueButton);
-
-        Debug.Log("GuideDialogueAutoSetup: 导游对话UI创建完成");
+        Debug.Log("GuideDialogueAutoSetup_Legacy: 导游对话UI创建完成（使用Legacy Text）");
     }
 
     GameObject CreateUIElement(string name, Transform parent, Vector2 anchor, Vector2 position, Vector2 size)
@@ -204,61 +176,14 @@ public class GuideDialogueAutoSetup : MonoBehaviour
         return obj;
     }
 
-    /// <summary>
-    /// 设置支持中文的字体
-    /// </summary>
-    void SetChineseFont(TextMeshProUGUI textComponent)
-    {
-        // 尝试查找项目中已配置的中文字体资源
-        #if UNITY_EDITOR
-        // 常见的中文字体资源路径
-        string[] fontPaths = new string[]
-        {
-            "Assets/TextMesh Pro/Resources/TMP Settings.asset", // TMP默认设置
-            "Assets/TextMesh Pro/Font Resources", // TMP字体资源文件夹
-        };
-
-        // 获取TMP设置
-        if (TMPro.TMP_Settings.defaultFontAsset != null)
-        {
-            textComponent.font = TMPro.TMP_Settings.defaultFontAsset;
-            Debug.Log("GuideDialogueAutoSetup: 使用TMP默认字体");
-        }
-
-        // 尝试加载常见的中文字体资源
-        string[] chineseFontNames = new string[]
-        {
-            "LiberationSans SDF", // TMP默认字体
-            "NotoSansCJK-Regular SDF",
-            "SourceHanSansCN-Regular SDF",
-            "MSYH SDF", // 微软雅黑
-        };
-
-        foreach (string fontName in chineseFontNames)
-        {
-            TMPro.TMP_FontAsset fontAsset = Resources.Load<TMPro.TMP_FontAsset>("Font Resources/" + fontName);
-            if (fontAsset != null)
-            {
-                textComponent.font = fontAsset;
-                Debug.Log($"GuideDialogueAutoSetup: 使用字体 {fontName}");
-                break;
-            }
-        }
-        #endif
-    }
-
     void TriggerWelcomeDialogue()
     {
         if (guideUI != null && welcomeDialogue != null && welcomeDialogue.Length > 0)
         {
             guideUI.StartGuideDialogue(guideName, null, welcomeDialogue);
-            Debug.Log("GuideDialogueAutoSetup: 触发欢迎对话");
         }
     }
 
-    /// <summary>
-    /// 测试对话（可在运行时通过Inspector按钮调用）
-    /// </summary>
     [ContextMenu("测试对话")]
     public void TestDialogue()
     {
