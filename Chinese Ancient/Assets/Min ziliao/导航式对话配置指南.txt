@@ -1,0 +1,220 @@
+=====================================
+  Min Exhibition 导航式对话配置指南
+=====================================
+
+一、快速设置（推荐方法）
+=====================
+
+方案A: 使用新的触发器脚本（最简单）
+-----------------------------------
+
+1. 打开 "Min Exhibition.unity" 场景
+
+2. 在场景中创建一个空GameObject：
+   - GameObject名称建议: "MinExhibitionDialogueTrigger"
+   - 位置可以放在任何地方（建议放在根目录）
+
+3. 添加组件:
+   - 点击 "Add Component"
+   - 搜索并添加 "Min Exhibition Dialogue Trigger"
+
+4. 配置参数（在Inspector中）:
+   ✓ Trigger Delay: 0.5 (玩家进入0.5秒后开始对话)
+   ✓ Trigger Once: true (只触发一次)
+   ✓ Guide Name: "民俗展览讲解员" (可自定义)
+   ✓ Welcome Dialogue: 编辑对话内容（已预设示例）
+
+5. 保存场景
+
+6. 运行测试！玩家进入场景后会自动看到导航对话
+
+
+方案B: 使用现有的自动设置脚本
+---------------------------------
+
+1. 打开 "Min Exhibition.unity" 场景
+
+2. 在场景中创建一个空GameObject：
+   - GameObject名称建议: "GuideDialogueAutoSetup"
+
+3. 添加组件:
+   - 搜索并添加 "Guide Dialogue Auto Setup"
+
+4. 配置参数:
+   ✓ Guide Name: 导游名称
+   ✓ Use Default Portrait: 是否使用默认立绘
+   ✓ Welcome Dialogue: 对话内容
+   ✓ Trigger Delay: 触发延迟时间
+   ✓ Trigger Once: 是否只触发一次
+
+5. 保存场景
+
+
+二、对话系统说明
+=====================
+
+核心组件:
+---------
+1. GuideDialogueUI (脚本)
+   - 控制对话UI的显示
+   - 处理打字机效果
+   - 支持立绘显示
+
+2. GuideDialogueData (ScriptableObject)
+   - 存储对话数据
+   - 可创建多个对话数据资产
+   - 支持右键菜单生成示例对话
+
+3. DialogueManager (通用对话管理器)
+   - 管理NPC对话
+   - 支持选项对话
+
+交互方式:
+---------
+- 按键: L 键 (推进对话)
+- 鼠标: 点击"继续"按钮
+- 打字中按L: 立即显示完整文本
+- 打字完成后按L: 进入下一句
+
+
+三、自定义对话内容
+=====================
+
+方法1: 在Inspector中直接编辑
+-----------------------------
+选中触发器GameObject，在Inspector的"Welcome Dialogue"数组中编辑：
+- 每一行是一句对话
+- 点击"+"添加新对话
+- 点击"-"删除对话
+- 可以拖动调整顺序
+
+方法2: 使用ScriptableObject
+-----------------------------
+1. 右键 Project 窗口 -> Create -> Game -> 导游对话数据
+2. 命名例如: "MinExhibitionGuideDialogue"
+3. 在Inspector中编辑对话内容
+4. 右键点击数据资产，选择示例对话生成：
+   - "生成Min Exhibition示例对话"
+   - "生成土楼示例对话"
+   - "生成苏州园林示例对话"
+
+
+四、对话内容建议（Min Exhibition民俗展馆）
+=====================================
+
+欢迎对话示例:
+-------------
+"欢迎来到民俗文化展览馆！"
+
+"这里展示了中国丰富多彩的民俗文化，
+包括传统建筑、生活用具、文化习俗等。"
+
+"您可以自由参观以下展区："
+"- 福建土楼：客家建筑的独特魅力"
+"- 茶文化：中国茶道与茶具"
+"- 传统农具：了解古代农耕文化"
+"- 民俗艺术：戏台与抽签游戏"
+
+"按 L 键可以推进对话，祝您参观愉快！"
+
+
+展区引导对话:
+-------------
+可针对不同展区设置专门的触发器和对话内容：
+
+1. 土楼展区:
+   "这是福建土楼的模型..."
+   "土楼是客家文化的象征..."
+
+2. 茶文化展区:
+   "欢迎来到茶文化展区..."
+   "中国是茶的故乡..."
+
+3. 农具展区:
+   "这里展示了传统农耕用具..."
+   "古代劳动人民的智慧结晶..."
+
+
+五、常见问题
+=====================
+
+Q: 对话没有显示？
+A: 检查以下几点：
+   - 场景名称是否包含"Min"或"Exhibition"
+   - Canvas是否存在于场景中
+   - GuideDialogueUI组件是否正确加载
+   - 查看Console错误信息
+
+Q: 中文显示乱码？
+A: TextMeshPro需要中文字体支持：
+   - 确保TMP Settings中有中文字体
+   - 或在Assets/TextMesh Pro/Resources/Font Resources/添加中文字体资源
+
+Q: 如何重复触发对话？
+A: 将"Trigger Once"设置为false
+
+Q: 如何更改按键？
+A: 在GuideDialogueUI脚本中修改advanceKey的默认值
+
+Q: 立绘图片如何替换？
+A: 将立绘图片放在以下路径之一：
+   - Assets/Resources/UIdesign/AIChat/立绘/1-1.png
+   - 或在GuideDialogueAutoSetup中修改路径
+
+
+六、高级用法
+=====================
+
+1. 区域触发对话:
+   - 使用Box Collider或Trigger Collider
+   - 配合OnTriggerEnter方法触发对话
+   - 示例：玩家进入特定区域时显示解说
+
+2. 交互物体触发:
+   - 点击展品时显示相关介绍
+   - 使用Raycast检测点击
+   - 调用DialogueManager.StartDialogue()
+
+3. 序列对话:
+   - 创建多个GuideDialogueData
+   - 按顺序播放不同场景的对话
+   - 使用协程或事件系统控制流程
+
+4. 多语言支持:
+   - 创建多套对话数据
+   - 根据语言设置加载对应数据
+   - 使用PlayerPrefs保存语言偏好
+
+
+七、文件位置参考
+=====================
+
+脚本位置:
+---------
+Assets/Scripts/GuideDialogueUI.cs
+Assets/Scripts/GuideDialogueData.cs
+Assets/Scripts/GuideDialogueAutoSetup.cs
+Assets/Scripts/DialogueManager.cs
+Assets/Scripts/MinExhibitionDialogueTrigger.cs (新建)
+
+场景文件:
+---------
+Assets/Min Exhibition.unity
+
+对话数据（建议）:
+-----------------
+Assets/Min ziliao/DialogueData/
+
+
+八、快速测试
+=====================
+
+1. 在Unity中打开Min Exhibition场景
+2. 添加MinExhibitionDialogueTrigger组件
+3. 点击Play
+4. 应该在0.5秒后自动看到对话
+
+
+=====================================
+如有问题，请查看Console日志获取详细错误信息
+=====================================

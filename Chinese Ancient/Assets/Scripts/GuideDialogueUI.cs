@@ -6,6 +6,7 @@ using TMPro;
 /// <summary>
 /// 导游对话UI控制器
 /// 在屏幕下方显示带立绘的导游对话
+/// 支持TextMeshPro和Legacy UI Text
 /// </summary>
 public class GuideDialogueUI : MonoBehaviour
 {
@@ -14,9 +15,17 @@ public class GuideDialogueUI : MonoBehaviour
     [Header("UI引用")]
     [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private Image portraitImage; // 立绘图片
-    [SerializeField] private TextMeshProUGUI guideNameText;
-    [SerializeField] private TextMeshProUGUI dialogueText;
-    [SerializeField] private TextMeshProUGUI continuePromptText;
+
+    // TextMeshPro组件
+    [SerializeField] private TextMeshProUGUI guideNameTextTMP;
+    [SerializeField] private TextMeshProUGUI dialogueTextTMP;
+    [SerializeField] private TextMeshProUGUI continuePromptTextTMP;
+
+    // Legacy UI Text组件
+    [SerializeField] private Text guideNameTextLegacy;
+    [SerializeField] private Text dialogueTextLegacy;
+    [SerializeField] private Text continuePromptTextLegacy;
+
     [SerializeField] private Button continueButton;
 
     [Header("设置")]
@@ -95,10 +104,7 @@ public class GuideDialogueUI : MonoBehaviour
         }
 
         // 设置导游名称
-        if (guideNameText != null)
-        {
-            guideNameText.text = guideName;
-        }
+        SetGuideNameText(guideName);
 
         // 设置立绘图片
         if (portraitImage != null && portraitSprite != null)
@@ -135,10 +141,7 @@ public class GuideDialogueUI : MonoBehaviour
         Debug.Log($"GuideDialogueUI: 播放第 {currentDialogueIndex + 1}/{currentDialogueSequence.Length} 句对话");
 
         // 隐藏继续提示
-        if (continuePromptText != null)
-        {
-            continuePromptText.gameObject.SetActive(false);
-        }
+        SetContinuePromptActive(false);
 
         // 开始打字机效果
         if (typingCoroutine != null)
@@ -155,18 +158,20 @@ public class GuideDialogueUI : MonoBehaviour
     {
         isTyping = true;
 
-        if (dialogueText == null)
+        if (!HasDialogueTextComponent())
         {
             Debug.LogError("GuideDialogueUI: dialogueText 为空！");
             yield break;
         }
 
-        dialogueText.text = "";
+        SetDialogueText("");
 
         // 逐字显示文本
+        string currentText = "";
         foreach (char c in text)
         {
-            dialogueText.text += c;
+            currentText += c;
+            SetDialogueText(currentText);
             yield return new WaitForSeconds(typingSpeed);
         }
 
@@ -174,11 +179,8 @@ public class GuideDialogueUI : MonoBehaviour
         Debug.Log("GuideDialogueUI: 打字机效果完成");
 
         // 显示继续提示
-        if (continuePromptText != null)
-        {
-            continuePromptText.gameObject.SetActive(true);
-            continuePromptText.text = $"按 {advanceKey} 键或点击按钮继续...";
-        }
+        SetContinuePromptActive(true);
+        SetContinuePromptText($"按 {advanceKey} 键继续...");
     }
 
     /// <summary>
@@ -223,17 +225,14 @@ public class GuideDialogueUI : MonoBehaviour
             typingCoroutine = null;
         }
 
-        if (dialogueText != null && currentDialogueSequence != null && currentDialogueIndex < currentDialogueSequence.Length)
+        if (HasDialogueTextComponent() && currentDialogueSequence != null && currentDialogueIndex < currentDialogueSequence.Length)
         {
-            dialogueText.text = currentDialogueSequence[currentDialogueIndex];
+            SetDialogueText(currentDialogueSequence[currentDialogueIndex]);
             isTyping = false;
 
             // 显示继续提示
-            if (continuePromptText != null)
-            {
-                continuePromptText.gameObject.SetActive(true);
-                continuePromptText.text = $"按 {advanceKey} 键或点击按钮继续...";
-            }
+            SetContinuePromptActive(true);
+            SetContinuePromptText($"按 {advanceKey} 键继续...");
         }
     }
 
@@ -271,10 +270,7 @@ public class GuideDialogueUI : MonoBehaviour
         }
 
         // 隐藏继续提示
-        if (continuePromptText != null)
-        {
-            continuePromptText.gameObject.SetActive(false);
-        }
+        SetContinuePromptActive(false);
 
         // 重置对话序列状态
         currentDialogueSequence = null;
@@ -311,24 +307,104 @@ public class GuideDialogueUI : MonoBehaviour
     public bool IsDialogueActive => isDialogueActive;
 
     /// <summary>
-    /// 设置UI组件（用于运行时动态绑定）
+    /// 设置UI组件（用于运行时动态绑定）- TextMeshPro版本
     /// </summary>
     public void SetUIComponents(GameObject panel, Image portrait, TextMeshProUGUI nameText,
         TextMeshProUGUI dialogue, TextMeshProUGUI prompt, Button button)
     {
         dialoguePanel = panel;
         portraitImage = portrait;
-        guideNameText = nameText;
-        dialogueText = dialogue;
-        continuePromptText = prompt;
+        guideNameTextTMP = nameText;
+        dialogueTextTMP = dialogue;
+        continuePromptTextTMP = prompt;
         continueButton = button;
 
-        // 绑定按钮事件
         if (continueButton != null)
         {
             continueButton.onClick.AddListener(OnContinueClicked);
         }
 
-        Debug.Log("GuideDialogueUI: UI组件已绑定");
+        Debug.Log("GuideDialogueUI: UI组件已绑定 (TextMeshPro)");
+    }
+
+    /// <summary>
+    /// 设置UI组件（用于运行时动态绑定）- Legacy Text版本
+    /// </summary>
+    public void SetUIComponents(GameObject panel, Image portrait, Text nameText,
+        Text dialogue, Text prompt, Button button)
+    {
+        dialoguePanel = panel;
+        portraitImage = portrait;
+        guideNameTextLegacy = nameText;
+        dialogueTextLegacy = dialogue;
+        continuePromptTextLegacy = prompt;
+        continueButton = button;
+
+        if (continueButton != null)
+        {
+            continueButton.onClick.AddListener(OnContinueClicked);
+        }
+
+        Debug.Log("GuideDialogueUI: UI组件已绑定 (Legacy Text)");
+    }
+
+    /// <summary>
+    /// 设置导游名称文本
+    /// </summary>
+    private void SetGuideNameText(string name)
+    {
+        if (guideNameTextTMP != null)
+        {
+            guideNameTextTMP.text = name;
+        }
+        else if (guideNameTextLegacy != null)
+        {
+            guideNameTextLegacy.text = name;
+        }
+    }
+
+    /// <summary>
+    /// 获取对话文本组件（支持两种类型）
+    /// </summary>
+    private string GetDialogueText()
+    {
+        if (dialogueTextTMP != null) return dialogueTextTMP.text;
+        if (dialogueTextLegacy != null) return dialogueTextLegacy.text;
+        return "";
+    }
+
+    /// <summary>
+    /// 设置对话文本
+    /// </summary>
+    private void SetDialogueText(string text)
+    {
+        if (dialogueTextTMP != null) dialogueTextTMP.text = text;
+        if (dialogueTextLegacy != null) dialogueTextLegacy.text = text;
+    }
+
+    /// <summary>
+    /// 显示/隐藏继续提示
+    /// </summary>
+    private void SetContinuePromptActive(bool active)
+    {
+        if (continuePromptTextTMP != null) continuePromptTextTMP.gameObject.SetActive(active);
+        if (continuePromptTextLegacy != null) continuePromptTextLegacy.gameObject.SetActive(active);
+    }
+
+    /// <summary>
+    /// 设置继续提示文本
+    /// </summary>
+    private void SetContinuePromptText(string text)
+    {
+        if (continuePromptTextTMP != null) continuePromptTextTMP.text = text;
+        if (continuePromptTextLegacy != null) continuePromptTextLegacy.text = text;
+    }
+
+    /// <summary>
+    /// 检查是否有对话文本组件
+    /// </summary>
+    private bool HasDialogueTextComponent()
+    {
+        return dialogueTextTMP != null || dialogueTextLegacy != null;
     }
 }
