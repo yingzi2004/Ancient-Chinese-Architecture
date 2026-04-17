@@ -34,6 +34,12 @@ public class MinExhibitionDialogueTrigger : MonoBehaviour
         "按 L 键可以推进对话，祝您参观愉快！"
     };
 
+    [Header("高亮设置")]
+    [Tooltip("需要高亮显示的关键字（如：F键、M键）")]
+    [SerializeField] private string[] highlightKeywords;
+    [Tooltip("关键字高亮颜色")]
+    [SerializeField] private Color highlightColor = new Color(1f, 0.84f, 0f); // 默认金色
+
     private GuideDialogueUI guideUI;
     private bool hasTriggered = false;
     private bool isInitialized = false;
@@ -145,8 +151,28 @@ public class MinExhibitionDialogueTrigger : MonoBehaviour
             return;
         }
 
+        // 处理关键字高亮
+        string[] processedLines = new string[welcomeDialogue.Length];
+        string colorHex = ColorUtility.ToHtmlStringRGB(highlightColor);
+
+        for (int i = 0; i < welcomeDialogue.Length; i++)
+        {
+            string line = welcomeDialogue[i];
+            if (highlightKeywords != null && highlightKeywords.Length > 0)
+            {
+                foreach (string kw in highlightKeywords)
+                {
+                    if (!string.IsNullOrEmpty(kw) && line.Contains(kw))
+                    {
+                        line = line.Replace(kw, $"<color=#{colorHex}>{kw}</color>");
+                    }
+                }
+            }
+            processedLines[i] = line;
+        }
+
         // 开始对话
-        guideUI.StartGuideDialogue(guideName, guidePortrait, welcomeDialogue, expressionPortraits);
+        guideUI.StartGuideDialogue(guideName, guidePortrait, processedLines, expressionPortraits);
         hasTriggered = true;
 
         Debug.Log($"MinExhibitionDialogueTrigger: 触发欢迎对话 - 导游: {guideName}, 对话数: {welcomeDialogue.Length}");

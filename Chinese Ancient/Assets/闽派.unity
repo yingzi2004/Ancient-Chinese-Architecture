@@ -994,6 +994,7 @@ MonoBehaviour:
   npcNameTextTMP: {fileID: 0}
   dialogueText: {fileID: 1054267754}
   dialogueTextTMP: {fileID: 0}
+  portraitImage: {fileID: 0}
   playerName: "\u6211"
   parseSpeakerPrefix: 1
   npcDialogueColor: {r: 1, g: 1, b: 1, a: 1}
@@ -2563,11 +2564,14 @@ MonoBehaviour:
   triggerOnce: 1
   guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
   guidePortrait: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
+  expressionPortraits: []
   welcomeDialogue:
   - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
   - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
   - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
 --- !u!114 &372203410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6211,11 +6215,14 @@ MonoBehaviour:
   triggerOnce: 1
   guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
   guidePortrait: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
+  expressionPortraits: []
   welcomeDialogue:
   - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
   - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
   - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
 --- !u!114 &816104291
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6232,9 +6239,12 @@ MonoBehaviour:
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
   portraitSprite: {fileID: 0}
+  expressionPortraits: []
   dialogueLines:
   - "\u8FD9\u91CC\u6709\u4E2A\u62BD\u7B7E\u5C0F\u6E38\u620F"
   - "\u5FEB\u53BB\u63A2\u7D22\u4E00\u4E0B\u5427"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
 --- !u!65 &816104292
 BoxCollider:
@@ -11851,11 +11861,14 @@ MonoBehaviour:
   triggerOnce: 1
   guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
   guidePortrait: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
+  expressionPortraits: []
   welcomeDialogue:
   - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
   - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
   - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
 --- !u!114 &1545286111
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11871,11 +11884,29 @@ MonoBehaviour:
   triggerOnce: 1
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
-  portraitSprite: {fileID: 0}
+  portraitSprite: {fileID: 21300000, guid: ed6dc30c2dc67894b95e7ad48fef27fa, type: 3}
+  expressionPortraits:
+  - {fileID: 21300000, guid: 20eb5e9df3eec9142a002eff85089f49, type: 3}
+  - {fileID: 21300000, guid: 641f1979ccf0a3f46820152ff84d0520, type: 3}
+  - {fileID: 0}
+  - {fileID: 21300000, guid: df6c9b5def95ef841bd0bd52472dde81, type: 3}
+  - {fileID: 21300000, guid: df6c9b5def95ef841bd0bd52472dde81, type: 3}
+  - {fileID: 0}
+  - {fileID: 21300000, guid: 20eb5e9df3eec9142a002eff85089f49, type: 3}
   dialogueLines:
-  - "\u8FD9\u662F\u571F\u697C"
-  - "\u770B\u770B\u5427"
-  - ',....'
+  - "\u5FEB\u770B\u5FEB\u770B\uFF0C\u6211\u4EEC\u5DF2\u7ECF\u5230\u771F\u6B63\u7684\u571F\u697C\u91CC\u5566\u2014\u2014"
+  - "\u5BF9\u5566\u5BA2\u5B98\uFF0C\u5DEE\u70B9\u5FD8\u4E86\u4E00\u4EF6\u8981\u7D27\u4E8B\uFF01\u867D\u7136\u6211\u5E73\u65F6\u559C\u6B22\u5728\u8FB9\u4E0A\u53FD\u53FD\u55B3\u55B3\uFF0C\u4F46\u6211\u6BD5\u7ADF\u53EA\u662F\u4E2A\u5C0F\u5377\u7075\u561B\uFF0C\u7075\u529B\u6709\u9650\uFF0C\u4E0D\u80FD\u65F6\u65F6\u523B\u523B\u8E66\u51FA\u6765\u8BF4\u8BDD..."
+  - "\u4F60\u77A7\u89C1\u89C6\u91CE\u5DE6\u4E0A\u65B9\u90A3\u4E2A\u53F8\u5357\u957F\u52FA\u6CA1\u6709\uFF1F\u90A3\u53EF\u662F\u6211\u597D\u4E0D\u5BB9\u6613\u5BFB\u6765\u7684\u6CD5\u5668\uFF01\u4E13\u95E8\u7528\u6765\u7ED9\u8FF7\u8DEF\u7684\u4EBA\u6307\u65B9\u5411\u7684\u54E6\uFF01"
+  - "\u201C\u7528\u6CD5\u561B\u2026\u2026\u8BF4\u6765\u6709\u70B9\u513F\u53E4\u602A\uFF0C\u4F60\u5F97\u5728\u4F60\u4EEC\u90A3\u4E2A\u4E16\u754C\u7684\u2026\u2026\u5443\u2026\u2026\u4E00\u4E2A\u53EB
+    \u2018\u8BF6\u7B26\u4E00\u2019 \u7684\u673A\u5173\u4E0A\u6309\u4E00\u4E0B\u3002"
+  - "\u6211\u4E5F\u4E0D\u77E5\u9053\u4E3A\u5565\u53EB\u8FD9\u4E2A\u540D\u513F\uFF0C\u5927\u6982\u662F\u4EC0\u4E48\u4E0A\u53E4\u79D8\u6587\uFF1F\u53CD\u6B63\u4F60\u6309\u4E86\u90A3\u4E2A\u673A\u5173\uFF0C\u8FD9\u53F8\u5357\u5C31\u4F1A\u8F6C\u8D77\u6765\uFF0C\u7136\u540E\u2014\u2014\u5679\u5679\uFF01\u4E00\u4E2A\u2018\u5B89\u9759\u7248\u2019\u7684\u5C0F\u5FAE\u5C31\u4F1A\u51FA\u73B0\u5728\u8FD9\u513F\u7B49\u4F60\u53D1\u95EE\u5566\uFF01"
+  - "\u90A3\u4E2A\u5F62\u6001\u7684\u6211\u867D\u7136\u4E0D\u4F1A\u4E3B\u52A8\u642D\u8BDD\uFF0C\u4F46\u4F60\u60F3\u95EE\u4EC0\u4E48\uFF0C\u4E0D\u7BA1\u662F\u592F\u571F\u600E\u4E48\u4E0D\u584C\u3001\u8FD8\u662F\u8FD9\u6728\u5934\u600E\u4E48\u5361\u4F4F\u7684\uFF0C\u5979\u90FD\u77E5\u9053\u5F97\u4E00\u6E05\u4E8C\u695A\uFF01\u5C31\u5F53\u662F\u2026\u2026\u55EF\u2026\u2026\u6211\u5B58\u4E86\u597D\u591A\u597D\u591A\u5B66\u95EE\u7684\u5F71\u5B50\u5728\u91CC\u9762\uFF01"
+  - "\u6240\u4EE5\u4F60\u5C3D\u7BA1\u653E\u5FC3\u53BB\u770B\u5EFA\u7B51\uFF0C\u6709\u60F3\u95EE\u7684\u65F6\u5019\uFF0C\u6309\u90A3\u4E2A\u2018\u8BF6\u7B26\u4E00\u2019\u6447\u6447\u53F8\u5357\uFF0C\u6211\u51C6\u5728\uFF01"
+  highlightKeywords:
+  - "\u4E0D\u80FD\u65F6\u65F6\u523B\u523B\u8E66\u51FA\u6765\u8BF4\u8BDD"
+  - "\u53F8\u5357\u957F\u52FA"
+  - "\u8BF6\u7B26\u4E00"
+  highlightColor: {r: 0.8584906, g: 0.8373152, b: 0.5061855, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
 --- !u!65 &1545286112
 BoxCollider:
@@ -11896,8 +11927,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1.3922518, y: 1, z: 1.4697725}
+  m_Center: {x: 0.19612598, y: 0, z: -0.23488635}
 --- !u!1 &1546339420
 GameObject:
   m_ObjectHideFlags: 0
