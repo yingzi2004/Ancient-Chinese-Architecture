@@ -4902,6 +4902,85 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 267748784}
   m_CullTransparentMesh: 1
+--- !u!1 &315728466
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 315728467}
+  - component: {fileID: 315728469}
+  - component: {fileID: 315728468}
+  m_Layer: 0
+  m_Name: "\u7EE7\u7EED\u63D0\u793A"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &315728467
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 315728466}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.000011444092}
+  m_LocalScale: {x: 0.9999326, y: 0.9999326, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 330049772}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 4796.9995, y: -404.00104}
+  m_SizeDelta: {x: 5000, y: 800}
+  m_Pivot: {x: 0.5, y: 1}
+--- !u!114 &315728468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 315728466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.49803922}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: e3265ab4bf004d28a9537516768c1c75, type: 3}
+    m_FontSize: 200
+    m_FontStyle: 1
+    m_BestFit: 0
+    m_MinSize: 1
+    m_MaxSize: 300
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: "L\u952E\u7EE7\u7EED\u5BF9\u8BDD"
+--- !u!222 &315728469
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 315728466}
+  m_CullTransparentMesh: 1
 --- !u!1 &326369043
 GameObject:
   m_ObjectHideFlags: 0
@@ -5131,6 +5210,7 @@ RectTransform:
   m_LocalScale: {x: 0.05, y: 0.05, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 315728467}
   - {fileID: 1839615715}
   - {fileID: 1434601964}
   - {fileID: 374992875}
@@ -23184,7 +23264,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -6.873, y: 76.931}
+  m_AnchoredPosition: {x: -156, y: -61}
   m_SizeDelta: {x: 1625.117, y: 746}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1157022864
@@ -23230,7 +23310,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -25016,7 +25096,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Enter text...
+  m_text: "\u6709\u4EC0\u4E48\u95EE\u9898\u90FD\u5C3D\u7BA1\u6765\u95EE\u5C0F\u5FAE\u5427\uFF01"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e3641a4e54191bf47b1ab01bbcc02d2d, type: 2}
   m_sharedMaterial: {fileID: -3232881488772099042, guid: e3641a4e54191bf47b1ab01bbcc02d2d, type: 2}
@@ -30443,7 +30523,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 4, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1935363948
@@ -31448,11 +31528,18 @@ MonoBehaviour:
   portraitSprite: {fileID: 21300000, guid: ed6dc30c2dc67894b95e7ad48fef27fa, type: 3}
   expressionPortraits:
   - {fileID: 0}
+  - {fileID: 21300000, guid: df6c9b5def95ef841bd0bd52472dde81, type: 3}
+  - {fileID: 21300000, guid: df6c9b5def95ef841bd0bd52472dde81, type: 3}
   - {fileID: 21300000, guid: 20eb5e9df3eec9142a002eff85089f49, type: 3}
   dialogueLines:
-  - "\u5440\uFF0C\u4F60\u8D70\u5230\u8FD9\u91CC\u5566\uFF0C\u524D\u9762\u5C31\u662F\u571F\u697C\u7684\u5165\u53E3\u4E86\uFF01\u8FDB\u5165\u95E8\u4E2D\u6309\u4E0BF\u952E\u5C31\u53EF\u4EE5\u89E6\u53D1\u4F20\u9001\u4E86\u54E6"
-  - "\u5B83\u5DF2\u7ECF\u51C6\u5907\u597D\uFF0C\u8981\u5E26\u4F60\u770B\u770B\u771F\u6B63\u7684\u571F\u697C\u5566\uFF01\n"
-  highlightKeywords: []
+  - "\u5440\uFF0C\u5BA2\u5B98\u8D70\u5230\u8FD9\u91CC\u5566\uFF01\u524D\u9762\u8FD9\u6247\u95E8\u540E\u5934\uFF0C\u53EF\u5C31\u662F\u771F\u6B63\u7684\u571F\u697C\u5566\u2014\u2014\u4E0D\u662F\u5C55\u677F\uFF0C\u4E0D\u662F\u6A21\u578B\uFF0C\u662F\u5B9E\u5B9E\u5728\u5728\u80FD\u8D70\u8FDB\u53BB\u7684\u90A3\u79CD\uFF01"
+  - "\u4E0D\u8FC7\u8FD9\u95E8\u6709\u70B9\u513F\u53E4\u602A\uFF0C\u5B83\u8BA4\u7684\u662F\u4F60\u4EEC\u90A3\u4E2A\u4E16\u754C\u7684\u89C4\u77E9\u3002\u4F60\u5F97\u8D70\u5230\u95E8\u524D\uFF0C\u5BF9\u7740\u5B83\u6309\u4E00\u4E0B\u2026\u2026\u55EF\u2026\u2026\u90A3\u4E2A\u53EB
+    \u2018\u8BF6\u7B26\u2019 \uFF08F) \u7684\u673A\u5173\u3002\n\uFF08\u5C0F\u5FAE\u6B6A\u6B6A\u5934\uFF0C\u4E00\u8138\u4E0D\u89E3\uFF09\n"
+  - "\u597D\u5947\u602A\u7684\u540D\u5B57\u54E6\u2026\u2026\u4F60\u4EEC\u90A3\u8FB9\u559C\u6B22\u7ED9\u673A\u5173\u8D77\u8FD9\u79CD\u542C\u4E0D\u61C2\u7684\u4EE3\u53F7\u5417\uFF1F"
+  - "\u7B97\u5566\u7B97\u5566\uFF0C\u53CD\u6B63\u5BA2\u5B98\u77E5\u9053\u5C31\u597D\u2014\u2014\u8D70\u5230\u95E8\u524D\uFF0C\u6309\u4E0B\u2018\u8BF6\u7B26\u2019\uFF0C\u54B1\u4EEC\u5C31\u571F\u697C\u89C1\uFF01
+    \u91CC\u5934\u7684\u6881\u67F1\u69AB\u536F\u3001\u592F\u571F\u5899\u9762\uFF0C\u90FD\u7B49\u7740\u5BA2\u5B98\u53BB\u77A7\u5462\uFF01\n"
+  highlightKeywords:
+  - "\uFF08F)"
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
 --- !u!65 &2044520017
@@ -32462,7 +32549,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -872178677, guid: 6047e298e417fd84488fc14cc764b747, type: 3}
+  m_Sprite: {fileID: 1740073778, guid: a3649ad774f7a504d9374c047c7ad100, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
