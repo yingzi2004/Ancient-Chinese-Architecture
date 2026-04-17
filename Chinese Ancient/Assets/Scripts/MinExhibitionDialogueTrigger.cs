@@ -18,8 +18,11 @@ public class MinExhibitionDialogueTrigger : MonoBehaviour
     [SerializeField] private string guideName = "民俗展览讲解员";
 
     [Header("立绘设置")]
-    [Tooltip("导游立绘图片（将显示在对话框左上方）")]
+    [Tooltip("导游默认立绘图片（将显示在对话框左上方）")]
     [SerializeField] private Sprite guidePortrait;
+
+    [Tooltip("针对每句对话的不同表情立绘，可使角色更灵动。数量建议与对话内容一致，若对应位置为空则使用默认立绘。")]
+    [SerializeField] private Sprite[] expressionPortraits;
 
     [Header("欢迎对话内容")]
     [TextArea(3, 10)]
@@ -143,7 +146,7 @@ public class MinExhibitionDialogueTrigger : MonoBehaviour
         }
 
         // 开始对话
-        guideUI.StartGuideDialogue(guideName, guidePortrait, welcomeDialogue);
+        guideUI.StartGuideDialogue(guideName, guidePortrait, welcomeDialogue, expressionPortraits);
         hasTriggered = true;
 
         Debug.Log($"MinExhibitionDialogueTrigger: 触发欢迎对话 - 导游: {guideName}, 对话数: {welcomeDialogue.Length}");
