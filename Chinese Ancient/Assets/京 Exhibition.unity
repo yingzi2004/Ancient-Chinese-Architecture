@@ -6497,7 +6497,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1605334504}
   m_HandleRect: {fileID: 1605334503}
   m_Direction: 0
-  m_Value: 0.5001666
+  m_Value: 0.50024986
   m_Size: 0.9995223
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -8522,7 +8522,7 @@ Transform:
   m_GameObject: {fileID: 508698310}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1176.6183, y: -549.3108, z: 13.196478}
+  m_LocalPosition: {x: -1177, y: -549.3108, z: 13.196478}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -12826,7 +12826,7 @@ Transform:
   m_GameObject: {fileID: 926877994}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1185.266, y: 550.06, z: 3.336}
+  m_LocalPosition: {x: 1184.48, y: 550.06, z: 4.19}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -16255,6 +16255,7 @@ MonoBehaviour:
   jumpHeight: 1.5
   gravity: -19.62
   isInspecting: 0
+  isOnBoat: 0
   cameraTransform: {fileID: 1193753712}
   mouseSensitivity: 2
   rotationSharpness: 50
@@ -18590,7 +18591,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1201.2205, y: 536.68933}
+  m_AnchoredPosition: {x: 1201.62, y: 536.68933}
   m_SizeDelta: {x: 2376, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1357927133
