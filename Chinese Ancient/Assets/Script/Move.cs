@@ -12,6 +12,10 @@ public class PlayerController : MonoBehaviour
     // 新增：检视状态控制
     [HideInInspector]
     public bool isInspecting = false;
+    
+    // 新增：乘船状态控制
+    [HideInInspector]
+    public bool isOnBoat = false;
 
     [Header("--- 视角设置 ---")]
     public Transform cameraTransform;
@@ -156,6 +160,8 @@ public class PlayerController : MonoBehaviour
 
     void HandleMovement()
     {
+        if (isOnBoat) return; // 乘船时禁用人物自身的移动
+
         isGrounded = controller.isGrounded;
         if (isGrounded && velocity.y < 0) velocity.y = -2f; 
 
