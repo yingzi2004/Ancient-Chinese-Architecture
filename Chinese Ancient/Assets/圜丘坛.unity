@@ -900,6 +900,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5978473650095289932, guid: 6060f486b1d757e499db963c05f3707a, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: e924d0417fcf6c645a8e962285b1fd1f, type: 2}
     - target: {fileID: 9143153289700551230, guid: 6060f486b1d757e499db963c05f3707a, type: 3}
       propertyPath: m_Name
       value: SM_Sun_Gate_Roof_A (1)
@@ -20781,13 +20785,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 386276e0871dd2f44a61624f0023680c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerController: {fileID: 0}
   dialoguePanel: {fileID: 1330320488}
   npcNameText: {fileID: 1723600371}
+  npcNameTextTMP: {fileID: 0}
   dialogueText: {fileID: 2100815250}
+  dialogueTextTMP: {fileID: 0}
+  playerName: "\u6211"
+  parseSpeakerPrefix: 1
+  npcDialogueColor: {r: 1, g: 1, b: 1, a: 1}
+  playerDialogueColor: {r: 0.8, g: 0.95, b: 1, a: 1}
+  forcePlayerName: 1
+  replaceNpcTagWithCurrentNpcName: 1
+  replacePlayerTagWithPlayerName: 1
+  maxSpeakerPrefixLength: 8
+  speakerSeparators: ":\uFF1A"
+  defaultNpcName: NPC
+  npcNameColor: {r: 1, g: 1, b: 1, a: 1}
+  playerNameColor: {r: 1, g: 1, b: 1, a: 1}
+  tintNameColor: 0
   optionsContainer: {fileID: 158502983}
   optionButtonPrefab: {fileID: 3454552674252206463, guid: 57531183883921444b49cbbdbb594edf, type: 3}
   typingSpeed: 0.05
   autoCloseDelay: 2.5
+  showContinuePrompt: 1
   continuePromptText: {fileID: 0}
   advanceKey: 32
 --- !u!4 &1919137875
@@ -21021,6 +21042,12 @@ MonoBehaviour:
   player: {fileID: 886212399}
   playerTag: player
   triggerDistance: 3
+  interactKey: 108
+  npcAnimator: {fileID: 0}
+  useBoolParameter: 0
+  waveAnimationTrigger: Wave
+  waveAnimationBool: Wave
+  waveBoolAutoResetSeconds: 0.15
   triggerOnce: 1
   exitDistanceOffset: 1
   showDebugLogs: 1
@@ -21324,6 +21351,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5978473650095289932, guid: 6060f486b1d757e499db963c05f3707a, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: d81f28baac815f3419f2b85ecfc3170d, type: 2}
     - target: {fileID: 9143153289700551230, guid: 6060f486b1d757e499db963c05f3707a, type: 3}
       propertyPath: m_Name
       value: SM_Sun_Gate_Roof_A (3)
