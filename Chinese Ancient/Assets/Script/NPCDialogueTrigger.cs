@@ -129,8 +129,14 @@ public class NPCDialogueTrigger : MonoBehaviour
     [Tooltip("触发距离（米）")]
     public float triggerDistance = 3f;
 
-    [Tooltip("按键触发对话")]
+    [Tooltip("自动触发对话（靠近时自动开始，不需要按键）")]
+    public bool autoTriggerOnApproach = true;
+
+    [Tooltip("按键触发对话（仅在autoTriggerOnApproach=false时有效）")]
     public KeyCode interactKey = KeyCode.L;
+
+    [Tooltip("自动触发延迟时间（秒），避免立即触发")]
+    public float autoTriggerDelay = 0.5f;
 
     [Tooltip("NPC的Animator（用于控制动画）")]
     public Animator npcAnimator;
@@ -172,6 +178,8 @@ public class NPCDialogueTrigger : MonoBehaviour
     private float exitDistance;
     private float debugLogTimer = 0f;
     private Coroutine waveResetCoroutine;
+    private Coroutine autoTriggerCoroutine;
+    private bool dialogueStarted = false;
 
     private void Start()
     {
@@ -313,15 +321,30 @@ public class NPCDialogueTrigger : MonoBehaviour
             Debug.Log($"<color=green>[NPC对话触发器]</color> 玩家进入触发范围！距离: {distance:F2}米");
             isInsideRange = true;
 
-            // 显示提示面板
-            if (showPromptUI && promptPanel != null)
+            // 自动触发模式：延迟后自动开始对话
+            if (autoTriggerOnApproach)
             {
-                promptPanel.SetActive(true);
+                if (!triggerOnce || !hasTriggeredOnce)
+                {
+                    if (autoTriggerCoroutine != null)
+                    {
+                        StopCoroutine(autoTriggerCoroutine);
+                    }
+                    autoTriggerCoroutine = StartCoroutine(AutoTriggerAfterDelay());
+                }
+            }
+            else
+            {
+                // 按键触发模式：显示提示面板
+                if (showPromptUI && promptPanel != null)
+                {
+                    promptPanel.SetActive(true);
+                }
             }
         }
 
-        // 按下互动键：对话推进由 DialogueManager 自己处理；这里仅负责“开启对话”
-        if (Input.GetKeyDown(interactKey))
+        // 按键触发模式（仅在autoTriggerOnApproach=false时有效）
+        if (!autoTriggerOnApproach && Input.GetKeyDown(interactKey))
         {
             if (DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueActive)
             {
@@ -342,6 +365,7 @@ public class NPCDialogueTrigger : MonoBehaviour
                     // 触发对话
                     TriggerDialogue();
                     hasTriggeredOnce = true;
+                    dialogueStarted = true;
                 }
                 else if (triggerOnce && hasTriggeredOnce)
                 {
@@ -358,11 +382,19 @@ public class NPCDialogueTrigger : MonoBehaviour
                 Debug.Log($"<color=yellow>[NPC对话触发器]</color> 玩家离开范围并重置！距离: {distance:F2}米");
                 isInsideRange = false;
 
+                // 取消自动触发协程
+                if (autoTriggerCoroutine != null)
+                {
+                    StopCoroutine(autoTriggerCoroutine);
+                    autoTriggerCoroutine = null;
+                }
+
                 // 结束正在进行的对话
                 if (DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueActive)
                 {
                     Debug.Log("<color=yellow>[NPC对话触发器]</color> 玩家离开，结束对话");
                     DialogueManager.Instance.EndDialogue();
+                    dialogueStarted = false;
                 }
 
                 // 隐藏提示面板
@@ -444,6 +476,43 @@ public class NPCDialogueTrigger : MonoBehaviour
     }
 
     /// <summary>
+    /// 延迟自动触发对话
+    /// </summary>
+    private IEnumerator AutoTriggerAfterDelay()
+    {
+        Debug.Log($"<color=cyan>[NPC对话触发器]</color> {autoTriggerDelay}秒后自动触发对话...");
+
+        yield return new WaitForSeconds(autoTriggerDelay);
+
+        // 检查玩家是否还在范围内
+        if (isInsideRange && player != null)
+        {
+            float distance = Vector3.Distance(transform.position, player.position);
+            if (distance <= triggerDistance)
+            {
+                Debug.Log($"<color=green>[NPC对话触发器]</color> 自动触发对话！距离: {distance:F2}米");
+
+                // 转向玩家
+                FacePlayer();
+
+                // 播放挥手动画
+                PlayWaveAnimation();
+
+                // 触发对话
+                TriggerDialogue();
+                hasTriggeredOnce = true;
+                dialogueStarted = true;
+            }
+            else
+            {
+                Debug.Log($"<color=yellow>[NPC对话触发器]</color> 玩家已离开范围，取消自动触发");
+            }
+        }
+
+        autoTriggerCoroutine = null;
+    }
+
+    /// <summary>
     /// 触发对话
     /// </summary>
     private void TriggerDialogue()
@@ -489,6 +558,14 @@ public class NPCDialogueTrigger : MonoBehaviour
     {
         hasTriggeredOnce = false;
         isInsideRange = false;
+        dialogueStarted = false;
+
+        // 取消正在进行的自动触发
+        if (autoTriggerCoroutine != null)
+        {
+            StopCoroutine(autoTriggerCoroutine);
+            autoTriggerCoroutine = null;
+        }
     }
 
     /// <summary>
