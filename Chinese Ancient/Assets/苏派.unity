@@ -24541,7 +24541,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6e1eeeaf6cd8d9242ba89b32e3dc9fdb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -371614,7 +371614,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 318819801510244394, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 1094.035
       objectReference: {fileID: 0}
     - target: {fileID: 318819801510244394, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -371646,7 +371646,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2238264388738802712, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 1726.7367
       objectReference: {fileID: 0}
     - target: {fileID: 2238264388738802712, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -371682,7 +371682,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2902557653118959552, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 777.68414
       objectReference: {fileID: 0}
     - target: {fileID: 2902557653118959552, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -371710,7 +371710,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7041987131521354730, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 1410.3859
       objectReference: {fileID: 0}
     - target: {fileID: 7041987131521354730, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -371746,7 +371746,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9175691772647429875, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 461.33328
       objectReference: {fileID: 0}
     - target: {fileID: 9175691772647429875, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -374211,7 +374211,9 @@ MonoBehaviour:
   player: {fileID: 623818432}
   playerTag: player
   triggerDistance: 3
+  autoTriggerOnApproach: 1
   interactKey: 108
+  autoTriggerDelay: 0.5
   npcAnimator: {fileID: 0}
   useBoolParameter: 0
   waveAnimationTrigger: Wave
@@ -450992,7 +450994,9 @@ MonoBehaviour:
   player: {fileID: 623818432}
   playerTag: player
   triggerDistance: 3
+  autoTriggerOnApproach: 1
   interactKey: 108
+  autoTriggerDelay: 0.5
   npcAnimator: {fileID: 1940881164}
   useBoolParameter: 1
   waveAnimationTrigger: Wave

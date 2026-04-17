@@ -350,6 +350,7 @@ public class IncenseSmokeEffect : MonoBehaviour
         }
     }
 
+#if UNITY_EDITOR
     /// <summary>
     /// 编辑器快捷方法：通过菜单添加烟雾效果到选中的GameObject
     /// </summary>
@@ -381,4 +382,5 @@ public class IncenseSmokeEffect : MonoBehaviour
             Debug.LogWarning("[香炉烟雾] 请先选择一个GameObject");
         }
     }
+#endif
 }
