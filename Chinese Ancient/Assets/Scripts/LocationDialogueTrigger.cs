@@ -14,11 +14,14 @@ public class LocationDialogueTrigger : MonoBehaviour
     [Tooltip("触发延迟时间（秒）")]
     [SerializeField] private float triggerDelay = 0.3f;
 
+    [Tooltip("初始化延迟（秒），避免刚进场景就触发")]
+    [SerializeField] private float initializationDelay = 2f;
+
     [Tooltip("玩家离开后是否自动隐藏对话")]
-    [SerializeField] private bool autoHideOnExit = false;
+    [SerializeField] private bool autoHideOnExit = true;
 
     [Tooltip("自动隐藏延迟（秒）")]
-    [SerializeField] private float autoHideDelay = 5f;
+    [SerializeField] private float autoHideDelay = 1f;
 
     [Header("对话内容")]
     [SerializeField] private string guideName = "导游";
@@ -35,6 +38,7 @@ public class LocationDialogueTrigger : MonoBehaviour
 
     private bool hasTriggered = false;
     private bool isPlayerInTrigger = false;
+    private bool isInitialized = false;
     private GuideDialogueUI guideUI;
     private Coroutine autoHideCoroutine;
 
@@ -46,12 +50,38 @@ public class LocationDialogueTrigger : MonoBehaviour
         {
             Debug.LogWarning($"LocationDialogueTrigger ({locationDescription}): 未找到GuideDialogueUI！");
         }
+
+        // 延迟初始化，避免刚进场景就触发
+        if (initializationDelay > 0)
+        {
+            Debug.Log($"LocationDialogueTrigger ({locationDescription}): 延迟 {initializationDelay} 秒后开始检测");
+            Invoke(nameof(EnableDetection), initializationDelay);
+        }
+        else
+        {
+            isInitialized = true;
+        }
+    }
+
+    /// <summary>
+    /// 启用检测
+    /// </summary>
+    private void EnableDetection()
+    {
+        isInitialized = true;
+        Debug.Log($"LocationDialogueTrigger ({locationDescription}): 开始检测玩家");
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player"))
             return;
+
+        if (!isInitialized)
+        {
+            Debug.Log($"LocationDialogueTrigger: 未初始化，忽略触发 - {locationDescription}");
+            return;
+        }
 
         if (triggerOnce && hasTriggered)
             return;
