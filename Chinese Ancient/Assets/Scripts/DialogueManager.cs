@@ -634,9 +634,25 @@ public class DialogueManager : MonoBehaviour
         if (dialogueText != null) dialogueText.text = "";
         if (dialogueTextTMP != null) dialogueTextTMP.text = "";
 
-        // 逐字显示文本
-        foreach (char c in text)
+        // 逐字显示文本（支持富文本标签）
+        for (int i = 0; i < text.Length; i++)
         {
+            char c = text[i];
+            
+            // 跳过富文本标签，一次性显示标签本身避免打出来的字符乱码
+            if (c == '<')
+            {
+                int closingIndex = text.IndexOf('>', i);
+                if (closingIndex != -1)
+                {
+                    string tag = text.Substring(i, closingIndex - i + 1);
+                    if (dialogueText != null) dialogueText.text += tag;
+                    if (dialogueTextTMP != null) dialogueTextTMP.text += tag;
+                    i = closingIndex;
+                    continue; // 标签内容不消耗打字时间
+                }
+            }
+
             if (dialogueText != null) dialogueText.text += c;
             if (dialogueTextTMP != null) dialogueTextTMP.text += c;
             yield return new WaitForSeconds(typingSpeed);

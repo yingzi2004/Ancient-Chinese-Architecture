@@ -30,6 +30,12 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
         "按 L 键继续..."
     };
 
+    [Header("高亮设置")]
+    [Tooltip("需要高亮显示的关键字（如：F键、M键）")]
+    [SerializeField] private string[] highlightKeywords;
+    [Tooltip("关键字高亮颜色")]
+    [SerializeField] private Color highlightColor = new Color(1f, 0.84f, 0f); // 默认金色
+
     [Header("调试信息")]
     [SerializeField] private string locationName = "未命名位置";
 
@@ -325,8 +331,28 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
             return;
         }
 
-        // 开始对话 - 使用配置的NPC显示名称
-        dialogueManager.StartAutoDialogue(npcDisplayName, dialogueLines, portraitSprite, expressionPortraits);
+        // 处理关键字高亮
+        string[] processedLines = new string[dialogueLines.Length];
+        string colorHex = ColorUtility.ToHtmlStringRGB(highlightColor);
+
+        for (int i = 0; i < dialogueLines.Length; i++)
+        {
+            string line = dialogueLines[i];
+            if (highlightKeywords != null && highlightKeywords.Length > 0)
+            {
+                foreach (string kw in highlightKeywords)
+                {
+                    if (!string.IsNullOrEmpty(kw) && line.Contains(kw))
+                    {
+                        line = line.Replace(kw, $"<color=#{colorHex}>{kw}</color>");
+                    }
+                }
+            }
+            processedLines[i] = line;
+        }
+
+        // 开始对话 - 使用配置的NPC显示名称和处理后的富文本台词
+        dialogueManager.StartAutoDialogue(npcDisplayName, processedLines, portraitSprite, expressionPortraits);
         hasTriggered = true;
 
         Debug.Log($"[{locationName}] 触发对话成功！对话数量: {dialogueLines.Length}");

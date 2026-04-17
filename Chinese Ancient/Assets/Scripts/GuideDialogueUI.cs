@@ -187,10 +187,24 @@ public class GuideDialogueUI : MonoBehaviour
 
         SetDialogueText("");
 
-        // 逐字显示文本
+        // 逐字显示文本（支持富文本标签）
         string currentText = "";
-        foreach (char c in text)
+        for (int i = 0; i < text.Length; i++)
         {
+            char c = text[i];
+            if (c == '<')
+            {
+                int closingIndex = text.IndexOf('>', i);
+                if (closingIndex != -1)
+                {
+                    string tag = text.Substring(i, closingIndex - i + 1);
+                    currentText += tag;
+                    SetDialogueText(currentText);
+                    i = closingIndex;
+                    continue; // 标签内容不消耗打字时间
+                }
+            }
+
             currentText += c;
             SetDialogueText(currentText);
             yield return new WaitForSeconds(typingSpeed);
