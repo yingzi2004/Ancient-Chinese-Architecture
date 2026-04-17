@@ -4602,6 +4602,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
+      propertyPath: Hour
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: TabNumber
       value: 0
       objectReference: {fileID: 0}
@@ -4609,6 +4613,10 @@ PrefabInstance:
       propertyPath: PlayerCamera
       value: 
       objectReference: {fileID: 1154393845}
+    - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
+      propertyPath: StartingHour
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: PlayerTransform
       value: 
@@ -4620,6 +4628,34 @@ PrefabInstance:
     - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: GetPlayerAtRuntime
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
+      propertyPath: SunSize.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
+      propertyPath: MoonSize.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
+      propertyPath: DetectionLayerMask.m_Bits
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
+      propertyPath: TemperatureCurve.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
+      propertyPath: SunIntensityCurve.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
+      propertyPath: PrecipitationGraph.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
+      propertyPath: TemperatureFluctuation.m_RotationOrder
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 114651210412826156, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: PlayerTag
@@ -4683,7 +4719,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 318819801510244394, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 1094.035
       objectReference: {fileID: 0}
     - target: {fileID: 318819801510244394, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -4703,7 +4739,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2238264388738802712, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 1726.7367
       objectReference: {fileID: 0}
     - target: {fileID: 2238264388738802712, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -4739,7 +4775,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2902557653118959552, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 777.68414
       objectReference: {fileID: 0}
     - target: {fileID: 2902557653118959552, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -4759,7 +4795,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7041987131521354730, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 1410.3859
       objectReference: {fileID: 0}
     - target: {fileID: 7041987131521354730, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -4783,7 +4819,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9175691772647429875, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 461.33328
       objectReference: {fileID: 0}
     - target: {fileID: 9175691772647429875, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: m_AnchoredPosition.y
