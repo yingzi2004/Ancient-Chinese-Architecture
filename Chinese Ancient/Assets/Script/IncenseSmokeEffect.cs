@@ -59,7 +59,7 @@ public class IncenseSmokeEffect : MonoBehaviour
     [Tooltip("自定义烟雾材质（留空则使用默认粒子材质）")]
     public Material customSmokeMaterial;
 
-    private ParticleSystem particleSystem;
+    private ParticleSystem customParticleSys;
     private ParticleSystem.MainModule mainModule;
     private ParticleSystem.EmissionModule emissionModule;
     private ParticleSystem.ShapeModule shapeModule;
@@ -70,7 +70,7 @@ public class IncenseSmokeEffect : MonoBehaviour
 
     private void Awake()
     {
-        particleSystem = GetComponent<ParticleSystem>();
+        customParticleSys = GetComponent<ParticleSystem>();
 
         // 配置粒子系统
         ConfigureParticleSystem();
@@ -90,12 +90,12 @@ public class IncenseSmokeEffect : MonoBehaviour
     private void ConfigureParticleSystem()
     {
         // 获取各个模块
-        mainModule = particleSystem.main;
-        emissionModule = particleSystem.emission;
-        shapeModule = particleSystem.shape;
-        velocityModule = particleSystem.velocityOverLifetime;
-        colorModule = particleSystem.colorOverLifetime;
-        sizeModule = particleSystem.sizeOverLifetime;
+        mainModule = customParticleSys.main;
+        emissionModule = customParticleSys.emission;
+        shapeModule = customParticleSys.shape;
+        velocityModule = customParticleSys.velocityOverLifetime;
+        colorModule = customParticleSys.colorOverLifetime;
+        sizeModule = customParticleSys.sizeOverLifetime;
 
         // === 主模块设置 ===
         mainModule.maxParticles = maxParticles;
@@ -173,7 +173,7 @@ public class IncenseSmokeEffect : MonoBehaviour
         sizeModule.size = new ParticleSystem.MinMaxCurve(1f, sizeCurve);
 
         // === 旋转模块设置 ===
-        var rotationModule = particleSystem.rotationOverLifetime;
+        var rotationModule = customParticleSys.rotationOverLifetime;
         rotationModule.enabled = true;
         rotationModule.separateAxes = false;
 
@@ -184,7 +184,7 @@ public class IncenseSmokeEffect : MonoBehaviour
         rotationModule.z = rotationCurve;
 
         // === 渲染器设置 ===
-        particleRenderer = particleSystem.GetComponent<ParticleSystemRenderer>();
+        particleRenderer = customParticleSys.GetComponent<ParticleSystemRenderer>();
         if (particleRenderer != null)
         {
             particleRenderer.renderMode = ParticleSystemRenderMode.Billboard;
@@ -255,7 +255,7 @@ public class IncenseSmokeEffect : MonoBehaviour
     /// </summary>
     public void PlaySmoke()
     {
-        particleSystem.Play();
+        customParticleSys.Play();
         Debug.Log("[香炉烟雾] 烟雾效果已启动");
     }
 
@@ -264,7 +264,7 @@ public class IncenseSmokeEffect : MonoBehaviour
     /// </summary>
     public void StopSmoke()
     {
-        particleSystem.Stop();
+        customParticleSys.Stop();
         Debug.Log("[香炉烟雾] 烟雾效果已停止");
     }
 
@@ -273,7 +273,7 @@ public class IncenseSmokeEffect : MonoBehaviour
     /// </summary>
     public void PauseSmoke()
     {
-        particleSystem.Pause();
+        customParticleSys.Pause();
         Debug.Log("[香炉烟雾] 烟雾效果已暂停");
     }
 
@@ -283,8 +283,8 @@ public class IncenseSmokeEffect : MonoBehaviour
     public void SetSmokeIntensity(float intensity)
     {
         intensity = Mathf.Clamp01(intensity);
-        mainModule = particleSystem.main;
-        emissionModule = particleSystem.emission;
+        mainModule = customParticleSys.main;
+        emissionModule = customParticleSys.emission;
 
         // 调整发射速率
         emissionModule.rateOverTime = emissionRate * intensity;
@@ -300,7 +300,7 @@ public class IncenseSmokeEffect : MonoBehaviour
     /// </summary>
     public void SetSmokeColor(Color newColor)
     {
-        mainModule = particleSystem.main;
+        mainModule = customParticleSys.main;
         mainModule.startColor = newColor;
         smokeColor = newColor;
 
