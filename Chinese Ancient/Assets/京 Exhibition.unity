@@ -4435,7 +4435,7 @@ Transform:
   m_GameObject: {fileID: 195406488}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.46, y: 0.17, z: 3.05}
+  m_LocalPosition: {x: 3.9915056, y: 0.6586431, z: 1.7870979}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4457,11 +4457,14 @@ MonoBehaviour:
   triggerOnce: 1
   guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
   guidePortrait: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
+  expressionPortraits: []
   welcomeDialogue:
   - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
   - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
   - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
 --- !u!114 &195406491
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4477,10 +4480,17 @@ MonoBehaviour:
   triggerOnce: 1
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
-  portraitSprite: {fileID: 0}
+  portraitSprite: {fileID: 21300000, guid: d0675f73109c3e4498154f48a6726c41, type: 3}
+  expressionPortraits:
+  - {fileID: 21300000, guid: d110b26242fd17e4abba588f56c59f6a, type: 3}
+  - {fileID: 21300000, guid: 75a90b6bb3626cb4b92d356d1538e904, type: 3}
+  - {fileID: 21300000, guid: d86bbc0b2e35bee41850cc1b59ee7a2d, type: 3}
   dialogueLines:
-  - "\u8FD9\u91CC\u6709\u4E00\u4E2A\u5929\u575B\u7684\u5C0F\u6A21\u578B"
-  - "\u53F3\u8FB9\u6709\u4E00\u4E2A\u5C0F\u89C6\u9891\u53EF\u4EE5\u89C2\u770B\u54E6"
+  - "\u5BA2\u5B98\u4F60\u77A7\u90A3\u7948\u5E74\u6BBF\u2014\u2014\u938F\u91D1\u7684\u5B9D\u9876\u76F4\u6307\u5929\u7A79\uFF0C\u50CF\u662F\u8DDF\u5929\u8001\u7237\u8BF4\u8BDD\u4F3C\u7684\u3002\u4E09\u5C42\u84DD\u7409\u7483\u7684\u5C4B\u6A90\uFF0C\u4E00\u5708\u5708\u6536\u62E2\u4E0A\u53BB\uFF0C\u7A33\u7A33\u5F53\u5F53\uFF0C\u53C8\u900F\u7740\u4E00\u80A1\u5B50\u5411\u4E0A\u7684\u52B2\u513F\u3002\u53E4\u4EBA\u7BA1\u8FD9\u53EB\u2018\u6512\u5C16\u9876\u2019\uFF0C\u53EF\u5C0F\u5FAE\u89C9\u5F97\uFF0C\u8FD9\u4E0D\u5C31\u662F\u628A\u4EBA\u95F4\u7684\u7948\u613F\u4E00\u5C42\u5C42\u9001\u5230\u5929\u4E0A\u53BB\u561B\uFF01"
+  - "\u8FD8\u6709\u5462\uFF0C\u6BBF\u91CC\u5934\u90A3\u4E8C\u5341\u516B\u6839\u5927\u67F1\u5B50\uFF0C\u53EF\u4E0D\u662F\u968F\u4FBF\u7ACB\u7684\u2014\u2014\u4E2D\u95F4\u56DB\u6839\u63CF\u7740\u91D1\u82B1\u7684\u53EB\u2018\u9F99\u4E95\u67F1\u2019\uFF0C\u5B88\u7740\u6625\u590F\u79CB\u51AC\u56DB\u5B63\uFF1B\u5F80\u5916\u4E00\u5708\u5341\u4E8C\u6839\uFF0C\u7BA1\u7740\u4E00\u5E74\u7684\u5341\u4E8C\u4E2A\u6708\uFF1B\u6700\u5916\u5934\u5341\u4E8C\u6839\uFF0C\u5B88\u7740\u4E00\u65E5\u7684\u5341\u4E8C\u4E2A\u65F6\u8FB0\u3002\u52A0\u8D77\u6765\u4E8C\u5341\u56DB\u6839\uFF0C\u6B63\u5BF9\u4E8C\u5341\u56DB\u8282\u6C14\uFF0C\u518D\u52A0\u4E2D\u95F4\u56DB\u6839\uFF0C\u521A\u597D\u4E8C\u5341\u516B\u661F\u5BBF\uFF01"
+  - "\u4E00\u6839\u67F1\u5B50\u4E00\u4E2A\u6570\uFF0C\u4E00\u4E2A\u6570\u4E00\u4E2A\u610F\u601D\uFF0C\u53E4\u4EBA\u628A\u4E00\u6574\u5E74\u7684\u65E5\u5B50\u3001\u4E00\u6574\u7247\u5929\uFF0C\u90FD\u5B89\u5B89\u9759\u9759\u7801\u5728\u8FD9\u6BBF\u91CC\u4E86\u3002\u4F60\u8BF4\u4ED6\u4EEC\u662F\u4E0D\u662F\u628A\u5929\u5730\u90FD\u88C5\u5728\u5FC3\u91CC\u4E86\uFF1F"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
 --- !u!65 &195406492
 BoxCollider:
@@ -4501,8 +4511,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1.3954496, y: 1, z: 1.8539972}
+  m_Center: {x: 0.19772482, y: 0, z: -0.42699862}
 --- !u!1 &203330117
 GameObject:
   m_ObjectHideFlags: 0
@@ -6497,8 +6507,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1605334504}
   m_HandleRect: {fileID: 1605334503}
   m_Direction: 0
-  m_Value: 0.5000833
-  m_Size: 0.9995224
+  m_Value: 0.50033313
+  m_Size: 0.9995222
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -8105,6 +8115,7 @@ Transform:
   m_Children:
   - {fileID: 452422914}
   - {fileID: 195406489}
+  - {fileID: 1288456497}
   - {fileID: 1218482999}
   - {fileID: 1206340766}
   - {fileID: 2021667390}
@@ -8138,7 +8149,7 @@ Transform:
   m_GameObject: {fileID: 452422913}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.38, y: 0.34, z: -6.708}
+  m_LocalPosition: {x: -2.38, y: 0.34, z: -6.361}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8160,11 +8171,14 @@ MonoBehaviour:
   triggerOnce: 1
   guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
   guidePortrait: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
+  expressionPortraits: []
   welcomeDialogue:
   - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
   - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
   - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
 --- !u!114 &452422916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8180,10 +8194,19 @@ MonoBehaviour:
   triggerOnce: 1
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
-  portraitSprite: {fileID: 0}
+  portraitSprite: {fileID: 21300000, guid: d0675f73109c3e4498154f48a6726c41, type: 3}
+  expressionPortraits:
+  - {fileID: 0}
+  - {fileID: 21300000, guid: d86bbc0b2e35bee41850cc1b59ee7a2d, type: 3}
+  - {fileID: 0}
+  - {fileID: 21300000, guid: d86bbc0b2e35bee41850cc1b59ee7a2d, type: 3}
   dialogueLines:
-  - "\u8FD9\u91CC\u5C31\u662F\u4EAC\u6D3E\u7684\u573A\u9986\u4E86"
-  - "\u5FEB\u8FDB\u53BB\u770B\u770B\u5427"
+  - "\u5BA2\u5B98\uFF01\u54B1\u4EEC\u5230\u5566\u2014\u2014\u5317\u4EAC\u5929\u575B\u7684\u5C55\u9986\uFF01"
+  - "\u4F60\u77A7\u6211\u8FD9\u8EAB\u6253\u626E\uFF01\u9701\u84DD\u7684\u8863\u88F3\uFF0C\u938F\u91D1\u7684\u7EB9\u6837\u2014\u2014\u662F\u4E0D\u662F\u8DDF\u90A3\u7948\u5E74\u6BBF\u7684\u84DD\u74E6\u91D1\u9876\u4E00\u4E2A\u6A21\u5B50\u51FA\u6765\u7684\uFF1F"
+  - "\u8FD9\u4E00\u8DEF\u4ECE\u5357\u8D70\u5230\u5317\uFF0C\u571F\u697C\u7684\u592F\u571F\u3001\u56ED\u6797\u7684\u82B1\u7A97\u3001\u5927\u9662\u7684\u7816\u96D5\u2026\u2026\u5982\u4ECA\u5440\uFF0C\u54B1\u4EEC\u603B\u7B97\u5230\u4E86\u8FD9\u538B\u8F74\u7684\u4E00\u7AD9\u5566"
+  - "\u7B49\u628A\u8FD9\u5C55\u9986\u91CC\u7684\u95E8\u9053\u77A7\u660E\u767D\u4E86\uFF0C\u54B1\u4EEC\u5C31\u53BB\u90A3\u771F\u6B63\u7684\u5929\u575B\uFF0C\u90A3\u624D\u662F\u8FD9\u8D9F\u65C5\u7A0B\u6700\u6C14\u6D3E\u7684\u6536\u5C3E\u5462\uFF01\u5BA2\u5B98\u6162\u6162\u901B\uFF0C\u6211\u5019\u7740\uFF01"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
 --- !u!65 &452422917
 BoxCollider:
@@ -11146,8 +11169,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 6be84cad538aa374e805ff6cb2e3a981, type: 2}
-  m_sharedMaterial: {fileID: 738485329921420126, guid: 6be84cad538aa374e805ff6cb2e3a981, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e3641a4e54191bf47b1ab01bbcc02d2d, type: 2}
+  m_sharedMaterial: {fileID: -3232881488772099042, guid: e3641a4e54191bf47b1ab01bbcc02d2d, type: 2}
   m_fontSharedMaterials:
   - {fileID: 738485329921420126, guid: 6be84cad538aa374e805ff6cb2e3a981, type: 2}
   m_fontMaterial: {fileID: 0}
@@ -11237,7 +11260,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 738485329921420126, guid: 6be84cad538aa374e805ff6cb2e3a981, type: 2}
+  - {fileID: -3232881488772099042, guid: e3641a4e54191bf47b1ab01bbcc02d2d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -13602,7 +13625,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2774, y: -523}
+  m_AnchoredPosition: {x: -1108, y: 970}
   m_SizeDelta: {x: 5000, y: 800}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &1026969562
@@ -13646,7 +13669,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
+  m_Text: "\u5C0F\u5FAE"
 --- !u!1001 &1032799689
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15627,7 +15650,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -104, y: 72}
+  m_AnchoredPosition: {x: -104, y: -241}
   m_SizeDelta: {x: 7000, y: 1500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1147051190
@@ -16255,6 +16278,7 @@ MonoBehaviour:
   jumpHeight: 1.5
   gravity: -19.62
   isInspecting: 0
+  isOnBoat: 0
   cameraTransform: {fileID: 1193753712}
   mouseSensitivity: 2
   rotationSharpness: 50
@@ -18004,6 +18028,118 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1288456496
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1288456497}
+  - component: {fileID: 1288456500}
+  - component: {fileID: 1288456499}
+  - component: {fileID: 1288456498}
+  m_Layer: 0
+  m_Name: "\u7EB8\u724C"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1288456497
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288456496}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.676715, y: 0.44909215, z: 9.103}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 449632229}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1288456498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288456496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d7f3758a5a54154c8cb7b69ac03a5b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggerDelay: 0.5
+  triggerOnce: 1
+  guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
+  guidePortrait: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
+  expressionPortraits: []
+  welcomeDialogue:
+  - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
+  - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
+  - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
+  - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+--- !u!114 &1288456499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288456496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b519bef13f851e498ea3de1c5e8e5b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggerOnce: 1
+  triggerDelay: 0.3
+  npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
+  portraitSprite: {fileID: 21300000, guid: d0675f73109c3e4498154f48a6726c41, type: 3}
+  expressionPortraits:
+  - {fileID: 0}
+  - {fileID: 21300000, guid: d86bbc0b2e35bee41850cc1b59ee7a2d, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 21300000, guid: 75a90b6bb3626cb4b92d356d1538e904, type: 3}
+  - {fileID: 21300000, guid: d86bbc0b2e35bee41850cc1b59ee7a2d, type: 3}
+  dialogueLines:
+  - "\u5BA2\u5B98\u5BA2\u5B98\uFF0C\u4F60\u77A7\u524D\u5934\u90A3\u65B9\u5C0F\u5C0F\u7684\u571C\u4E18\u6A21\u578B\u2014\u2014"
+  - "\u8FD9\u4E0A\u5934\u53EF\u85CF\u4E86\u4E2A\u597D\u73A9\u7684\u5C0F\u628A\u620F\uFF01\u8D70\u8FDB\u53BB\u5440\uFF0C\u773C\u524D\u4F1A\u8E66\u51FA\u597D\u591A\u597D\u591A\u5F20\u724C\u513F\uFF0C\u80CC\u9762\u51B2\u7740\u4F60\uFF0C\u7B49\u4F60\u6765\u7FFB\u3002"
+  - "\u724C\u9762\u4E0A\u5370\u7684\u90FD\u662F\u5929\u575B\u7684\u6A21\u6837\u2014\u2014\u7948\u5E74\u6BBF\u7684\u84DD\u74E6\u3001\u571C\u4E18\u7684\u77F3\u9636\u3001\u56DE\u97F3\u58C1\u7684\u5F27\u5899\u2026\u2026\u4E00\u5F20\u4E00\u5F20\uFF0C\u628A\u5929\u575B\u7684\u89D2\u89D2\u843D\u843D\u90FD\u85CF\u5728\u91CC\u5934\u5566\u3002"
+  - "\u73A9\u6CD5\u7B80\u5355\u5F97\u5F88\uFF0C\u7FFB\u4E00\u5F20\uFF0C\u518D\u7FFB\u4E00\u5F20\u3002\u4E24\u5F20\u4E00\u4E2A\u6837\u513F\uFF0C\u5B83\u4EEC\u5C31\u4E56\u4E56\u644A\u7740\uFF1B\u4E0D\u4E00\u6837\u5462\uFF0C\u4FBF\u81EA\u4E2A\u513F\u7FFB\u56DE\u53BB\u3002\u5168\u7FFB\u5F00\u4E86\uFF0C\u5C31\u7B97\u8D62\uFF01"
+  - "\u4E0D\u8FC7\u5BA2\u5B98\uFF0C\u8FD9\u53EF\u4E0D\u662F\u4EC0\u4E48\u8981\u7D27\u7684\u8003\u9A8C\uFF0C\u5C31\u662F\u4E2A\u6B47\u6B47\u811A\u3001\u7EC3\u7EC3\u773C\u529B\u7684\u5C0F\u73A9\u610F\u513F\u3002\u60F3\u73A9\u591A\u4E45\u73A9\u591A\u4E45\uFF0C\u4E0D\u60F3\u73A9\u4E86\uFF0C\u968F\u65F6\u8D70\u5F00\u4FBF\u662F"
+  - "\u53BB\u5427\u53BB\u5427\uFF0C\u8BD5\u8BD5\u773C\u529B\uFF0C\u987A\u4FBF\u77A7\u77A7\u5929\u575B\u7684\u597D\u6A21\u6837\uFF01"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+--- !u!65 &1288456500
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288456496}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.9791479, y: 1.4002824, z: 1.8539972}
+  m_Center: {x: 0.28863287, y: -0.20014134, z: -0.42699862}
 --- !u!1 &1309144478
 GameObject:
   m_ObjectHideFlags: 0
@@ -26013,8 +26149,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b733dd4dfb77e4b4d87ed33ddfd92ad0, type: 2}
-  m_sharedMaterial: {fileID: -654565752387396225, guid: b733dd4dfb77e4b4d87ed33ddfd92ad0, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e3641a4e54191bf47b1ab01bbcc02d2d, type: 2}
+  m_sharedMaterial: {fileID: -3232881488772099042, guid: e3641a4e54191bf47b1ab01bbcc02d2d, type: 2}
   m_fontSharedMaterials:
   - {fileID: -654565752387396225, guid: b733dd4dfb77e4b4d87ed33ddfd92ad0, type: 2}
   - {fileID: 2013284670}
@@ -26105,7 +26241,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -654565752387396225, guid: b733dd4dfb77e4b4d87ed33ddfd92ad0, type: 2}
+  - {fileID: -3232881488772099042, guid: e3641a4e54191bf47b1ab01bbcc02d2d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -26263,11 +26399,14 @@ MonoBehaviour:
   triggerOnce: 1
   guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
   guidePortrait: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
+  expressionPortraits: []
   welcomeDialogue:
   - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
   - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
   - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
 --- !u!114 &2003621371
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26281,14 +26420,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.1, g: 0.1, b: 0.1, a: 0.9}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 04f3a7eb408b97e4eb619047db9b977b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -26930,6 +27069,7 @@ MonoBehaviour:
   npcNameTextTMP: {fileID: 0}
   dialogueText: {fileID: 1147051191}
   dialogueTextTMP: {fileID: 0}
+  portraitImage: {fileID: 0}
   playerName: "\u6211"
   parseSpeakerPrefix: 1
   npcDialogueColor: {r: 1, g: 1, b: 1, a: 1}

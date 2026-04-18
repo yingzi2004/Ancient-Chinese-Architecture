@@ -6048,7 +6048,7 @@ Transform:
   m_GameObject: {fileID: 418357556}
   serializedVersion: 2
   m_LocalRotation: {x: -0.003921453, y: -0, z: -0, w: 0.9999923}
-  m_LocalPosition: {x: -2.7520037, y: 0.20342457, z: -7.5515404}
+  m_LocalPosition: {x: 2.858, y: 0.334, z: 2.749}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6093,13 +6093,21 @@ MonoBehaviour:
   triggerOnce: 1
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
-  portraitSprite: {fileID: 0}
-  expressionPortraits: []
+  portraitSprite: {fileID: 21300000, guid: 5a5dd07a7cc5b8240a4e552535fe2fd5, type: 3}
+  expressionPortraits:
+  - {fileID: 0}
+  - {fileID: 21300000, guid: db900c40afa5ba049a1b31455c9d4df9, type: 3}
+  - {fileID: 0}
+  - {fileID: 21300000, guid: db900c40afa5ba049a1b31455c9d4df9, type: 3}
   dialogueLines:
-  - "\u664B\u573A\u9986"
-  - ......
-  highlightKeywords: []
-  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  - "\u5BA2\u5B98\uFF0C\u4F60\u77A7\u8FD9\u7EA2\u706F\u7B3C\u2026\u2026\u662F\u4E0D\u662F\u50CF\u628A\u6574\u5EA7\u5927\u9662\u7684\u65E7\u6545\u4E8B\u90FD\u7167\u4EAE\u5566\uFF1F"
+  - "\u8FD9\u664B\u5546\u7684\u5927\u9662\u513F\u554A\uFF0C\u8BB2\u7A76\u7684\u5C31\u662F\u4E00\u4E2A\u2018\u6734\u539A\u2019\u3002\u4F60\u77A7\u6211\u8FD9\u8EAB\u8863\u88F3\uFF0C\u662F\u4E0D\u662F\u4E5F\u67D3\u4E0A\u4E86\u8FD9\u9752\u7816\u7070\u74E6\u4E0E\u7EA2\u706F\u7B3C\u7684\u6C14\u97F5\uFF1F"
+  - "\u65E2\u7136\u5230\u4E86\u8FD9\u513F\uFF0C\u5C0F\u5FAE\u5F97\u5E26\u4F60\u77A7\u4E2A\u8FD9\u91CC\u9876\u597D\u73A9\u513F\u7684\u5B9D\u8D1D\u2014\u2014\u7941\u53BF\u526A\u7EB8\uFF01\u8FD9\u53EF\u662F\u4F20\u4E86\u4E00\u5343\u4E03\u767E\u591A\u5E74\u7684\u8001\u624B\u827A\u4E86\uFF0C\u4E00\u628A\u526A\u5200\uFF0C\u4E00\u5F20\u7EA2\u7EB8\uFF0C\u5C31\u80FD\u53D8\u51FA\u82B1\u9E1F\u9C7C\u866B\uFF0C\u751A\u81F3\u8FD8\u80FD\u628A\u8FD9\u5927\u9662\u91CC\u7684\u798F\u6C14\u7ED9\u526A\u51FA\u6765\u5462\uFF01"
+  - "\u6765\u6765\u6765\uFF0C\u5BA2\u5B98\u4E5F\u522B\u5149\u542C\u6211\u8BF4\uFF0C\u90A3\u8FB9\u684C\u4E0A\u7EB8\u7B14\u90FD\u5907\u597D\u5566\u3002\u54B1\u4EEC\u4E5F\u52A8\u624B\u8BD5\u8BD5\uFF0C\u526A\u4E2A\u2018\u9C7C\u620F\u83B2\u2019\u7684\u7EB9\u6837\u5E26\u56DE\u53BB\uFF1F\u8FD9\u9C7C\u513F\u7ED5\u7740\u83B2\u82B1\u6E38\u554A\u6E38\uFF0C\u526A\u7684\u53EF\u4E0D\u53EA\u662F\u597D\u770B\uFF0C\u91CC\u5934\u8FD8\u85CF\u7740\u2018\u8FDE\u5E74\u6709\u4F59\u2019\u7684\u597D\u5F69\u5934\u5462\uFF01"
+  highlightKeywords:
+  - "\u7941\u53BF\u526A\u7EB8"
+  - "\u9C7C\u620F\u83B2"
+  highlightColor: {r: 0.8301887, g: 0.16838734, b: 0.18219958, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
 --- !u!65 &418357560
 BoxCollider:
@@ -6120,110 +6128,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &425985836
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 425985837}
-  - component: {fileID: 425985840}
-  - component: {fileID: 425985839}
-  - component: {fileID: 425985838}
-  m_Layer: 0
-  m_Name: "\u5927\u95E8"
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &425985837
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 425985836}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.003921453, y: -0, z: -0, w: 0.9999923}
-  m_LocalPosition: {x: 0.65, y: -0.13, z: 1.848}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1893148722}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &425985838
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 425985836}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d7f3758a5a54154c8cb7b69ac03a5b6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  triggerDelay: 0.5
-  triggerOnce: 1
-  guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
-  guidePortrait: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
-  expressionPortraits: []
-  welcomeDialogue:
-  - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
-  - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
-  - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
-  - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
-  highlightKeywords: []
-  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
---- !u!114 &425985839
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 425985836}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b519bef13f851e498ea3de1c5e8e5b5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  triggerOnce: 1
-  triggerDelay: 0.3
-  npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
-  portraitSprite: {fileID: 0}
-  expressionPortraits: []
-  dialogueLines:
-  - "\u8FD9\u91CC\u7684\u5899\u4E0A\u6709\u4E00\u4E2A\u89C6\u9891"
-  - "\u770B\u4E00\u4E0B"
-  highlightKeywords: []
-  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
-  locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
---- !u!65 &425985840
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 425985836}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1.114666, y: 1.3096383, z: 1.5280154}
+  m_Center: {x: -0.057332993, y: 0.04458198, z: -0.089573026}
 --- !u!1 &432875032
 GameObject:
   m_ObjectHideFlags: 0
@@ -25093,7 +24999,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 418357557}
-  - {fileID: 425985837}
   - {fileID: 1992398613}
   - {fileID: 618026774}
   - {fileID: 354436390}
