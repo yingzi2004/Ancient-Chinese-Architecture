@@ -27,7 +27,11 @@ public class ShadowSoftener : MonoBehaviour {
                 l.shadows = LightShadows.Soft; // 强制使用软阴影
             }
         }
-        RenderSettings.ambientLight = new Color(0.8f, 0.8f, 0.8f); // 提亮全局环境光，减少死黑
-        DynamicGI.UpdateEnvironment(); // 强制刷新环境光照（非常重要，修复传送后变暗的问题）
+        
+        // 当开启天气系统时，不应锁死高亮的全局环境光，这会导致夜间过亮。
+        // 若完全不应用，则删除或注释以下两行即可。
+        // 如果仍想单独对夜间压暗，可以引入对UniStormSystem的时间判断，但通常建议交由天气系统自身处理环境光渐变。
+        // RenderSettings.ambientLight = new Color(0.8f, 0.8f, 0.8f); // 原本这行锁死了高亮
+        // DynamicGI.UpdateEnvironment();
     }
 }
