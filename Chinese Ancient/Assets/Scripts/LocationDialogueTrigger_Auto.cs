@@ -17,7 +17,11 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
 
     [Header("对话内容")]
     [SerializeField] private string npcDisplayName = "按L键继续  小微"; // NPC显示名称
-    [SerializeField] private Sprite portraitSprite; // 立绘图片（可在Inspector中设置）
+    [SerializeField] private Sprite portraitSprite; // 默认立绘图片
+
+    [Tooltip("针对每句对话的不同表情立绘差分。若不为空且有图片，播放该句对话时将切换为对应的表情。")]
+    [SerializeField] private Sprite[] expressionPortraits;
+
     [TextArea(3, 10)]
     [SerializeField] private string[] dialogueLines = new string[]
     {
@@ -25,6 +29,12 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
         "这里有精彩的展品等待您的探索。",
         "按 L 键继续..."
     };
+
+    [Header("高亮设置")]
+    [Tooltip("需要高亮显示的关键字（如：F键、M键）")]
+    [SerializeField] private string[] highlightKeywords;
+    [Tooltip("关键字高亮颜色")]
+    [SerializeField] private Color highlightColor = new Color(1f, 0.84f, 0f); // 默认金色
 
     [Header("调试信息")]
     [SerializeField] private string locationName = "未命名位置";
@@ -137,6 +147,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
 
         // 设置DialogueManager的引用
         dialogueManager.dialoguePanel = panelObj;
+        dialogueManager.portraitImage = portraitObj.GetComponent<Image>();
         dialogueManager.npcNameText = nameObj.GetComponent<Text>();
         dialogueManager.dialogueText = dialogueObj.GetComponent<Text>();
         dialogueManager.continuePromptText = continueObj.GetComponent<Text>();
@@ -199,7 +210,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
         if (spriteToUse != null)
         {
             portraitImage.sprite = spriteToUse;
-            portraitImage.preserveAspect = true; // 保持图片比例
+            portraitImage.preserveAspect = true; // 保持图片比例适配，防止变形
             Debug.Log($"[{locationName}] 成功加载立绘图片");
         }
         else
@@ -320,8 +331,28 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
             return;
         }
 
-        // 开始对话 - 使用配置的NPC显示名称
-        dialogueManager.StartAutoDialogue(npcDisplayName, dialogueLines);
+        // 处理关键字高亮
+        string[] processedLines = new string[dialogueLines.Length];
+        string colorHex = ColorUtility.ToHtmlStringRGB(highlightColor);
+
+        for (int i = 0; i < dialogueLines.Length; i++)
+        {
+            string line = dialogueLines[i];
+            if (highlightKeywords != null && highlightKeywords.Length > 0)
+            {
+                foreach (string kw in highlightKeywords)
+                {
+                    if (!string.IsNullOrEmpty(kw) && line.Contains(kw))
+                    {
+                        line = line.Replace(kw, $"<color=#{colorHex}>{kw}</color>");
+                    }
+                }
+            }
+            processedLines[i] = line;
+        }
+
+        // 开始对话 - 使用配置的NPC显示名称和处理后的富文本台词
+        dialogueManager.StartAutoDialogue(npcDisplayName, processedLines, portraitSprite, expressionPortraits);
         hasTriggered = true;
 
         Debug.Log($"[{locationName}] 触发对话成功！对话数量: {dialogueLines.Length}");

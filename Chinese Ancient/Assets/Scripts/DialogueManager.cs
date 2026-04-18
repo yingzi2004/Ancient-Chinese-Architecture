@@ -28,6 +28,9 @@ public class DialogueManager : MonoBehaviour
     public Text dialogueText;
     public TMP_Text dialogueTextTMP;
 
+    [Tooltip("立绘图片")]
+    public Image portraitImage;
+
     [Header("说话人区分")]
     [Tooltip("玩家在对话框里的显示名字")]
     public string playerName = "我";
@@ -106,6 +109,9 @@ public class DialogueManager : MonoBehaviour
     private string currentPreparedText;
     private bool currentPreparedIsPlayer;
     private string currentPreparedSpeaker;
+
+    private Sprite defaultPortrait; // 默认立绘保存
+    private Sprite[] currentExpressions; // 当前对话序列对应的表情差分
 
     void Awake()
     {
@@ -459,10 +465,36 @@ public class DialogueManager : MonoBehaviour
 
     /// <summary>
     /// 开始自动对话序列（无选项）
+    /// 支持传入默认立绘和表情差分数组
     /// </summary>
-    public void StartAutoDialogue(string npcName, string[] dialogueSequence)
+    public void StartAutoDialogue(string npcName, string[] dialogueSequence, Sprite defaultPortrait = null, Sprite[] expressionPortraits = null)
     {
         Debug.Log($"DialogueManager: 开始自动对话序列 - NPC: {npcName}, 对话数量: {dialogueSequence?.Length ?? 0}");
+
+        // 如果未绑定 portraitImage，尝试找一找
+        if (portraitImage == null && dialoguePanel != null)
+        {
+            Transform p = dialoguePanel.transform.Find("PortraitImage");
+            if (p != null) portraitImage = p.GetComponent<Image>();
+        }
+
+        // 记录立绘配置
+        this.defaultPortrait = defaultPortrait;
+        this.currentExpressions = expressionPortraits;
+
+        if (portraitImage != null)
+        {
+            if (defaultPortrait != null)
+            {
+                portraitImage.sprite = defaultPortrait;
+                portraitImage.gameObject.SetActive(true);
+            }
+            else
+            {
+                // 可选隐藏
+                // portraitImage.gameObject.SetActive(false);
+            }
+        }
 
         if (!string.IsNullOrEmpty(npcName))
         {
@@ -548,6 +580,24 @@ public class DialogueManager : MonoBehaviour
 
         Debug.Log($"DialogueManager: 播放第 {currentDialogueIndex + 1}/{currentDialogueSequence.Length} 句对话");
 
+        // 尝试切换表情差分
+        if (portraitImage != null)
+        {
+            if (currentExpressions != null && currentDialogueIndex < currentExpressions.Length && currentExpressions[currentDialogueIndex] != null)
+            {
+                portraitImage.sprite = currentExpressions[currentDialogueIndex];
+            }
+            else if (defaultPortrait != null)
+            {
+                portraitImage.sprite = defaultPortrait;
+            }
+            // 每次切图都开启UI适配属性，防止变形，但不强制原尺寸
+            if (portraitImage.sprite != null) 
+            {
+                portraitImage.preserveAspect = true;
+            }
+        }
+
         // 清除旧的选项按钮（如果有）
         if (optionsContainer != null)
         {
@@ -584,9 +634,25 @@ public class DialogueManager : MonoBehaviour
         if (dialogueText != null) dialogueText.text = "";
         if (dialogueTextTMP != null) dialogueTextTMP.text = "";
 
-        // 逐字显示文本
-        foreach (char c in text)
+        // 逐字显示文本（支持富文本标签）
+        for (int i = 0; i < text.Length; i++)
         {
+            char c = text[i];
+            
+            // 跳过富文本标签，一次性显示标签本身避免打出来的字符乱码
+            if (c == '<')
+            {
+                int closingIndex = text.IndexOf('>', i);
+                if (closingIndex != -1)
+                {
+                    string tag = text.Substring(i, closingIndex - i + 1);
+                    if (dialogueText != null) dialogueText.text += tag;
+                    if (dialogueTextTMP != null) dialogueTextTMP.text += tag;
+                    i = closingIndex;
+                    continue; // 标签内容不消耗打字时间
+                }
+            }
+
             if (dialogueText != null) dialogueText.text += c;
             if (dialogueTextTMP != null) dialogueTextTMP.text += c;
             yield return new WaitForSeconds(typingSpeed);

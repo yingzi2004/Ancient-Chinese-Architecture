@@ -38,6 +38,8 @@ public class GuideDialogueUI : MonoBehaviour
     private string[] currentDialogueSequence;
     private int currentDialogueIndex = 0;
     private PlayerController playerController;
+    private Sprite defaultPortrait; // 保存默认立绘
+    private Sprite[] currentExpressions; // 当前对话序列对应的表情差分
 
     void Awake()
     {
@@ -82,7 +84,7 @@ public class GuideDialogueUI : MonoBehaviour
     /// <summary>
     /// 开始导游对话
     /// </summary>
-    public void StartGuideDialogue(string guideName, Sprite portraitSprite, string[] dialogueSequence)
+    public void StartGuideDialogue(string guideName, Sprite portraitSprite, string[] dialogueSequence, Sprite[] expressionPortraits = null)
     {
         if (dialogueSequence == null || dialogueSequence.Length == 0)
         {
@@ -105,6 +107,10 @@ public class GuideDialogueUI : MonoBehaviour
 
         // 设置导游名称
         SetGuideNameText(guideName);
+
+        // 保存默认立绘和表情差分
+        defaultPortrait = portraitSprite;
+        currentExpressions = expressionPortraits;
 
         // 设置立绘图片
         if (portraitImage != null && portraitSprite != null)
@@ -140,6 +146,21 @@ public class GuideDialogueUI : MonoBehaviour
 
         Debug.Log($"GuideDialogueUI: 播放第 {currentDialogueIndex + 1}/{currentDialogueSequence.Length} 句对话");
 
+        // 尝试切换表情差分
+        if (portraitImage != null)
+        {
+            if (currentExpressions != null && currentDialogueIndex < currentExpressions.Length && currentExpressions[currentDialogueIndex] != null)
+            {
+                portraitImage.sprite = currentExpressions[currentDialogueIndex];
+                portraitImage.gameObject.SetActive(true);
+            }
+            else if (defaultPortrait != null)
+            {
+                portraitImage.sprite = defaultPortrait;
+                portraitImage.gameObject.SetActive(true);
+            }
+        }
+
         // 隐藏继续提示
         SetContinuePromptActive(false);
 
@@ -166,10 +187,24 @@ public class GuideDialogueUI : MonoBehaviour
 
         SetDialogueText("");
 
-        // 逐字显示文本
+        // 逐字显示文本（支持富文本标签）
         string currentText = "";
-        foreach (char c in text)
+        for (int i = 0; i < text.Length; i++)
         {
+            char c = text[i];
+            if (c == '<')
+            {
+                int closingIndex = text.IndexOf('>', i);
+                if (closingIndex != -1)
+                {
+                    string tag = text.Substring(i, closingIndex - i + 1);
+                    currentText += tag;
+                    SetDialogueText(currentText);
+                    i = closingIndex;
+                    continue; // 标签内容不消耗打字时间
+                }
+            }
+
             currentText += c;
             SetDialogueText(currentText);
             yield return new WaitForSeconds(typingSpeed);

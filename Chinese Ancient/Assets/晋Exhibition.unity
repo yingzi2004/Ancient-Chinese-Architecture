@@ -4902,11 +4902,14 @@ MonoBehaviour:
   triggerOnce: 1
   guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
   guidePortrait: {fileID: 21300000, guid: b046ff1280b044349948befe832f4436, type: 3}
+  expressionPortraits: []
   welcomeDialogue:
   - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
   - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
   - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
 --- !u!114 &313681678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4920,14 +4923,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.1, g: 0.1, b: 0.1, a: 0.9}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: ccbcbd58213157445b861b34fedb44a4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5552,6 +5555,7 @@ MonoBehaviour:
   npcNameTextTMP: {fileID: 0}
   dialogueText: {fileID: 735293499}
   dialogueTextTMP: {fileID: 0}
+  portraitImage: {fileID: 0}
   playerName: "\u6211"
   parseSpeakerPrefix: 1
   npcDialogueColor: {r: 1, g: 1, b: 1, a: 1}
@@ -6066,11 +6070,14 @@ MonoBehaviour:
   triggerOnce: 1
   guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
   guidePortrait: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
+  expressionPortraits: []
   welcomeDialogue:
   - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
   - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
   - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
 --- !u!114 &418357559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6087,9 +6094,12 @@ MonoBehaviour:
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
   portraitSprite: {fileID: 0}
+  expressionPortraits: []
   dialogueLines:
   - "\u664B\u573A\u9986"
   - ......
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
 --- !u!65 &418357560
 BoxCollider:
@@ -6162,11 +6172,14 @@ MonoBehaviour:
   triggerOnce: 1
   guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
   guidePortrait: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
+  expressionPortraits: []
   welcomeDialogue:
   - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
   - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
   - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
 --- !u!114 &425985839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6183,9 +6196,12 @@ MonoBehaviour:
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
   portraitSprite: {fileID: 0}
+  expressionPortraits: []
   dialogueLines:
   - "\u8FD9\u91CC\u7684\u5899\u4E0A\u6709\u4E00\u4E2A\u89C6\u9891"
   - "\u770B\u4E00\u4E0B"
+  highlightKeywords: []
+  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
 --- !u!65 &425985840
 BoxCollider:
@@ -10060,7 +10076,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -104, y: 72}
+  m_AnchoredPosition: {x: -104, y: -263}
   m_SizeDelta: {x: 7000, y: 1500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &735293498
@@ -13736,7 +13752,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2774, y: -523}
+  m_AnchoredPosition: {x: -1161, y: 995}
   m_SizeDelta: {x: 5000, y: 800}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &1011728652
@@ -13780,7 +13796,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
+  m_Text: "\u5C0F\u5FAE"
 --- !u!1 &1016335193
 GameObject:
   m_ObjectHideFlags: 0
@@ -16133,6 +16149,7 @@ MonoBehaviour:
   jumpHeight: 1.5
   gravity: -19.62
   isInspecting: 0
+  isOnBoat: 0
   cameraTransform: {fileID: 1193753712}
   mouseSensitivity: 2
   rotationSharpness: 50
@@ -21255,7 +21272,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1435984461}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -4}
+  m_LocalPosition: {x: 0, y: 0, z: -3.19}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -21265,7 +21282,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1201.2205, y: 536.68933}
+  m_AnchoredPosition: {x: 1196.97, y: 536.68933}
   m_SizeDelta: {x: 2376, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1435984463
@@ -22726,14 +22743,14 @@ RectTransform:
   m_GameObject: {fileID: 1644993256}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 45, y: 45, z: 45}
+  m_LocalScale: {x: 43, y: 45, z: 45}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 313681676}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -700, y: 800}
+  m_AnchoredPosition: {x: -635, y: 800}
   m_SizeDelta: {x: 120, y: 160}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1644993258
@@ -25476,7 +25493,7 @@ Transform:
   m_GameObject: {fileID: 1914675617}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1182.59, y: 550.63, z: 5.42}
+  m_LocalPosition: {x: 1180.227, y: 550.63, z: 6.78}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
