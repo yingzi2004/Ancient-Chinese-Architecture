@@ -1366,7 +1366,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.9572754, y: 0.11}
+  m_AnchoredPosition: {x: -1.246, y: 0.11}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &76975953
@@ -26475,7 +26475,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1439302376}
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 8.214}
+  m_LocalPosition: {x: 0, y: 0, z: 8.782}
   m_LocalScale: {x: 0.00042238014, y: 0.00042238025, z: 0.00042238014}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -26484,7 +26484,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.96191406, y: -0.416}
+  m_AnchoredPosition: {x: -1.276, y: -0.416}
   m_SizeDelta: {x: 2376, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1439302378
@@ -27798,7 +27798,7 @@ Transform:
   m_GameObject: {fileID: 1574847278}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: -0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 7.17, y: 3.07, z: 17.2373}
+  m_LocalPosition: {x: 7.673, y: 3.07, z: 17.2373}
   m_LocalScale: {x: 0.8909689, y: 1, z: 0.84126633}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -29116,8 +29116,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 641f1979ccf0a3f46820152ff84d0520, type: 3}
   - {fileID: 0}
   dialogueLines:
-  - "\u53E4\u4EBA\u7684\u592F\u571F\u667A\u6167\u771F\u662F\u5F88\u4E0D\u5F97\u4E86\u5462"
-  - "\u4F60\u770B\u5C55\u677F\u4E0A\u7684\u6B65\u9AA4\uFF0C\u6BCF\u4E00\u6B65\u90FD\u85CF\u7740\u4ED6\u4EEC\u7684\u5DE7\u601D\u5440"
+  - "\u5BA2\u5B98\u4F60\u770B\uFF01\u8FD9\u592F\u571F\u7684\u529F\u592B\uFF0C\u53E4\u4EBA\u771F\u662F\u4E86\u4E0D\u5F97\u5440\uFF01"
+  - "\u5C55\u677F\u4E0A\u8FD9\u4E9B\u6B65\u9AA4\uFF0C\u4E00\u6B65\u4E00\u5DE7\u601D\uFF0C\u6CA1\u70B9\u513F\u8010\u5FC3\u53EF\u771F\u505A\u4E0D\u51FA\u6765\u5462\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
@@ -30523,7 +30523,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 4, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1935363948
@@ -31540,7 +31540,7 @@ MonoBehaviour:
     \u91CC\u5934\u7684\u6881\u67F1\u69AB\u536F\u3001\u592F\u571F\u5899\u9762\uFF0C\u90FD\u7B49\u7740\u5BA2\u5B98\u53BB\u77A7\u5462\uFF01\n"
   highlightKeywords:
   - "\uFF08F)"
-  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  highlightColor: {r: 0.5882353, g: 0.69411767, b: 0.8, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
 --- !u!65 &2044520017
 BoxCollider:
