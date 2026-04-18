@@ -34,7 +34,17 @@ public class LotusFlower : MonoBehaviour
         if (player == null)
         {
             GameObject pObj = GameObject.FindGameObjectWithTag("Player");
-            if (pObj != null) player = pObj.transform;
+            if (pObj != null) 
+            {
+                player = pObj.transform;
+            }
+            else
+            {
+                // 尝试其他方法寻找玩家
+                PlayerController pc = FindObjectOfType<PlayerController>();
+                if (pc != null) player = pc.transform;
+                else if (Camera.main != null) player = Camera.main.transform;
+            }
         }
     }
 

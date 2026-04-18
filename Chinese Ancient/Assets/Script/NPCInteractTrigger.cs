@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 [System.Serializable]
 public class DialogNode
@@ -121,6 +122,13 @@ public class NPCInteractTrigger : MonoBehaviour
 
     [Tooltip("提示面板（可选，自动查找")]
     public GameObject promptPanel;
+
+    [Header("事件设置")]
+    [Tooltip("对话结束后是否恢复NPC原本的位置和朝向（如果要让NPC转身走开，请取消勾选）")]
+    public bool restoreTransformOnEnd = true;
+
+    [Tooltip("对话结束时触发的事件（可用于让NPC离开等）")]
+    public UnityEvent onDialogueEnd;
 
     private bool hasTriggeredOnce = false;
     private bool isInsideRange = false;
@@ -286,7 +294,7 @@ public class NPCInteractTrigger : MonoBehaviour
 
                 if (dialogueStarted)
                 {
-                    EndDialogue();
+                    EndDialogue(true);
                     StopAllCoroutines();
                 }
 
@@ -636,7 +644,7 @@ public class NPCInteractTrigger : MonoBehaviour
         }
     }
 
-    private void EndDialogue()
+    private void EndDialogue(bool skipEvent = false)
     {
         dialogueStarted = false;
         if (customDialoguePanel != null)
@@ -652,8 +660,16 @@ public class NPCInteractTrigger : MonoBehaviour
         }
 
         // 把NPC变回他原本的朝向/位置（避免一直盯着玩家
-        
-        RestoreTransform();
+        if (restoreTransformOnEnd)
+        {
+            RestoreTransform();
+        }
+
+        // 触发对话结束事件
+        if (!skipEvent)
+        {
+            onDialogueEnd?.Invoke();
+        }
     }
 
     private void legacyUpdateStyle(Text t, bool highlight)
@@ -672,7 +688,7 @@ public class NPCInteractTrigger : MonoBehaviour
     {
         if (dialogueStarted)
         {
-            EndDialogue();
+            EndDialogue(true);
             StopAllCoroutines();
         }
 
@@ -686,13 +702,18 @@ public class NPCInteractTrigger : MonoBehaviour
     /// <summary>
     /// 提供外部脚本调用临时插入某段新对话（不修改原本的 rootNode
     /// </summary>
-    public void StartSpecificDialogue(DialogNode customNode)
+    public void StartSpecificDialogue(DialogNode customNode, bool replaceRoot = true)
     {
         // 如果正在和NPC对话中又触发了给荷花，那就先强行中断旧对
         if (dialogueStarted) 
         {
-            EndDialogue();
+            EndDialogue(true);
             StopAllCoroutines(); // 停掉正在打字的旧对话
+        }
+
+        if (replaceRoot)
+        {
+            rootNode = customNode; // 永久替换之后聊天的内容
         }
 
         dialogueStarted = true;
