@@ -55,13 +55,16 @@ public class LotusFlower : MonoBehaviour
         // 状态 1：还没摘取荷花，此时判断玩家和荷花的距离
         if (!isPicked)
         {
-            float distToPlayer = Vector3.Distance(transform.position, player.position);
-            if (distToPlayer <= pickDistance)
+            if (Input.GetKeyDown(pickKey))
             {
-                // 等待按下 R 键
-                if (Input.GetKeyDown(pickKey))
+                float distToPlayer = Vector3.Distance(transform.position, player.position);
+                if (distToPlayer <= pickDistance)
                 {
                     PickLotus();
+                }
+                else
+                {
+                    Debug.Log($"<color=yellow>[采摘交互]</color> 距离荷花太远啦，当前距离: {distToPlayer:F2}米，要求距离内: {pickDistance}米。由于你乘船位置比较高，可以在荷花物体面板里把 Pick Distance 调大！");
                 }
             }
         }

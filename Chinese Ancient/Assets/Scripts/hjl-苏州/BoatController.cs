@@ -34,10 +34,14 @@ public class BoatController : MonoBehaviour
         // 尝试自动获取场景中的玩家
         if (player == null)
         {
-            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null)
+            player = FindObjectOfType<PlayerController>();
+            if (player == null)
             {
-                player = playerObj.GetComponent<PlayerController>();
+                GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+                if (playerObj != null)
+                {
+                    player = playerObj.GetComponentInChildren<PlayerController>();
+                }
             }
         }
     }
@@ -70,11 +74,23 @@ public class BoatController : MonoBehaviour
         if (player != null)
         {
             float distance = Vector3.Distance(transform.position, player.transform.position);
-            // 距离小于设定距离，并且按下 F 键上船
-            if (distance <= interactDistance && Input.GetKeyDown(KeyCode.F))
+            
+            if (Input.GetKeyDown(KeyCode.F))
             {
-                BoardBoat(player);
+                if (distance <= interactDistance)
+                {
+                    BoardBoat(player);
+                }
+                else
+                {
+                    Debug.Log($"<color=yellow>[船只交互]</color> 距离太远无法上船，当前距离: {distance:F2}米，要求距离内: {interactDistance}米。如果一直按不上请在船的面板上调大 Interact Distance！");
+                }
             }
+        }
+        else
+        {
+            // 实时查找玩家防丢
+            player = FindObjectOfType<PlayerController>();
         }
     }
 
