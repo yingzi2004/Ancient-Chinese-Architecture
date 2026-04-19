@@ -39,6 +39,23 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
     [Header("调试信息")]
     [SerializeField] private string locationName = "未命名位置";
 
+    [Header("重复与组控制")]
+    [Tooltip("全局文案去重：勾选后，这段对话只要在游戏中被播放过一次，别的触发器（甚至本身）就不会再说第二次，防止玩家重复看相同的文案。")]
+    [SerializeField] private bool globalPreventSameDialogue = false;
+
+    [Tooltip("共享触发组ID（可选）：给多个触发器填同样的ID（如'LostHints'），若勾选了TriggerOnce，则此ID的组只要有一个成员触发过，该组所有成员全都不会再触发。")]
+    [SerializeField] private string sharedGroupID = "";
+
+    // 静态内存（整个游戏运行期间共享）
+    private static System.Collections.Generic.HashSet<string> playedDialogueHashes = new System.Collections.Generic.HashSet<string>();
+    private static System.Collections.Generic.HashSet<string> triggeredGroupIDs = new System.Collections.Generic.HashSet<string>();
+
+    private string GetDialogueHash()
+    {
+        if (dialogueLines == null || dialogueLines.Length == 0) return "";
+        return string.Join("|", dialogueLines);
+    }
+
     private bool hasTriggered = false;
     private bool isPlayerInTrigger = false;
     private DialogueManager dialogueManager;
@@ -290,9 +307,26 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
 
         Debug.Log($"[{locationName}] 检测到碰撞，对象: {other.name}");
 
+        // 1. 本地单次触发检查
         if (triggerOnce && hasTriggered)
         {
             Debug.Log($"[{locationName}] 已触发过，跳过");
+            return;
+        }
+
+        // 2. 组级触发检查 (不同位置的同组触发器实现"一方触发，全组静默")
+        if (!string.IsNullOrEmpty(sharedGroupID) && triggeredGroupIDs.Contains(sharedGroupID))
+        {
+            Debug.Log($"[{locationName}] 同组 '{sharedGroupID}' 的其他触发器已触发过，跳过");
+            return;
+        }
+
+        // 3. 全局文案去重检查 (只要说过这句话，就在全游戏里不再触发同一句话)
+        if (globalPreventSameDialogue && playedDialogueHashes.Contains(GetDialogueHash()))
+        {
+            Debug.Log($"[{locationName}] 相同的文案早已在别处播放过，防重复去重生效，跳过");
+            // 直接标记已触发，避免玩家卡在这里频繁查重
+            hasTriggered = true;
             return;
         }
 
@@ -355,6 +389,17 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
         dialogueManager.StartAutoDialogue(npcDisplayName, processedLines, portraitSprite, expressionPortraits);
         hasTriggered = true;
 
+        // 记入系统的组级防漏和全局去重字典
+        if (!string.IsNullOrEmpty(sharedGroupID) && triggerOnce)
+        {
+            triggeredGroupIDs.Add(sharedGroupID);
+        }
+        
+        if (globalPreventSameDialogue)
+        {
+            playedDialogueHashes.Add(GetDialogueHash());
+        }
+
         Debug.Log($"[{locationName}] 触发对话成功！对话数量: {dialogueLines.Length}");
     }
 
@@ -374,11 +419,22 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
         }
     }
 
-    [ContextMenu("重置触发器")]
+    [ContextMenu("重置触发器(含全局静态记录)")]
     public void ResetTrigger()
     {
         hasTriggered = false;
-        Debug.Log($"[{locationName}] 触发器已重置");
+        
+        if (!string.IsNullOrEmpty(sharedGroupID))
+        {
+            triggeredGroupIDs.Remove(sharedGroupID);
+        }
+        
+        if (globalPreventSameDialogue)
+        {
+            playedDialogueHashes.Remove(GetDialogueHash());
+        }
+        
+        Debug.Log($"[{locationName}] 触发器及其关联的全局记录已重置");
     }
 
     [ContextMenu("手动触发对话")]
