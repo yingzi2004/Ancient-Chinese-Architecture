@@ -24,24 +24,44 @@ public class LanternLighter : MonoBehaviour, IInteractable
     public bool addOptimizedLight = true;
     public Color lightColor = new Color(1f, 0.4f, 0.2f); // 暖红偏橙色
     public float lightRange = 8f; // 照亮范围稍微扩大
-    public float lightIntensity = 3.0f; // 提高基础光照强度供观感测试
+    public float lightIntensity = 20.0f; // 大幅提高基础光照强度。在URP中如果开启了物理光照单位，5可能等于没亮，需要20甚至几百。
+    [Tooltip("光源相对灯笼【发光模型中心点】的偏移位置。Z轴负数通常是朝着玩家方向拉出。")]
+    public Vector3 lightOffset = new Vector3(0f, -0.2f, -0.6f);
+
+    [Header("NPC事件配置")]
+    [Tooltip("交付火折子后，等待多少秒后全院灯笼亮起")]
+    public float lightUpDelay = 3.0f;
 
     // 是否已经被点亮，防止重复触发
     private bool isLit = false;
 
-    // 实现了您游戏内的 IInteractable 接口，用于准星射线交互！
+    // 保留老版射线交互用于兼容测试（可直接点亮）
     public void Interact()
     {
         if (!isLit)
         {
             TurnOnAllLanterns();
-            
-            // 拾取后发光火折子消失
-            if (destroyOnPickup)
-            {
-                gameObject.SetActive(false); 
-            }
+            if (destroyOnPickup) gameObject.SetActive(false); 
         }
+    }
+
+    /// <summary>
+    /// 【新增】NPC系统专用接口：玩家交付火折子后，由剧情系统或NPC脚本触发此方法
+    /// </summary>
+    public void StartLightingSequence()
+    {
+        if (!isLit)
+        {
+            // 启动倒计时协程
+            StartCoroutine(WaitAndLightUp(lightUpDelay));
+        }
+    }
+
+    private System.Collections.IEnumerator WaitAndLightUp(float delay)
+    {
+        Debug.Log($"[剧情] 大伯拿到火折子，开始掌灯...等待 {delay} 秒...");
+        yield return new WaitForSeconds(delay);
+        TurnOnAllLanterns();
     }
 
     /// <summary>
@@ -81,8 +101,29 @@ public class LanternLighter : MonoBehaviour, IInteractable
         
         if (renderer != null)
         {
-            // 复用材质，节省开销
-            renderer.sharedMaterial = litMaterial;
+            // 解决四个灯笼合并模型的“多材质乱序”问题：
+            Material[] mats = renderer.sharedMaterials;
+            bool materialReplaced = false;
+
+            for (int i = 0; i < mats.Length; i++)
+            {
+                // 如果你在面板赋了原本的“纸罩材质(unlitMaterial)”，就精确定位纸罩所在的材质槽位进行替换
+                // 使用 Contains 是为了防止运行时 Unity 自动给材质名加上 " (Instance)" 后缀导致匹配失败
+                if (unlitMaterial != null && mats[i] != null && mats[i].name.Contains(unlitMaterial.name))
+                {
+                    mats[i] = litMaterial;
+                    materialReplaced = true;
+                }
+            }
+
+            // 如果Inspector没填 unlitMaterial 或者没匹配上，退回老办法（强制替换第0个元素）
+            if (!materialReplaced && mats.Length > 0)
+            {
+                mats[0] = litMaterial;
+            }
+
+            // 将修改后的材质数组重新赋值回去
+            renderer.sharedMaterials = mats;
 
             // 同步点亮内嵌的辅助点光源
             Light[] partialLights = lanternObj.GetComponentsInChildren<Light>(true);
@@ -97,9 +138,11 @@ public class LanternLighter : MonoBehaviour, IInteractable
             {
                 // 如果模型原本没有内嵌的点光源，则动态生成一个用来打亮周围环境的光源
                 GameObject fakeLightObj = new GameObject("FakeOptimizedLight");
+                
+                // 重点修复：购买的模型轴心(Pivot)通常在固定墙体的木架子上（深深插在墙里）
+                // 所以绝对不能按 localPosition 设置为0，必须基于实际发光网格的中心位置往下、往外偏移！
+                fakeLightObj.transform.position = renderer.bounds.center + lanternObj.transform.TransformDirection(lightOffset);
                 fakeLightObj.transform.SetParent(lanternObj.transform);
-                // 稍微往外或者往下偏移一点，防止产生的光被灯笼自己的模型完全吃掉
-                fakeLightObj.transform.localPosition = new Vector3(0, -0.5f, 0);
 
                 Light pLight = fakeLightObj.AddComponent<Light>();
                 pLight.type = LightType.Point;
