@@ -1816,7 +1816,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4adfeef3b9c55ce43a9e0b984e208cb8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3.886
+      value: 4.9
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4adfeef3b9c55ce43a9e0b984e208cb8, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3878,6 +3878,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1694388104871626409, guid: 678bf8bc91771fa498236de892b83d1d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1691888759}
+    - targetCorrespondingSourceObject: {fileID: 1694388104871626409, guid: 678bf8bc91771fa498236de892b83d1d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1691888760}
   m_SourcePrefab: {fileID: 100100000, guid: 678bf8bc91771fa498236de892b83d1d, type: 3}
 --- !u!1001 &1470457508
 PrefabInstance:
@@ -4201,6 +4204,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bae5d90dc68493e44ae029c765cfd813, type: 3}
+--- !u!1 &1516822901 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6839111498099167792, guid: bae5d90dc68493e44ae029c765cfd813, type: 3}
+  m_PrefabInstance: {fileID: 1511181661}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1564003110
 GameObject:
   m_ObjectHideFlags: 0
@@ -4574,22 +4582,39 @@ MonoBehaviour:
   npcName: "\u5C0F\u6D1B"
   rootNode:
     npcLines:
-    - "\u54CE\u5440\uFF0C\u4F60\u53EF\u7B97\u6765\u4E86\uFF01"
-    - "\u90A3\u5EA7\u7834\u5E99\u6709\u52A8\u9759\uFF0C\u4F60\u8981\u4E0D\u8981\u8FC7\u53BB\u770B\u770B\uFF1F"
+    - "\u8FD9\u4F4D\u65C5\u4EBA\uFF0C\u8FDC\u9053\u800C\u6765\u8F9B\u82E6\u4E86\u3002\u6B64\u5904\u4E43\u7948\u5E74\u6BBF\uFF0C\u662F\u660E\u6E05\u5E1D\u738B\u4E3E\u884C\u7948\u8C37\u5927\u5178\u3001\u7948\u6C42\u4E94\u8C37\u4E30\u767B\u4E4B\u5730\uFF0C\u5DF2\u6709\u516D\u767E\u5E74\u4F59\u8F7D\u5149\u9634\u77E3\u3002"
+    - "\u4ECA\u65E5\u6070\u9022\u5409\u65F6\uFF0C\u4F60\u53EF\u4EE5\u4EB2\u8EAB\u4F53\u9A8C\u70E7\u9999\u3001\u8DEA\u62DC\u7684\u4EEA\u5F0F\uFF0C\u6216\u8BB8\u80FD\u611F\u53D7\u5230\u8FD9\u4EFD\u8DE8\u8D8A\u5343\u5E74\u7684\u8654\u8BDA\uFF0C\u8FD8\u80FD\u83B7\u5F97\u4E00\u4EFD\u7948\u613F\u52A0\u6301\u54E6\u3002"
     choices:
-    - optionText: "\u597D\uFF0C\u6211\u8FD9\u5C31\u53BB\u3002"
+    - optionText: "\u597D\u5440\uFF0C\u6211\u613F\u610F,\u6211\u8BE5\u53BB\u54EA\u91CC\u4F53\u9A8C"
       nextNode:
         npcLines:
-        - "\u5343\u4E07\u5C0F\u5FC3\u70B9\uFF01"
+        - "\u770B\u5230\u524D\u9762\u7684\u7948\u5E74\u6BBF\u4E86\u5417,\u5C31\u5728\u6B63\u6BBF\u90A3\u91CC,\u5FEB\u53BB\u4F53\u9A8C\u5427"
         choices: []
         onNodeTriggerEvent:
           m_PersistentCalls:
             m_Calls: []
-    - optionText: "\u4E0D\u53BB\uFF0C\u6211\u5F88\u5FD9\u3002"
+    - optionText: "\u5148\u7B49\u7B49\uFF0C\u6211\u60F3\u591A\u4E86\u89E3\u4E00\u4E0B\u7948\u5E74\u6BBF\u7684\u6545\u4E8B\u3002"
       nextNode:
         npcLines:
-        - "\u73B0\u5728\u7684\u5E74\u8F7B\u4EBA\u554A..."
-        choices: []
+        - "\u597D\u5440,\u90A3\u6211\u7EE7\u7EED\u6765\u8BB2\u3002\u8FD9\u5EA7\u7948\u5E74\u6BBF\uFF0C\u524D\u8EAB\u662F\u660E\u6C38\u4E50\u5E74\u95F4\u7684\u5927\u7940\u6BBF\uFF0C\u540E\u7ECF\u5609\u9756\u6539\u5236\u3001\u4E7E\u9686\u66F4\u540D\uFF0C\u624D\u6210\u4ECA\u65E5\u6A21\u6837\uFF0C\u5149\u7EEA\u5E74\u95F4\u66FE\u906D\u96F7\u706B\u711A\u6BC1\uFF0C\u540E\u7ECF\u5320\u4EBA\u91CD\u5EFA\uFF0C\u624D\u5F97\u4EE5\u91CD\u73B0\u8F89\u714C\u3002"
+        - "\u5F53\u5E74\u5E1D\u738B\u4E3E\u884C\u7948\u8C37\u5927\u5178\uFF0C\u9700\u5148\u658B\u6212\u4E09\u65E5\uFF0C\u6C90\u6D74\u66F4\u8863\uFF0C\u518D\u4EB2\u4E34\u6B64\u5904\uFF0C\u884C\u71D4\u67F4\u3001\u4E0A\u9999\u3001\u8DEA\u62DC\u3001\u732E\u5E1B\u7B49\u4E00\u7CFB\u5217\u793C\u4EEA\uFF0C\u53EA\u4E3A\u7948\u6C42\u6765\u5E74\u98CE\u8C03\u96E8\u987A\u3001\u4E94\u8C37\u4E30\u767B\u3002"
+        - "\u8FD9\u4E9B\u793C\u4EEA\u867D\u7E41\u7410\uFF0C\u5374\u85CF\u7740\u53E4\u4EBA\u5BF9\u5929\u5730\u7684\u656C\u754F\u3002\u5982\u4ECA\u6211\u53EF\u7B80\u5316\u6D41\u7A0B\uFF0C\u5E26\u4F60\u4F53\u9A8C\u6700\u6838\u5FC3\u7684\u70E7\u9999\u3001\u8DEA\u62DC\u4E4B\u793C\uFF0C\u8981\u4E0D\u8981\u8BD5\u8BD5\uFF1F"
+        choices:
+        - optionText: "\u55EF\uFF0C\u73B0\u5728\u5C31\u4F53\u9A8C"
+          nextNode:
+            npcLines:
+            - "\u770B\u5230\u524D\u9762\u7684\u7948\u5E74\u6BBF\u4E86\u5417,\u5C31\u5728\u6B63\u6BBF\u90A3\u91CC,\u5FEB\u53BB\u4F53\u9A8C\u5427"
+            choices: []
+            onNodeTriggerEvent:
+              m_PersistentCalls:
+                m_Calls: []
+        - optionText: "\u4E0D\u7528\u5566,\u6211\u81EA\u5DF1\u5728\u901B\u4E00\u4E0B"
+          nextNode:
+            npcLines: []
+            choices: []
+            onNodeTriggerEvent:
+              m_PersistentCalls:
+                m_Calls: []
         onNodeTriggerEvent:
           m_PersistentCalls:
             m_Calls: []
@@ -4617,11 +4642,34 @@ MonoBehaviour:
   showDebugLogs: 1
   debugLogInterval: 1
   showPromptUI: 1
-  promptPanel: {fileID: 0}
+  promptPanel: {fileID: 1516822901}
   restoreTransformOnEnd: 1
   onDialogueEnd:
     m_PersistentCalls:
       m_Calls: []
+--- !u!136 &1691888760
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1691888756}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2.2656217
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.63281083, z: 0}
 --- !u!1001 &1696483273
 PrefabInstance:
   m_ObjectHideFlags: 0
