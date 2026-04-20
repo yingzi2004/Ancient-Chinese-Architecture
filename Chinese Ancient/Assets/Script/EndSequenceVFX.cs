@@ -68,6 +68,14 @@ public class EndSequenceVFX : MonoBehaviour
     [Range(0f, 5f)]
     public float holdBlackDuration = 0.5f;
 
+    [Header("额外：原场景背景音乐淡出")]
+    [Tooltip("原本在主场景播放的 BGM（AudioSource）。在晕厥变黑的过程中，自动帮它声音降到0")]
+    public AudioSource sceneBgmToFadeOut;
+
+    [Header("阶段 4：最终场景跳转 (新版地图过渡)")]
+    [Tooltip("黑屏后，要跳转到的新场景名称（例如 EndingMapScene）。如果不填，则停留在当前场景。")]
+    public string targetEndingScene;
+
     [Header("时间")]
     [Tooltip("是否使用不受TimeScale影响的时间（建议用于结尾过场）")]
     public bool useUnscaledTime = true;
@@ -197,6 +205,15 @@ public class EndSequenceVFX : MonoBehaviour
         float estimatedTotalTime = blurInDuration + (blinkCount * (singleBlinkDuration + 0.3f)) + fadeToBlackDuration;
         shakeDuration = Mathf.Max(shakeDuration, estimatedTotalTime);
 
+        // --- 新增：背景音乐淡出 ---
+        if (sceneBgmToFadeOut != null)
+        {
+            float startVol = sceneBgmToFadeOut.volume;
+            StartCoroutine(TweenFloat(startVol, 0f, estimatedTotalTime, v => {
+                if (sceneBgmToFadeOut != null) sceneBgmToFadeOut.volume = v;
+            }));
+        }
+
         Coroutine cShake = null;
         if (targetCamera != null && shakeDuration > 0f && shakeStrength > 0f)
         {
@@ -271,6 +288,12 @@ public class EndSequenceVFX : MonoBehaviour
             yield return Wait(holdBlackDuration);
         }
 
+        // 4) 地图重现与关闭（已改为：切换到最终结局场景）
+        if (!string.IsNullOrEmpty(targetEndingScene))
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(targetEndingScene);
+        }
+
 
         // 结束：执行回调
         try
@@ -323,7 +346,7 @@ public class EndSequenceVFX : MonoBehaviour
 
         var canvas = root.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = short.MaxValue;
+        canvas.sortingOrder = 30000; // 留出空间让最终地图 (比如设为31000) 能盖在上面
 
         root.AddComponent<CanvasScaler>();
         root.AddComponent<GraphicRaycaster>();
