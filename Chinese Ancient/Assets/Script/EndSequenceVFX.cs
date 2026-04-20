@@ -68,6 +68,10 @@ public class EndSequenceVFX : MonoBehaviour
     [Range(0f, 5f)]
     public float holdBlackDuration = 0.5f;
 
+    [Header("阶段 4：最终场景跳转 (新版地图过渡)")]
+    [Tooltip("黑屏后，要跳转到的新场景名称（例如 EndingMapScene）。如果不填，则停留在当前场景。")]
+    public string targetEndingScene;
+
     [Header("时间")]
     [Tooltip("是否使用不受TimeScale影响的时间（建议用于结尾过场）")]
     public bool useUnscaledTime = true;
@@ -271,6 +275,12 @@ public class EndSequenceVFX : MonoBehaviour
             yield return Wait(holdBlackDuration);
         }
 
+        // 4) 地图重现与关闭（已改为：切换到最终结局场景）
+        if (!string.IsNullOrEmpty(targetEndingScene))
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(targetEndingScene);
+        }
+
 
         // 结束：执行回调
         try
@@ -323,7 +333,7 @@ public class EndSequenceVFX : MonoBehaviour
 
         var canvas = root.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = short.MaxValue;
+        canvas.sortingOrder = 30000; // 留出空间让最终地图 (比如设为31000) 能盖在上面
 
         root.AddComponent<CanvasScaler>();
         root.AddComponent<GraphicRaycaster>();

@@ -187,6 +187,15 @@ public class ScrollMapController : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        // 当从外部（比如EndSequenceVFX）激活地图时，如果不需要再次播放开场动画，确保立刻显示！
+        if (!playOpenAnimation || hasPlayedGlobalMapAnimation)
+        {
+            InstantOpenMap();
+        }
+    }
+
     private void Start()
     {
         InitializeUI();
@@ -764,6 +773,87 @@ public class ScrollMapController : MonoBehaviour
         if (!isAnimating) return;
         mainSequence?.Complete(true);
         isAnimating = false;
+    }
+
+    /// <summary>
+    /// 关闭地图动画：卷轴向中间卷起，最后完美黑屏并退出游戏
+    /// 触发方法：可以绑定给 EndSequenceVFX 面板里的 onMapCloseTrigger
+    /// </summary>
+    public void CloseMapAnimation()
+    {
+        // 阻止重复触发
+        if (isAnimating) return;
+        isAnimating = true;
+
+        if (mainSequence != null && mainSequence.IsActive())
+        {
+            mainSequence.Kill();
+        }
+
+        // 把对话框等 UI 强制藏起来，保证画面纯净
+        if (mapDialoguePanel != null) mapDialoguePanel.SetActive(false);
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+
+        mainSequence = DOTween.Sequence();
+
+        // 1. 如果要合上，卷轴遮挡卷边必须先显示出来
+        if (coverLeft != null)
+        {
+            coverLeft.gameObject.SetActive(true);
+            coverLeft.anchoredPosition = new Vector2(scrollLeftTargetX - coverLeft.rect.width, coverLeft.anchoredPosition.y);
+        }
+        if (coverRight != null)
+        {
+            coverRight.gameObject.SetActive(true);
+            coverRight.anchoredPosition = new Vector2(scrollRightTargetX + coverRight.rect.width, coverRight.anchoredPosition.y);
+        }
+
+        // 播放收起音效（利用展开音效反用）
+        if (audioSource != null && scrollOpenClip != null)
+        {
+            mainSequence.AppendCallback(() => audioSource.PlayOneShot(scrollOpenClip));
+        }
+
+        // 2. 轴心向中间合拢
+        if (scrollLeft != null)
+        {
+            mainSequence.Join(
+                scrollLeft.DOAnchorPosX(0f, scrollOpenDuration).SetEase(Ease.InOutQuad)
+            );
+        }
+        if (scrollRight != null)
+        {
+            mainSequence.Join(
+                scrollRight.DOAnchorPosX(0f, scrollOpenDuration).SetEase(Ease.InOutQuad)
+            );
+        }
+
+        // 3. 卷帘边向中间合拢（盖住世界）
+        if (coverLeft != null)
+        {
+            mainSequence.Join(
+                coverLeft.DOAnchorPosX(0f, baseMapRevealDuration).SetEase(Ease.InOutQuad)
+            );
+        }
+        if (coverRight != null)
+        {
+            mainSequence.Join(
+                coverRight.DOAnchorPosX(0f, baseMapRevealDuration).SetEase(Ease.InOutQuad)
+            );
+        }
+
+        // 4. 收拢结束后的最终闭幕（黑屏或退出）
+        mainSequence.OnComplete(() =>
+        {
+            isAnimating = false;
+            
+            // 下面是结束游戏的逻辑。因为已经是在谢幕了，合上后游戏就自动终止
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        });
     }
 
     private void Update()
