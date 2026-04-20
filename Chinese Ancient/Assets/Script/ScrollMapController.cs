@@ -711,7 +711,19 @@ public class ScrollMapController : MonoBehaviour
     private System.Collections.IEnumerator DeferredLoadScene(string targetScene)
     {
         yield return null; 
-        SceneManager.LoadScene(targetScene);
+
+        // 去除多余的空格防手抖
+        targetScene = targetScene.Trim();
+        Debug.Log($"【全军出击】正式装载目标场景: {targetScene}");
+
+        try
+        {
+            SceneManager.LoadScene(targetScene);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"【致命错误】加载场景 {targetScene} 失败了！！！请检查 File -> Build Settings 里是否添加了这个场景！详细报错：\n{e.Message}");
+        }
     }
 
     public void SkipAnimation()
