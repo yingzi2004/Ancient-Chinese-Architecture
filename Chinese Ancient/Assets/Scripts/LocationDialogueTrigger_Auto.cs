@@ -39,6 +39,13 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
     [Header("调试信息")]
     [SerializeField] private string locationName = "未命名位置";
 
+    [Header("沉浸式表现设定 (可选)")]
+    [Tooltip("延后显示立绘的对话索引 (0=立刻显示。填1表示第2句话时小微立绘才出现)")]
+    [SerializeField] private int portraitRevealIndex = 0;
+    
+    [Tooltip("延后显示NPC名字的对话索引 (0=立刻显示。填7表示前7句话名字框为空，第8句话即最后几句才真正显示名字)")]
+    [SerializeField] private int nameRevealIndex = 0;
+
     [Header("重复与组控制")]
     [Tooltip("全局文案去重：勾选后，这段对话只要在游戏中被播放过一次，别的触发器（甚至本身）就不会再说第二次，防止玩家重复看相同的文案。")]
     [SerializeField] private bool globalPreventSameDialogue = false;
@@ -393,7 +400,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
             processedLines[i] = line;
         }
 
-        // 开始对话 - 使用配置的NPC显示名称和处理后的富文本台词
+        // 开始对话 - 使用配置的NPC显示名称和处理后的富文本台词，并传递延后显示的索引
         dialogueManager.StartAutoDialogue(npcDisplayName, processedLines, portraitSprite, expressionPortraits, () => {
             Debug.Log($"[{locationName}] 对话结束回调触发！正在调用 onDialogueEnd ({onDialogueEnd?.GetPersistentEventCount() ?? 0} 个监听器)");
             
@@ -407,7 +414,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
             {
                 onDialogueEnd.Invoke();
             }
-        });
+        }, portraitRevealIndex, nameRevealIndex);
         hasTriggered = true;
 
         // 记入系统的组级防漏和全局去重字典
