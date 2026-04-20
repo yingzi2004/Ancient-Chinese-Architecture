@@ -112,6 +112,9 @@ public class DialogueManager : MonoBehaviour
 
     private Sprite defaultPortrait; // 默认立绘保存
     private Sprite[] currentExpressions; // 当前对话序列对应的表情差分
+    
+    private int currentPortraitRevealIndex = 0; // 当前序列的立绘隐藏阈值
+    private int currentNameRevealIndex = 0; // 当前序列的名字隐藏阈值
     private System.Action currentDialogueCallback; // 当前对话结束的回调
 
     void Awake()
@@ -468,10 +471,14 @@ public class DialogueManager : MonoBehaviour
     /// <summary>
     /// 开始自动对话序列（无选项）
     /// 支持传入默认立绘和表情差分数组
+    /// 额外支持立绘与名称延后显示的剧场效果参数
     /// </summary>
-    public void StartAutoDialogue(string npcName, string[] dialogueSequence, Sprite defaultPortrait = null, Sprite[] expressionPortraits = null, System.Action onComplete = null)
+    public void StartAutoDialogue(string npcName, string[] dialogueSequence, Sprite defaultPortrait = null, Sprite[] expressionPortraits = null, System.Action onComplete = null, int portraitRevealIndex = 0, int nameRevealIndex = 0)
     {
         currentDialogueCallback = onComplete;
+        this.currentPortraitRevealIndex = portraitRevealIndex;
+        this.currentNameRevealIndex = nameRevealIndex;
+
         Debug.Log($"DialogueManager: 开始自动对话序列 - NPC: {npcName}, 对话数量: {dialogueSequence?.Length ?? 0}");
 
         // 如果未绑定 portraitImage，尝试找一找
@@ -583,21 +590,31 @@ public class DialogueManager : MonoBehaviour
 
         Debug.Log($"DialogueManager: 播放第 {currentDialogueIndex + 1}/{currentDialogueSequence.Length} 句对话");
 
-        // 尝试切换表情差分
+        // 尝试切换表情差分及出场延后逻辑
         if (portraitImage != null)
         {
-            if (currentExpressions != null && currentDialogueIndex < currentExpressions.Length && currentExpressions[currentDialogueIndex] != null)
+            if (currentDialogueIndex < currentPortraitRevealIndex)
             {
-                portraitImage.sprite = currentExpressions[currentDialogueIndex];
+                // 暂时隐藏立绘
+                portraitImage.gameObject.SetActive(false);
             }
-            else if (defaultPortrait != null)
+            else
             {
-                portraitImage.sprite = defaultPortrait;
-            }
-            // 每次切图都开启UI适配属性，防止变形，但不强制原尺寸
-            if (portraitImage.sprite != null) 
-            {
-                portraitImage.preserveAspect = true;
+                if (currentExpressions != null && currentDialogueIndex < currentExpressions.Length && currentExpressions[currentDialogueIndex] != null)
+                {
+                    portraitImage.sprite = currentExpressions[currentDialogueIndex];
+                }
+                else if (defaultPortrait != null)
+                {
+                    portraitImage.sprite = defaultPortrait;
+                }
+                
+                // 每次切图都开启UI适配属性，防止变形，但不强制原尺寸
+                if (portraitImage.sprite != null) 
+                {
+                    portraitImage.preserveAspect = true;
+                    portraitImage.gameObject.SetActive(true);
+                }
             }
         }
 
@@ -624,6 +641,14 @@ public class DialogueManager : MonoBehaviour
         }
 
         PrepareLine(currentDialogueSequence[currentDialogueIndex]);
+
+        // 出场延后：如果在设定轮次之前，则名字不显示（或者显示？？？）
+        if (currentDialogueIndex < currentNameRevealIndex)
+        {
+            if (npcNameText != null) npcNameText.text = "";
+            if (npcNameTextTMP != null) npcNameTextTMP.text = "";
+        }
+
         typingCoroutine = StartCoroutine(TypeTextWithContinue(currentPreparedText));
     }
 
