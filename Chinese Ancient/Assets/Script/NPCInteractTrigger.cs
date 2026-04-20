@@ -13,6 +13,9 @@ public class DialogNode
 
     [Tooltip("这几句话说完后，抛给玩家的可选分支选项（如果不配，这个阶段对话就直接结束）")]
     public List<DialogChoice> choices = new List<DialogChoice>();
+
+    [Tooltip("【通用扩展】进入此剧情节点时自动触发的事件（比如拖入大伯的灯笼脚本并调用StartLightingSequence）")]
+    public UnityEvent onNodeTriggerEvent;
 }
 
 [System.Serializable]
@@ -64,6 +67,10 @@ public class NPCInteractTrigger : MonoBehaviour
             }
         }
     };
+
+    [Header("多剧情阶段存储（通用状态机）")]
+    [Tooltip("备用的替换剧情树。由外部脚本或拾取事件触发 SwitchAlternateDialogue(索引) 来切入到下一阶段对话。")]
+    public List<DialogNode> alternateNodes = new List<DialogNode>();
 
     [Header("触发设置")]
     [Tooltip("玩家 Transform，不设置则按 Tag 查找")]
@@ -381,6 +388,12 @@ public class NPCInteractTrigger : MonoBehaviour
         {
             EndDialogue();
             yield break;
+        }
+
+        // 【新增通用机制】如果这个对话节点上绑定了事件（如大伯拿到火折子去点灯），立刻触发！
+        if (node.onNodeTriggerEvent != null)
+        {
+            node.onNodeTriggerEvent.Invoke();
         }
 
         // 用我们刚刚独立生成（或连好的）的组件体系！它?DialogueManager 再也没有一毛钱关系
@@ -731,6 +744,20 @@ public class NPCInteractTrigger : MonoBehaviour
         }
 
         StartCoroutine(PlayInteractTree(customNode));
+    }
+
+    /// <summary>
+    /// 【新增通用功能】外部调用此接口（例如玩家拾取火折子后调用），永久切换该NPC接下来的固定常驻对话
+    /// </summary>
+    public void SwitchAlternateDialogue(int alternateIndex)
+    {
+        if (alternateIndex >= 0 && alternateIndex < alternateNodes.Count)
+        {
+            rootNode = alternateNodes[alternateIndex];
+            hasTriggeredOnce = false; // 允许玩家重新触发新阶段对话
+            dialogueStarted = false;
+            Debug.Log($"<color=green>[NPC剧情切换]</color> {npcName} 的剧情对话已切换到第 {alternateIndex} 阶段！");
+        }
     }
 
     public void ResetTrigger()
