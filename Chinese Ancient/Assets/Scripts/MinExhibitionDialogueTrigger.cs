@@ -40,6 +40,14 @@ public class MinExhibitionDialogueTrigger : MonoBehaviour
     [Tooltip("关键字高亮颜色")]
     [SerializeField] private Color highlightColor = new Color(1f, 0.84f, 0f); // 默认金色
 
+    [Header("结尾特效")]
+    [Tooltip("勾选后，对话结束会自动播放屏幕模糊、黑屏、相机震动特效（不自动退出游戏）")]
+    public bool playEndVFX = false;
+
+    [Header("事件设置")]
+    [Tooltip("对话结束时触发的事件")]
+    public UnityEngine.Events.UnityEvent onDialogueEnd = new UnityEngine.Events.UnityEvent();
+
     private GuideDialogueUI guideUI;
     private bool hasTriggered = false;
     private bool isInitialized = false;
@@ -172,7 +180,20 @@ public class MinExhibitionDialogueTrigger : MonoBehaviour
         }
 
         // 开始对话
-        guideUI.StartGuideDialogue(guideName, guidePortrait, processedLines, expressionPortraits);
+        guideUI.StartGuideDialogue(guideName, guidePortrait, processedLines, expressionPortraits, () => {
+            Debug.Log($"[{gameObject.name}] 对话结束了！");
+            
+            if (playEndVFX && EndSequenceVFX.Instance != null)
+            {
+                Debug.Log($"[{gameObject.name}] 准备播放黑屏震动模糊特效...");
+                EndSequenceVFX.Instance.Play(); // 只播特效不退出游戏
+            }
+
+            if (onDialogueEnd != null)
+            {
+                onDialogueEnd.Invoke();
+            }
+        });
         hasTriggered = true;
 
         Debug.Log($"MinExhibitionDialogueTrigger: 触发欢迎对话 - 导游: {guideName}, 对话数: {welcomeDialogue.Length}");

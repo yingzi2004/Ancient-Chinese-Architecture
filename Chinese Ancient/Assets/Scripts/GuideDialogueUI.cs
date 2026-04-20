@@ -40,6 +40,7 @@ public class GuideDialogueUI : MonoBehaviour
     private PlayerController playerController;
     private Sprite defaultPortrait; // 保存默认立绘
     private Sprite[] currentExpressions; // 当前对话序列对应的表情差分
+    private System.Action currentDialogueCallback;
 
     void Awake()
     {
@@ -84,8 +85,9 @@ public class GuideDialogueUI : MonoBehaviour
     /// <summary>
     /// 开始导游对话
     /// </summary>
-    public void StartGuideDialogue(string guideName, Sprite portraitSprite, string[] dialogueSequence, Sprite[] expressionPortraits = null)
+    public void StartGuideDialogue(string guideName, Sprite portraitSprite, string[] dialogueSequence, Sprite[] expressionPortraits = null, System.Action onComplete = null)
     {
+        currentDialogueCallback = onComplete;
         if (dialogueSequence == null || dialogueSequence.Length == 0)
         {
             Debug.LogWarning("GuideDialogueUI: 对话序列为空！");
@@ -310,6 +312,13 @@ public class GuideDialogueUI : MonoBehaviour
         // 重置对话序列状态
         currentDialogueSequence = null;
         currentDialogueIndex = 0;
+
+        if (currentDialogueCallback != null)
+        {
+            var cb = currentDialogueCallback;
+            currentDialogueCallback = null;
+            cb?.Invoke();
+        }
     }
 
     /// <summary>

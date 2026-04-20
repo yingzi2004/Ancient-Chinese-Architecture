@@ -157,6 +157,11 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(2f);
 
+        if (EndSequenceVFX.Instance != null)
+        {
+            yield return EndSequenceVFX.Instance.PlayRoutine();
+        }
+
         // 获取上一个场景的名称，如果没有保存则默认返回"SampleScene"
         string previousScene = PlayerPrefs.GetString("PreviousScene", "SampleScene");
 

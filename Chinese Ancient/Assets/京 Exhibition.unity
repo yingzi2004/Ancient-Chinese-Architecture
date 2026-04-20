@@ -4465,6 +4465,10 @@ MonoBehaviour:
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  playEndVFX: 0
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &195406491
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4492,6 +4496,12 @@ MonoBehaviour:
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+  globalPreventSameDialogue: 0
+  playEndVFX: 0
+  sharedGroupID: 
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &195406492
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6508,7 +6518,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1605334503}
   m_Direction: 0
   m_Value: 0.5
-  m_Size: 0.9995222
+  m_Size: 0.99952215
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -8179,6 +8189,10 @@ MonoBehaviour:
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  playEndVFX: 0
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &452422916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8208,6 +8222,12 @@ MonoBehaviour:
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+  globalPreventSameDialogue: 0
+  playEndVFX: 0
+  sharedGroupID: 
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &452422917
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -18086,6 +18106,10 @@ MonoBehaviour:
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  playEndVFX: 0
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1288456499
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18119,6 +18143,12 @@ MonoBehaviour:
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+  globalPreventSameDialogue: 0
+  playEndVFX: 0
+  sharedGroupID: 
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &1288456500
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -21371,7 +21401,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -15.812, y: 14.06}
+  m_AnchoredPosition: {x: -17.311, y: 14.543}
   m_SizeDelta: {x: 2376, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1591395306
@@ -26407,6 +26437,10 @@ MonoBehaviour:
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  playEndVFX: 0
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &2003621371
 MonoBehaviour:
   m_ObjectHideFlags: 0
