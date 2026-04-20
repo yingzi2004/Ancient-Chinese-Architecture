@@ -120,15 +120,9 @@ public class ScrollMapController : MonoBehaviour
     [SerializeField] private Image fadeOverlayImage;
     [SerializeField] private float sceneFadeDuration = 0.5f;
 
-    [Header("══ 开场对话（新增）══")]
-    [SerializeField] private GameObject dialoguePanel;
-    [SerializeField] private TextMeshProUGUI dialogueText;
-    [SerializeField] private float dialogueTypingSpeed = 0.08f;
-    [SerializeField] private float dialoguePauseDuration = 1.5f;
-
-    [Header("══ 地图打开后对话（新增）══")]
-    [SerializeField] private GameObject mapDialoguePanel;
-    [SerializeField] private TextMeshProUGUI mapDialogueText;
+    [Header("══ 玩家心路独白控制器 ══")]
+    [Tooltip("拖入挂载了 MapMonologueController 组件的物体（负责处理玩家可自由推进的文字独白）")]
+    [SerializeField] private MapMonologueController monologueController;
 
     [Header("══ 音效（可选）══")]
     [SerializeField] private AudioSource audioSource;
@@ -153,23 +147,6 @@ public class ScrollMapController : MonoBehaviour
     private bool isTransitioning = false;
     private CanvasGroup fadeOverlay;
 
-    // 开场对话文本
-    private string[] openingDialogue = new string[]
-    {
-        "咦…… 这是哪里？头有点晕……",
-        "我记得我是跟着古建筑考察队，去寻访苏州园林、北京天坛这些经典建筑的，怎么突然到了这个地方？",
-        "一阵风吹过，一张泛黄的古地图飘到你面前……"
-    };
-
-    // 地图打开后的对话文本
-    private string[] mapOpenDialogue = new string[]
-    {
-        "哇塞！这原来是汇集了各地经典的古建筑地图啊！也太酷了吧～",
-        "苏州园林、北京天坛、晋商大院、福建土楼都在上面，每一个都是我超想打卡的地方！",
-        "地图上的每个标记都闪着微光，仿佛在邀请你走进这些千年建筑的故事里～",
-        "好期待呀！真想马上走进这些古建筑，看看它们藏着的小细节～"
-    };
-
     private void Awake()
     {
         DOTween.Init();
@@ -184,6 +161,15 @@ public class ScrollMapController : MonoBehaviour
             }
             fadeOverlay.alpha = 1f;
             fadeOverlay.blocksRaycasts = true;
+        }
+    }
+
+    private void OnEnable()
+    {
+        // 当从外部（比如EndSequenceVFX）激活地图时，如果不需要再次播放开场动画，确保立刻显示！
+        if (!playOpenAnimation || hasPlayedGlobalMapAnimation)
+        {
+            InstantOpenMap();
         }
     }
 
@@ -205,9 +191,10 @@ public class ScrollMapController : MonoBehaviour
                 fadeOverlay.alpha = 0f;
                 fadeOverlay.blocksRaycasts = false;
             }
-            if (dialoguePanel != null)
+            if (monologueController != null)
             {
-                dialoguePanel.SetActive(false);
+                if (monologueController.openingPanel != null) monologueController.openingPanel.SetActive(false);
+                if (monologueController.mapOpenPanel != null) monologueController.mapOpenPanel.SetActive(false);
             }
             InstantOpenMap();
         }
@@ -456,30 +443,7 @@ public class ScrollMapController : MonoBehaviour
                 fadeOverlay = fadeOverlayImage.gameObject.AddComponent<CanvasGroup>();
             }
         }
-        // 注意：不在初始化时重置 fadeOverlay，因为开场序列需要从黑屏开始
-        // fadeOverlay 的初始状态由 PlayOpeningSequence() 控制
-
-        // 初始化对话面板
-        if (dialoguePanel != null)
-        {
-            dialoguePanel.SetActive(false);
-        }
-        if (dialogueText != null)
-        {
-            dialogueText.overflowMode = TextOverflowModes.Overflow;
-            dialogueText.enableWordWrapping = true;
-        }
-
-        // 初始化地图对话面板
-        if (mapDialoguePanel != null)
-        {
-            mapDialoguePanel.SetActive(false);
-        }
-        if (mapDialogueText != null)
-        {
-            mapDialogueText.overflowMode = TextOverflowModes.Overflow;
-            mapDialogueText.enableWordWrapping = true;
-        }
+        // 注意：不再初始化对话面板，这部分交由 MapMonologueController 接管
     }
 
     private void PlayOpenSequence()
@@ -766,6 +730,87 @@ public class ScrollMapController : MonoBehaviour
         isAnimating = false;
     }
 
+    /// <summary>
+    /// 关闭地图动画：卷轴向中间卷起，最后完美黑屏并退出游戏
+    /// 触发方法：可以绑定给 EndSequenceVFX 面板里的 onMapCloseTrigger
+    /// </summary>
+    public void CloseMapAnimation()
+    {
+        // 阻止重复触发
+        if (isAnimating) return;
+        isAnimating = true;
+
+        if (mainSequence != null && mainSequence.IsActive())
+        {
+            mainSequence.Kill();
+        }
+
+        // 把对话框等 UI 强制藏起来，保证画面纯净
+        if (mapDialoguePanel != null) mapDialoguePanel.SetActive(false);
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+
+        mainSequence = DOTween.Sequence();
+
+        // 1. 如果要合上，卷轴遮挡卷边必须先显示出来
+        if (coverLeft != null)
+        {
+            coverLeft.gameObject.SetActive(true);
+            coverLeft.anchoredPosition = new Vector2(scrollLeftTargetX - coverLeft.rect.width, coverLeft.anchoredPosition.y);
+        }
+        if (coverRight != null)
+        {
+            coverRight.gameObject.SetActive(true);
+            coverRight.anchoredPosition = new Vector2(scrollRightTargetX + coverRight.rect.width, coverRight.anchoredPosition.y);
+        }
+
+        // 播放收起音效（利用展开音效反用）
+        if (audioSource != null && scrollOpenClip != null)
+        {
+            mainSequence.AppendCallback(() => audioSource.PlayOneShot(scrollOpenClip));
+        }
+
+        // 2. 轴心向中间合拢
+        if (scrollLeft != null)
+        {
+            mainSequence.Join(
+                scrollLeft.DOAnchorPosX(0f, scrollOpenDuration).SetEase(Ease.InOutQuad)
+            );
+        }
+        if (scrollRight != null)
+        {
+            mainSequence.Join(
+                scrollRight.DOAnchorPosX(0f, scrollOpenDuration).SetEase(Ease.InOutQuad)
+            );
+        }
+
+        // 3. 卷帘边向中间合拢（盖住世界）
+        if (coverLeft != null)
+        {
+            mainSequence.Join(
+                coverLeft.DOAnchorPosX(0f, baseMapRevealDuration).SetEase(Ease.InOutQuad)
+            );
+        }
+        if (coverRight != null)
+        {
+            mainSequence.Join(
+                coverRight.DOAnchorPosX(0f, baseMapRevealDuration).SetEase(Ease.InOutQuad)
+            );
+        }
+
+        // 4. 收拢结束后的最终闭幕（黑屏或退出）
+        mainSequence.OnComplete(() =>
+        {
+            isAnimating = false;
+            
+            // 下面是结束游戏的逻辑。因为已经是在谢幕了，合上后游戏就自动终止
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        });
+    }
+
     private void Update()
     {
         // 我们在这里加一个暴力的全局鼠标点击检测，用来抓真凶！
@@ -849,33 +894,15 @@ public class ScrollMapController : MonoBehaviour
             if (rightGroup != null) rightGroup.alpha = 0f;
         }
 
-        // 4. 显示对话面板
-        if (dialoguePanel != null)
+        // 4. 显示并播放等待式可控玩家独白
+        if (monologueController != null)
         {
-            dialoguePanel.SetActive(true);
-        }
-
-        // 5. 依次播放对话
-        for (int i = 0; i < openingDialogue.Length; i++)
-        {
-            if (dialogueText != null)
-            {
-                // 在“风吹过”这句开始打字时同步播放风声音效
-                if (i == openingDialogue.Length - 1 && audioSource != null && windBlowClip != null)
-                {
-                    audioSource.PlayOneShot(windBlowClip);
-                }
-
-                yield return StartCoroutine(TypewriterEffect(openingDialogue[i]));
-
-                yield return new WaitForSeconds(dialoguePauseDuration);
-            }
-        }
-
-        // 6. 隐藏对话面板
-        if (dialoguePanel != null)
-        {
-            dialoguePanel.SetActive(false);
+            // 给独白管理器分配风声音效
+            monologueController.audioSource = this.audioSource;
+            monologueController.windBlowClip = this.windBlowClip;
+            
+            // 协程会暂停在这里，直到玩家点完了所有的字幕才会进入下一行黑屏淡出卷轴动画
+            yield return StartCoroutine(monologueController.PlayOpeningSequence());
         }
 
         // 7. 等待一小段时间
@@ -910,56 +937,17 @@ public class ScrollMapController : MonoBehaviour
     }
 
     /// <summary>
-    /// 打字机效果：逐字显示文本
-    /// </summary>
-    private System.Collections.IEnumerator TypewriterEffect(string text)
-    {
-        if (dialogueText == null) yield break;
-
-        dialogueText.text = text;
-        dialogueText.maxVisibleCharacters = 99999;
-        dialogueText.ForceMeshUpdate(true);
-
-        int totalCharacters = dialogueText.textInfo.characterCount;
-        dialogueText.maxVisibleCharacters = 0;
-
-        for (int i = 0; i <= totalCharacters; i++)
-        {
-            dialogueText.maxVisibleCharacters = i;
-            yield return new WaitForSeconds(dialogueTypingSpeed);
-        }
-
-        dialogueText.maxVisibleCharacters = 99999;
-    }
-
-    /// <summary>
     /// 地图打开后的对话序列
     /// </summary>
     private System.Collections.IEnumerator PlayMapOpenDialogue()
     {
-        // 等待一小段时间，让玩家先看清楚地图
+        // 等待一小段时间，让玩家先进地图适应一下
         yield return new WaitForSeconds(0.5f);
 
-        // 显示地图对话面板
-        if (mapDialoguePanel != null)
+        // 委托给独白管理器播放卷轴展开完成后的玩家感叹词
+        if (monologueController != null)
         {
-            mapDialoguePanel.SetActive(true);
-        }
-
-        // 依次播放对话
-        for (int i = 0; i < mapOpenDialogue.Length; i++)
-        {
-            if (mapDialogueText != null)
-            {
-                yield return StartCoroutine(TypewriterEffectForMap(mapOpenDialogue[i]));
-                yield return new WaitForSeconds(dialoguePauseDuration);
-            }
-        }
-
-        // 所有对话播放完毕，隐藏对话面板并开始镜头引导
-        if (mapDialoguePanel != null)
-        {
-            mapDialoguePanel.SetActive(false);
+            yield return StartCoroutine(monologueController.PlayMapOpenSequence());
         }
 
         Debug.Log("【地图对话结束】准备镜头引导...");
@@ -977,28 +965,5 @@ public class ScrollMapController : MonoBehaviour
             isAnimating = false;
             Debug.Log("【动画结束】镜头引导已关闭，直接允许点击。");
         }
-    }
-
-    /// <summary>
-    /// 打字机效果：逐字显示文本（地图对话框专用）
-    /// </summary>
-    private System.Collections.IEnumerator TypewriterEffectForMap(string text)
-    {
-        if (mapDialogueText == null) yield break;
-
-        mapDialogueText.text = text;
-        mapDialogueText.maxVisibleCharacters = 99999;
-        mapDialogueText.ForceMeshUpdate(true);
-
-        int totalCharacters = mapDialogueText.textInfo.characterCount;
-        mapDialogueText.maxVisibleCharacters = 0;
-
-        for (int i = 0; i <= totalCharacters; i++)
-        {
-            mapDialogueText.maxVisibleCharacters = i;
-            yield return new WaitForSeconds(dialogueTypingSpeed);
-        }
-
-        mapDialogueText.maxVisibleCharacters = 99999;
     }
 }

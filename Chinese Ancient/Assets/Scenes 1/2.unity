@@ -336,6 +336,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetSceneName: "\u4EAC Exhibition"
+  endSequenceVFX: {fileID: 0}
+  playEndVFXBeforeLoad: 1
   exitButton: {fileID: 583825991}
   buttonText: {fileID: 316020529}
   buttonImage: {fileID: 0}
@@ -973,8 +975,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u9000\u51FA\u6E38\u620F"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 7626c0765d56a3a46b99cd28abe0df37, type: 2}
-  m_sharedMaterial: {fileID: 8120531251106334684, guid: 7626c0765d56a3a46b99cd28abe0df37, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 17bbf20bb0c60114098a5f51785bc2f2, type: 2}
+  m_sharedMaterial: {fileID: -7326741304796805326, guid: 17bbf20bb0c60114098a5f51785bc2f2, type: 2}
   m_fontSharedMaterials:
   - {fileID: 8120531251106334684, guid: 7626c0765d56a3a46b99cd28abe0df37, type: 2}
   m_fontMaterial: {fileID: 0}

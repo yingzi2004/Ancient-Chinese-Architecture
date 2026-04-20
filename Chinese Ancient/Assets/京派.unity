@@ -3349,6 +3349,23 @@ MonoBehaviour:
   singleBlinkDuration: 0.6
   fadeToBlackDuration: 0.5
   holdBlackDuration: 0.1
+  finalMapObject: {fileID: 1305719385610862917, guid: 3c85e2262b2c43540b0cbd95c9f7ae4c, type: 3}
+  holdMapBeforeClose: 2
+  onMapCloseTrigger:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2665715826885115370, guid: 6eac464a80abff94986ffea6471918eb, type: 3}
+        m_TargetAssemblyTypeName: ScrollMapController, Assembly-CSharp
+        m_MethodName: CloseMapAnimation
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   useUnscaledTime: 1
   onSequenceCompleted:
     m_PersistentCalls:
