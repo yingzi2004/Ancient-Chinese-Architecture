@@ -68,6 +68,10 @@ public class EndSequenceVFX : MonoBehaviour
     [Range(0f, 5f)]
     public float holdBlackDuration = 0.5f;
 
+    [Header("额外：原场景背景音乐淡出")]
+    [Tooltip("原本在主场景播放的 BGM（AudioSource）。在晕厥变黑的过程中，自动帮它声音降到0")]
+    public AudioSource sceneBgmToFadeOut;
+
     [Header("阶段 4：最终场景跳转 (新版地图过渡)")]
     [Tooltip("黑屏后，要跳转到的新场景名称（例如 EndingMapScene）。如果不填，则停留在当前场景。")]
     public string targetEndingScene;
@@ -200,6 +204,15 @@ public class EndSequenceVFX : MonoBehaviour
         // 自动计算摇晃时长，让它覆盖整个“模糊 + 眨眼 + 变黑全过程”
         float estimatedTotalTime = blurInDuration + (blinkCount * (singleBlinkDuration + 0.3f)) + fadeToBlackDuration;
         shakeDuration = Mathf.Max(shakeDuration, estimatedTotalTime);
+
+        // --- 新增：背景音乐淡出 ---
+        if (sceneBgmToFadeOut != null)
+        {
+            float startVol = sceneBgmToFadeOut.volume;
+            StartCoroutine(TweenFloat(startVol, 0f, estimatedTotalTime, v => {
+                if (sceneBgmToFadeOut != null) sceneBgmToFadeOut.volume = v;
+            }));
+        }
 
         Coroutine cShake = null;
         if (targetCamera != null && shakeDuration > 0f && shakeStrength > 0f)

@@ -745,10 +745,6 @@ public class ScrollMapController : MonoBehaviour
             mainSequence.Kill();
         }
 
-        // 把对话框等 UI 强制藏起来，保证画面纯净
-        if (mapDialoguePanel != null) mapDialoguePanel.SetActive(false);
-        if (dialoguePanel != null) dialoguePanel.SetActive(false);
-
         mainSequence = DOTween.Sequence();
 
         // 1. 如果要合上，卷轴遮挡卷边必须先显示出来

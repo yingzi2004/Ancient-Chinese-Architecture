@@ -3232,6 +3232,8 @@ MonoBehaviour:
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+  portraitRevealIndex: 0
+  nameRevealIndex: 0
   globalPreventSameDialogue: 0
   playEndVFX: 0
   sharedGroupID: 
@@ -3344,28 +3346,13 @@ MonoBehaviour:
   holdBlurBeforeShake: 1
   shakeDuration: 1.46
   shakeStrength: 1.81
-  shakeFrequency: 53.5
+  shakeFrequency: 36.6
   blinkCount: 3
   singleBlinkDuration: 0.6
   fadeToBlackDuration: 0.5
   holdBlackDuration: 0.1
-  finalMapObject: {fileID: 1305719385610862917, guid: 3c85e2262b2c43540b0cbd95c9f7ae4c, type: 3}
-  holdMapBeforeClose: 2
-  onMapCloseTrigger:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2665715826885115370, guid: 6eac464a80abff94986ffea6471918eb, type: 3}
-        m_TargetAssemblyTypeName: ScrollMapController, Assembly-CSharp
-        m_MethodName: CloseMapAnimation
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+  sceneBgmToFadeOut: {fileID: 412532744}
+  targetEndingScene: Finally
   useUnscaledTime: 1
   onSequenceCompleted:
     m_PersistentCalls:
@@ -4971,6 +4958,8 @@ MonoBehaviour:
   - "\u6700\u540E\u4E00\u7A0B"
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+  portraitRevealIndex: 0
+  nameRevealIndex: 0
   globalPreventSameDialogue: 0
   playEndVFX: 0
   sharedGroupID: 
@@ -5406,6 +5395,8 @@ MonoBehaviour:
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+  portraitRevealIndex: 0
+  nameRevealIndex: 0
   globalPreventSameDialogue: 0
   playEndVFX: 0
   sharedGroupID: 

@@ -30,12 +30,36 @@ public class StandaloneMapCloser : MonoBehaviour
     [Tooltip("左右卷轴合并时，距离屏幕正中心的间隙（防止卷轴互相穿模重叠）。如填入60，则左轴停在-60，右轴停在60。")]
     public float centerOffset = 60f;
 
+    [Header("音乐设置 (可选)")]
+    [Tooltip("如果你想在结局地图界面播放一段音乐，请拖入音频片段 (AudioClip)")]
+    public AudioClip endingBGM;
+    [Tooltip("进入新场景时，音乐淡入需要多少秒？")]
+    public float audioFadeInDuration = 2.0f;
+    [Tooltip("离开地图关游戏时，音乐淡出需要多少秒？")]
+    public float audioFadeOutDuration = 1.5f;
+
     [Header("最终退场黑屏(可选)")]
     [Tooltip("如果你有一张全屏纯黑并且透明度为0的图片，可以拖到这。用来做退出前的极致黑屏淡入。")]
     public Image finalFadeImage;
 
+    private AudioSource bgmSource;
+
     private IEnumerator Start()
     {
+        // 自动创建底层黑背景
+        CreateBlackBackground();
+
+        // 音乐淡入处理
+        if (endingBGM != null)
+        {
+            bgmSource = gameObject.AddComponent<AudioSource>();
+            bgmSource.clip = endingBGM;
+            bgmSource.loop = true;
+            bgmSource.volume = 0f;
+            bgmSource.Play();
+            bgmSource.DOFade(1f, audioFadeInDuration).SetEase(Ease.Linear);
+        }
+
         // 刚进入新场景时，如果在黑板隐藏状态，保证它能显示出来
         if (leftCover != null) leftCover.gameObject.SetActive(true);
         if (rightCover != null) rightCover.gameObject.SetActive(true);
@@ -85,18 +109,71 @@ public class StandaloneMapCloser : MonoBehaviour
             seq.Join(rightCover.DOAnchorPosX(targetX, closeDuration).SetEase(Ease.InOutSine));
         }
 
-        // 3. 动画执行完毕后的谢幕
+        // 3. 动画执行完毕后的谢幕：强制淡入全屏黑屏！
         seq.OnComplete(() =>
         {
-            if (finalFadeImage != null)
-            {
-                // 最后再淡入一层完美黑屏，时长1秒，结束后退游戏
-                finalFadeImage.DOFade(1f, 1f).SetEase(Ease.Linear).OnComplete(QuitGame);
-            }
-            else
-            {
-                QuitGame(); // 如果没配置最后黑屏图片，合上后直接秒退
-            }
+            CreateAndFadeBlackOverlay();
+        });
+    }
+
+    /// <summary>
+    /// 自动创建一个铺在游戏最底层的纯黑背景，确保不管咋样背景都是黑的
+    /// </summary>
+    private void CreateBlackBackground()
+    {
+        // 创建底层 Canvas
+        GameObject bgObj = new GameObject("BgBlackCanvas");
+        Canvas c = bgObj.AddComponent<Canvas>();
+        c.renderMode = RenderMode.ScreenSpaceOverlay;
+        c.sortingOrder = -32767; // 放到极远的底层
+
+        // 创建黑色Image
+        GameObject imgObj = new GameObject("BgImage");
+        imgObj.transform.SetParent(bgObj.transform, false);
+        Image img = imgObj.AddComponent<Image>();
+        img.color = Color.black;
+
+        // 全屏拉伸
+        RectTransform rt = img.rectTransform;
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.sizeDelta = Vector2.zero;
+    }
+
+    /// <summary>
+    /// 自动创建一个最顶层的纯黑画布，并执行淡入。不用再拖 finalFadeImage 了一劳永逸！
+    /// </summary>
+    private void CreateAndFadeBlackOverlay()
+    {
+        // 创建霸道顶层 Canvas
+        GameObject fadeObj = new GameObject("FinalFadeCanvas");
+        Canvas c = fadeObj.AddComponent<Canvas>();
+        c.renderMode = RenderMode.ScreenSpaceOverlay;
+        c.sortingOrder = 32767; // 压在所有东西之上
+
+        // 挡住鼠标点击
+        fadeObj.AddComponent<GraphicRaycaster>(); 
+
+        // 创建初始透明的纯黑Image
+        GameObject imgObj = new GameObject("FadeImage");
+        imgObj.transform.SetParent(fadeObj.transform, false);
+        Image img = imgObj.AddComponent<Image>();
+        img.color = new Color(0, 0, 0, 0);
+
+        RectTransform rt = img.rectTransform;
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.sizeDelta = Vector2.zero;
+
+        // 如果有背景音乐，跟着黑屏一起淡出为 0
+        if (bgmSource != null)
+        {
+            bgmSource.DOFade(0f, 1.5f).SetEase(Ease.Linear);
+        }
+
+        // 开始淡入到全屏纯黑，用时1.5秒，黑透后再退游戏
+        img.DOFade(1f, 1.5f).SetEase(Ease.Linear).OnComplete(() => {
+            QuitGame();
         });
     }
 
