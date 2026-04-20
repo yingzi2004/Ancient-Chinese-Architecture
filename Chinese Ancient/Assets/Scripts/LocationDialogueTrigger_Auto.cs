@@ -43,8 +43,16 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
     [Tooltip("全局文案去重：勾选后，这段对话只要在游戏中被播放过一次，别的触发器（甚至本身）就不会再说第二次，防止玩家重复看相同的文案。")]
     [SerializeField] private bool globalPreventSameDialogue = false;
 
+    [Header("结尾特效")]
+    [Tooltip("勾选后，对话结束必然触发屏幕模糊、黑屏、相机震动（不自动退出游戏）")]
+    public bool playEndVFX = false;
+
     [Tooltip("共享触发组ID（可选）：给多个触发器填同样的ID（如'LostHints'），若勾选了TriggerOnce，则此ID的组只要有一个成员触发过，该组所有成员全都不会再触发。")]
     [SerializeField] private string sharedGroupID = "";
+
+    [Header("事件设置")]
+    [Tooltip("对话结束时触发的事件")]
+    public UnityEngine.Events.UnityEvent onDialogueEnd = new UnityEngine.Events.UnityEvent();
 
     // 静态内存（整个游戏运行期间共享）
     private static System.Collections.Generic.HashSet<string> playedDialogueHashes = new System.Collections.Generic.HashSet<string>();
@@ -386,7 +394,20 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
         }
 
         // 开始对话 - 使用配置的NPC显示名称和处理后的富文本台词
-        dialogueManager.StartAutoDialogue(npcDisplayName, processedLines, portraitSprite, expressionPortraits);
+        dialogueManager.StartAutoDialogue(npcDisplayName, processedLines, portraitSprite, expressionPortraits, () => {
+            Debug.Log($"[{locationName}] 对话结束回调触发！正在调用 onDialogueEnd ({onDialogueEnd?.GetPersistentEventCount() ?? 0} 个监听器)");
+            
+            if (playEndVFX && EndSequenceVFX.Instance != null)
+            {
+                Debug.Log($"[{locationName}] 正在播放黑屏震动模糊特效...");
+                EndSequenceVFX.Instance.Play();
+            }
+
+            if (onDialogueEnd != null)
+            {
+                onDialogueEnd.Invoke();
+            }
+        });
         hasTriggered = true;
 
         // 记入系统的组级防漏和全局去重字典

@@ -112,6 +112,7 @@ public class DialogueManager : MonoBehaviour
 
     private Sprite defaultPortrait; // 默认立绘保存
     private Sprite[] currentExpressions; // 当前对话序列对应的表情差分
+    private System.Action currentDialogueCallback; // 当前对话结束的回调
 
     void Awake()
     {
@@ -426,8 +427,9 @@ public class DialogueManager : MonoBehaviour
     /// <summary>
     /// 开始对话
     /// </summary>
-    public void StartDialogue(string npcName, string greeting, DialogueOption[] options)
+    public void StartDialogue(string npcName, string greeting, DialogueOption[] options, System.Action onComplete = null)
     {
+        currentDialogueCallback = onComplete;
         Debug.Log($"DialogueManager: 开始对话 - NPC: {npcName}");
 
         if (!string.IsNullOrEmpty(npcName))
@@ -467,8 +469,9 @@ public class DialogueManager : MonoBehaviour
     /// 开始自动对话序列（无选项）
     /// 支持传入默认立绘和表情差分数组
     /// </summary>
-    public void StartAutoDialogue(string npcName, string[] dialogueSequence, Sprite defaultPortrait = null, Sprite[] expressionPortraits = null)
+    public void StartAutoDialogue(string npcName, string[] dialogueSequence, Sprite defaultPortrait = null, Sprite[] expressionPortraits = null, System.Action onComplete = null)
     {
+        currentDialogueCallback = onComplete;
         Debug.Log($"DialogueManager: 开始自动对话序列 - NPC: {npcName}, 对话数量: {dialogueSequence?.Length ?? 0}");
 
         // 如果未绑定 portraitImage，尝试找一找
@@ -1128,6 +1131,13 @@ public class DialogueManager : MonoBehaviour
             {
                 Destroy(child.gameObject);
             }
+        }
+
+        if (currentDialogueCallback != null)
+        {
+            var cb = currentDialogueCallback;
+            currentDialogueCallback = null;
+            cb?.Invoke();
         }
     }
 

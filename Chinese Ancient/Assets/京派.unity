@@ -2939,7 +2939,7 @@ MonoBehaviour:
   m_Antialiasing: 2
   m_AntialiasingQuality: 2
   m_StopNaN: 0
-  m_Dithering: 0
+  m_Dithering: 1
   m_ClearDepth: 1
   m_AllowXRRendering: 1
   m_AllowHDROutput: 1
@@ -3314,6 +3314,10 @@ MonoBehaviour:
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  playEndVFX: 0
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1139947597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3349,6 +3353,12 @@ MonoBehaviour:
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+  globalPreventSameDialogue: 0
+  playEndVFX: 0
+  sharedGroupID: 
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &1139947598
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3414,6 +3424,66 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1189361439
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1189361441}
+  - component: {fileID: 1189361440}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1189361440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1189361439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2273bb667ccf78d458cb3d760449092e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetCamera: {fileID: 988613039}
+  initialDelay: 1
+  maxBlur: 2
+  blurInDuration: 0.25
+  holdBlurBeforeShake: 1
+  shakeDuration: 1.46
+  shakeStrength: 1.81
+  shakeFrequency: 53.5
+  blinkCount: 3
+  singleBlinkDuration: 0.6
+  fadeToBlackDuration: 0.5
+  holdBlackDuration: 0.1
+  useUnscaledTime: 1
+  onSequenceCompleted:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!4 &1189361441
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1189361439}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -180.04799, y: 1.2250214, z: -144.47137}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4633,11 +4703,21 @@ MonoBehaviour:
         npcLines:
         - "\u5343\u4E07\u5C0F\u5FC3\u70B9\uFF01"
         choices: []
+        onNodeTriggerEvent:
+          m_PersistentCalls:
+            m_Calls: []
     - optionText: "\u4E0D\u53BB\uFF0C\u6211\u5F88\u5FD9\u3002"
       nextNode:
         npcLines:
         - "\u73B0\u5728\u7684\u5E74\u8F7B\u4EBA\u554A..."
         choices: []
+        onNodeTriggerEvent:
+          m_PersistentCalls:
+            m_Calls: []
+    onNodeTriggerEvent:
+      m_PersistentCalls:
+        m_Calls: []
+  alternateNodes: []
   player: {fileID: 1724057531}
   playerTag: Player
   triggerDistance: 3
@@ -4961,6 +5041,10 @@ MonoBehaviour:
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  playEndVFX: 0
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1748181511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4991,6 +5075,12 @@ MonoBehaviour:
   - "\u6700\u540E\u4E00\u7A0B"
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+  globalPreventSameDialogue: 0
+  playEndVFX: 0
+  sharedGroupID: 
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &1748181512
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5079,6 +5169,10 @@ MonoBehaviour:
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  playEndVFX: 0
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1789409355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5365,6 +5459,22 @@ MonoBehaviour:
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  playEndVFX: 0
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1189361439}
+        m_TargetAssemblyTypeName: EndSequenceVFX, Assembly-CSharp
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1889107903
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5400,6 +5510,24 @@ MonoBehaviour:
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+  globalPreventSameDialogue: 0
+  playEndVFX: 0
+  sharedGroupID: 
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1189361440}
+        m_TargetAssemblyTypeName: EndSequenceVFX, Assembly-CSharp
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!65 &1889107904
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5813,3 +5941,4 @@ SceneRoots:
   - {fileID: 934200136}
   - {fileID: 1511181661}
   - {fileID: 221547747}
+  - {fileID: 1189361441}

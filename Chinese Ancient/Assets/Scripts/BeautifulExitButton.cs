@@ -18,6 +18,13 @@ public class BeautifulExitButton : MonoBehaviour
     [Tooltip("要返回的场景名称")]
     public string targetSceneName = "京 Exhibition";
 
+    [Header("结尾特效（可选）")]
+    [Tooltip("如果指定了 EndSequenceVFX，会在切场景前播放：模糊->黑屏->摇晃")]
+    public EndSequenceVFX endSequenceVFX;
+
+    [Tooltip("是否在切场景前播放结尾特效")]
+    public bool playEndVFXBeforeLoad = true;
+
     [Header("按钮组件")]
     public Button exitButton;
     public Text buttonText;
@@ -73,6 +80,8 @@ public class BeautifulExitButton : MonoBehaviour
     private Sequence pulseSequence;
     private Outline outline;
     private Shadow shadow;
+
+    private bool isLoading;
 
     void Start()
     {
@@ -211,6 +220,14 @@ public class BeautifulExitButton : MonoBehaviour
 
     void OnButtonClick()
     {
+        if (isLoading) return;
+        isLoading = true;
+
+        if (exitButton != null)
+        {
+            exitButton.interactable = false;
+        }
+
         // 播放音效
         if (audioSource != null && clickSound != null)
         {
@@ -250,6 +267,13 @@ public class BeautifulExitButton : MonoBehaviour
     void LoadScene()
     {
         Debug.Log($"返回场景: {targetSceneName}");
+
+        if (playEndVFXBeforeLoad && endSequenceVFX != null)
+        {
+            endSequenceVFX.PlayAndLoadScene(targetSceneName);
+            return;
+        }
+
         SceneManager.LoadScene(targetSceneName);
     }
 
