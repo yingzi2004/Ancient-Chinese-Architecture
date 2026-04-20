@@ -23,6 +23,8 @@ public class StandaloneMapCloser : MonoBehaviour
     public RectTransform rightCover;
 
     [Header("动画时间设置")]
+    [Tooltip("地图刚出现时，从彻底的黑屏渐渐浮现出来的用时")]
+    public float mapFadeInDuration = 1.5f;
     [Tooltip("进入新场景后，地图展示几秒钟才开始收起？")]
     public float waitBeforeClose = 2.0f;
     [Tooltip("向中间合拢动画的持续时间")]
@@ -48,6 +50,17 @@ public class StandaloneMapCloser : MonoBehaviour
     {
         // 自动创建底层黑背景
         CreateBlackBackground();
+
+        // 动态创建一个霸道的纯黑画布用于开场渐亮淡入
+        Image openingBlackMask = CreateTopBlackOverlay();
+
+        // 执行开场的地图渐入(纯黑变透明)
+        if (openingBlackMask != null)
+        {
+            openingBlackMask.DOFade(0f, mapFadeInDuration).SetEase(Ease.InOutSine).OnComplete(() => {
+                Destroy(openingBlackMask.canvas.gameObject);
+            });
+        }
 
         // 音乐淡入处理
         if (endingBGM != null)
@@ -114,6 +127,31 @@ public class StandaloneMapCloser : MonoBehaviour
         {
             CreateAndFadeBlackOverlay();
         });
+    }
+
+    private Image CreateTopBlackOverlay()
+    {
+        // 创建霸道顶层 Canvas
+        GameObject fadeObj = new GameObject("OpeningBlackCanvas");
+        Canvas c = fadeObj.AddComponent<Canvas>();
+        c.renderMode = RenderMode.ScreenSpaceOverlay;
+        c.sortingOrder = 32767; // 压在所有东西之上
+
+        // 挡住鼠标点击
+        fadeObj.AddComponent<GraphicRaycaster>();
+
+        // 创建纯黑Image
+        GameObject imgObj = new GameObject("FadeImage");
+        imgObj.transform.SetParent(fadeObj.transform, false);
+        Image img = imgObj.AddComponent<Image>();
+        img.color = Color.black;
+
+        RectTransform rt = img.rectTransform;
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.sizeDelta = Vector2.zero;
+
+        return img;
     }
 
     /// <summary>

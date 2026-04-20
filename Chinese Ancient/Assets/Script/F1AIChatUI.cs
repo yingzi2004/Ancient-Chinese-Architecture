@@ -355,10 +355,14 @@ public class F1AIChatUI : MonoBehaviour
         if (chatPanel != null)
         {
             chatPanel.SetActive(isOpen);
+            if (isOpen)
+            {
+                ForceTopUIClickable();
+            }
         }
-        
+
         if (!isOpen && ttsClient != null) ttsClient.Stop();
-        
+
         UpdateCursorState();
     }
 
@@ -375,9 +379,40 @@ public class F1AIChatUI : MonoBehaviour
     {
         if (isOpen == open) return;
         isOpen = open;
-        if (chatPanel != null) chatPanel.SetActive(isOpen);
+        if (chatPanel != null)
+        {
+            chatPanel.SetActive(isOpen);
+            if (isOpen)
+            {
+                ForceTopUIClickable();
+            }
+        }
         if (!isOpen && ttsClient != null) ttsClient.Stop();
         UpdateCursorState();
+    }
+
+    private void ForceTopUIClickable()
+    {
+        if (chatPanel == null) return;
+        
+        chatPanel.transform.SetAsLastSibling();
+
+        Canvas c = chatPanel.GetComponent<Canvas>();
+        if (c == null)
+            c = chatPanel.AddComponent<Canvas>();
+        c.overrideSorting = true;
+        c.sortingOrder = 30000;
+
+        if (chatPanel.GetComponent<UnityEngine.UI.GraphicRaycaster>() == null)
+            chatPanel.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+
+        if (UnityEngine.EventSystems.EventSystem.current == null)
+        {
+            Debug.LogWarning("[AI UI] 检测到场景缺少 EventSystem！已自动为您创建以修复 UI 无法输入的问题。");
+            GameObject eventSystemObj = new GameObject("EventSystem");
+            eventSystemObj.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            eventSystemObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+        }
     }
 
     public bool IsWindowOpen()
