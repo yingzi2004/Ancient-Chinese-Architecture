@@ -5285,6 +5285,10 @@ MonoBehaviour:
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  playEndVFX: 0
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &335915667
 GameObject:
   m_ObjectHideFlags: 0
@@ -5994,6 +5998,12 @@ MonoBehaviour:
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+  globalPreventSameDialogue: 0
+  playEndVFX: 0
+  sharedGroupID: 
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &478020424
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6018,6 +6028,10 @@ MonoBehaviour:
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  playEndVFX: 0
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &478057248
 GameObject:
   m_ObjectHideFlags: 0
@@ -21770,6 +21784,12 @@ MonoBehaviour:
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+  globalPreventSameDialogue: 0
+  playEndVFX: 0
+  sharedGroupID: 
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &1073225703
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -21830,6 +21850,10 @@ MonoBehaviour:
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  playEndVFX: 0
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!43 &1076333206
 Mesh:
   m_ObjectHideFlags: 0
@@ -28640,8 +28664,8 @@ Transform:
   m_GameObject: {fileID: 1635759389}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 11.986, y: -0.013768315, z: 9.946}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 10.17, y: -0.013768315, z: 8.12}
+  m_LocalScale: {x: 1, y: 1, z: 1.21}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 738578205}
@@ -28670,6 +28694,10 @@ MonoBehaviour:
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  playEndVFX: 0
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1635759392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28695,6 +28723,12 @@ MonoBehaviour:
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+  globalPreventSameDialogue: 0
+  playEndVFX: 0
+  sharedGroupID: 
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &1635759393
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -29096,6 +29130,10 @@ MonoBehaviour:
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  playEndVFX: 0
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1738461316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29121,6 +29159,12 @@ MonoBehaviour:
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+  globalPreventSameDialogue: 0
+  playEndVFX: 0
+  sharedGroupID: 
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &1738461317
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -31510,6 +31554,10 @@ MonoBehaviour:
   - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
   highlightKeywords: []
   highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
+  playEndVFX: 0
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &2044520016
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31542,6 +31590,12 @@ MonoBehaviour:
   - "\uFF08F)"
   highlightColor: {r: 0.5882353, g: 0.69411767, b: 0.8, a: 1}
   locationName: "\u672A\u547D\u540D\u4F4D\u7F6E"
+  globalPreventSameDialogue: 0
+  playEndVFX: 0
+  sharedGroupID: 
+  onDialogueEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &2044520017
 BoxCollider:
   m_ObjectHideFlags: 0
