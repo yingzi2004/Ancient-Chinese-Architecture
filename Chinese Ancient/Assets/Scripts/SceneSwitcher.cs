@@ -1,18 +1,12 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// 场景切换器：玩家靠近物体自动跳转到目标场景，并保存当前场景和玩家位置
-/// 使用方法：将此脚本挂载到物体上（如小正方体），添加Box Collider并勾选Is Trigger
-/// </summary>
 public class SceneSwitcher : MonoBehaviour
 {
     [Header("目标场景设置")]
-    [Tooltip("要跳转到的场景名称")]
     public string targetSceneName = "2";
 
     [Header("玩家设置")]
-    [Tooltip("玩家对象（用于获取位置），如果为空则自动查找")]
     public GameObject player;
 
     private bool playerInZone = false;

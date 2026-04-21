@@ -1,16 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-/// <summary>
-/// 鼠标解锁器：在场景加载时解锁鼠标并保持光标始终可见
-/// 使用方法：将此脚本挂载到需要鼠标交互的场景中（如2场景的任意物体上）
-/// </summary>
 public class MouseUnlocker : MonoBehaviour
 {
     [Header("设置")]
-    [Tooltip("是否在场景加载时自动解锁鼠标")]
     public bool unlockOnStart = true;
 
-    [Tooltip("是否强制保持鼠标可见（防止被其他脚本锁定）")]
     public bool forceKeepVisible = true;
 
     void Start()

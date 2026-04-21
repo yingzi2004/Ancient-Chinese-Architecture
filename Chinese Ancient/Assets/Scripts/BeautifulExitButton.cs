@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
@@ -6,23 +6,14 @@ using UnityEngine.EventSystems;
 using System.Collections;
 using DG.Tweening;  // 使用DOTween
 
-/// <summary>
-/// 美化的纸牌游戏退出按钮：带有动画效果、音效和视觉反馈
-/// 使用方法：
-/// 1. 将此脚本挂载到退出按钮上
-/// 2. 可选：添加AudioSource组件配置点击音效
-/// </summary>
 public class BeautifulExitButton : MonoBehaviour
 {
     [Header("场景设置")]
-    [Tooltip("要返回的场景名称")]
     public string targetSceneName = "京 Exhibition";
 
     [Header("结尾特效（可选）")]
-    [Tooltip("如果指定了 EndSequenceVFX，会在切场景前播放：模糊->黑屏->摇晃")]
     public EndSequenceVFX endSequenceVFX;
 
-    [Tooltip("是否在切场景前播放结尾特效")]
     public bool playEndVFXBeforeLoad = true;
 
     [Header("按钮组件")]
@@ -38,39 +29,29 @@ public class BeautifulExitButton : MonoBehaviour
     public Color textColor = Color.white;
 
     [Header("动画效果")]
-    [Tooltip("是否启用悬停放大动画")]
     public bool enableHoverAnimation = true;
-    [Tooltip("悬停时的放大比例")]
     [Range(0.8f, 1.5f)]
     public float hoverScale = 1.1f;
-    [Tooltip("动画过渡速度")]
     [Range(0.1f, 5f)]
     public float animationSpeed = 3f;
 
     [Header("按钮点击效果")]
-    [Tooltip("点击时是否缩小一下")]
     public bool enableClickEffect = true;
-    [Tooltip("点击时的缩小比例")]
     [Range(0.5f, 1f)]
     public float clickScale = 0.9f;
 
     [Header("音效")]
-    [Tooltip("点击音效（可选）")]
     public AudioClip clickSound;
     private AudioSource audioSource;
 
     [Header("脉冲动画（吸引注意力）")]
-    [Tooltip("是否启用脉冲呼吸效果")]
     public bool enablePulseAnimation = true;
-    [Tooltip("脉冲速度")]
     [Range(0.5f, 3f)]
     public float pulseSpeed = 1.5f;
-    [Tooltip("脉冲幅度")]
     [Range(0.05f, 0.3f)]
     public float pulseAmount = 0.1f;
 
     [Header("阴影效果")]
-    [Tooltip("是否添加阴影")]
     public bool enableShadow = true;
     public Color shadowColor = new Color(0f, 0f, 0f, 0.5f);
     public Vector2 shadowOffset = new Vector2(3, -3);

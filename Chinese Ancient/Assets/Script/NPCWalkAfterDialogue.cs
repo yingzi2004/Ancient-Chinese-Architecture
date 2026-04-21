@@ -1,37 +1,27 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 public class NPCWalkAfterDialogue : MonoBehaviour
 {
-    [Tooltip("NPC的Animator")]
     public Animator animator;
     
-    [Tooltip("指定NPC要顺次走过的目标点数组（按顺序创建空物体填入）")]
     public Transform[] waypoints;
 
-    [Tooltip("到达对应的点是否停下？数组大小须与路点一致。勾选代表停下来聊天，不勾选代表仅拐弯不停")]
     public bool[] stopAtWaypoints;
 
-    [Tooltip("到达对应的点后，是否直接消失并瞬间传送到下一个点？（用于隔空穿墙、瞬移等逻辑）")]
     public bool[] teleportToNextWaypoint;
     
-    [Tooltip("移动速度")]
     public float walkSpeed = 2f;
     
-    [Tooltip("转身速度")]
     public float turnSpeed = 5f;
 
-    [Tooltip("控制走路动画的Bool参数名")]
     public string walkAnimBoolParams = "Walk";
 
     [Header("逐步停点的对话配置")]
-    [Tooltip("NPCInteractTrigger组件（就是NPC身上的那个对话脚本，拖进来）")]
     public NPCInteractTrigger interactTrigger;
 
-    [Tooltip("到达每个点停下后，玩家再次按交互键(L)触发的新对话（数量需与路点数量一致）")]
     public DialogNode[] stopDialogues;
 
-    [Tooltip("全部走完后触发的其他事件（可选）")]
     public UnityEvent onAllWaypointsReached;
 
     private bool isWalking = false;

@@ -1,12 +1,9 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using DG.Tweening;
 using System.Collections.Generic;
 
-/// <summary>
-/// 快捷键调出的弹窗地图控制器 - 支持进度解锁、点击跳转与心脏鼓动呼吸效果
-/// </summary>
 public class PopupMapController : MonoBehaviour
 {
     [System.Serializable]
@@ -17,7 +14,6 @@ public class PopupMapController : MonoBehaviour
         public string targetSceneName;
 
         [Header("黑白差分图(可选)")]
-        [Tooltip("【如果有黑白图，拖到这里。未解锁时会显示它】")]
         public Sprite bwSprite;
 
         // 运行时缓存动态生成的黑白图层的CanvasGroup对象
@@ -29,17 +25,13 @@ public class PopupMapController : MonoBehaviour
     public List<MapBuilding> buildings = new List<MapBuilding>();
 
     [Header("══ ★ 手动解锁控制阵列 (取代之前的存档) ★ ══")]
-    [Tooltip("这几个勾选框代表对应的建筑是否亮起。0=土楼, 1=苏州, 2=京派, 3=晋商。\n你可以在不同场馆单独修改这个预制体，打勾谁谁就亮！\n当玩家碰到接触体时，代码也会自动给这里打上勾~")]
     public bool[] unlockedArray = new bool[] { true, false, false, false };
 
     [Header("══ 呼吸(心脏鼓动)效果设置 ══")]
-    [Tooltip("放大的最大倍数（1.05表示放大5%）")]
     public float pulseScale = 1.05f;
-    [Tooltip("鼓动一次的速度（秒）")]
     public float pulseDuration = 0.6f;
 
     [Header("══ 解锁设置 ══")]
-    [Tooltip("未解锁建筑变灰的颜色（可点击自由调整）")]
     public Color lockedBuildingColor = new Color(0.6f, 0.6f, 0.6f, 1f);
 
     [ContextMenu("★★★一键清空记录 (测试用)★★★")]
@@ -69,9 +61,6 @@ public class PopupMapController : MonoBehaviour
         RefreshMapVisuals();
     }
 
-    /// <summary>
-    /// 手动刷新地图表现，供别的脚本修改 unlockedArray 后立刻调用！
-    /// </summary>
     public void RefreshMapVisuals(int overridePulseIndex = -1)
     {
         Debug.Log($"<color=cyan>【场馆地图加载】完全抛弃存档模式！正在读取本场景面板中配置的 unlockedArray 解锁阵列...</color>");
@@ -212,9 +201,6 @@ public class PopupMapController : MonoBehaviour
         SceneManager.LoadScene(targetScene);
     }
 
-    /// <summary>
-    /// 动态生成真实的黑白图片涂层
-    /// </summary>
     private void EnsureBWOverlay(MapBuilding b)
     {
         if (b.bwSprite == null || b.runtimeBWGroup != null) return;

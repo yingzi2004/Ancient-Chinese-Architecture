@@ -1,18 +1,15 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UniStorm;
 
 public class CustomNightLighting : MonoBehaviour
 {
     [Header("夜间全局设置")]
-    [Tooltip("夜间主环境光压暗倍率 (越小越暗)")]
     [Range(0f, 1f)]
     public float nightAmbientMultiplier = 0.2f;
 
-    [Tooltip("夜间月光光源强度压暗倍率 (越小越暗)")]
     [Range(0f, 1f)]
     public float moonLightingMultiplier = 0.5f;
 
-    [Tooltip("开启以强制重写夜间天空盒/环境光颜色")]
     public bool overrideNightColor = false;
     public Color customNightAmbientColor = new Color(0.1f, 0.12f, 0.15f);
 

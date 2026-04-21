@@ -1,25 +1,17 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// 基于位置的对话触发器 - 自动创建UI版
-/// 玩家进入触发区域时显示相应的对话内容
-/// 会自动创建所需的UI组件
-/// </summary>
 public class LocationDialogueTrigger_Auto : MonoBehaviour
 {
     [Header("触发设置")]
-    [Tooltip("是否只触发一次")]
     [SerializeField] private bool triggerOnce = true;
 
-    [Tooltip("触发延迟时间（秒）")]
     [SerializeField] private float triggerDelay = 0.3f;
 
     [Header("对话内容")]
     [SerializeField] private string npcDisplayName = "按L键继续  小微"; // NPC显示名称
     [SerializeField] private Sprite portraitSprite; // 默认立绘图片
 
-    [Tooltip("针对每句对话的不同表情立绘差分。若不为空且有图片，播放该句对话时将切换为对应的表情。")]
     [SerializeField] private Sprite[] expressionPortraits;
 
     [TextArea(3, 10)]
@@ -31,34 +23,26 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
     };
 
     [Header("高亮设置")]
-    [Tooltip("需要高亮显示的关键字（如：F键、M键）")]
     [SerializeField] private string[] highlightKeywords;
-    [Tooltip("关键字高亮颜色")]
     [SerializeField] private Color highlightColor = new Color(1f, 0.84f, 0f); // 默认金色
 
     [Header("调试信息")]
     [SerializeField] private string locationName = "未命名位置";
 
     [Header("沉浸式表现设定 (可选)")]
-    [Tooltip("延后显示立绘的对话索引 (0=立刻显示。填1表示第2句话时小微立绘才出现)")]
     [SerializeField] private int portraitRevealIndex = 0;
     
-    [Tooltip("延后显示NPC名字的对话索引 (0=立刻显示。填7表示前7句话名字框为空，第8句话即最后几句才真正显示名字)")]
     [SerializeField] private int nameRevealIndex = 0;
 
     [Header("重复与组控制")]
-    [Tooltip("全局文案去重：勾选后，这段对话只要在游戏中被播放过一次，别的触发器（甚至本身）就不会再说第二次，防止玩家重复看相同的文案。")]
     [SerializeField] private bool globalPreventSameDialogue = false;
 
     [Header("结尾特效")]
-    [Tooltip("勾选后，对话结束必然触发屏幕模糊、黑屏、相机震动（不自动退出游戏）")]
     public bool playEndVFX = false;
 
-    [Tooltip("共享触发组ID（可选）：给多个触发器填同样的ID（如'LostHints'），若勾选了TriggerOnce，则此ID的组只要有一个成员触发过，该组所有成员全都不会再触发。")]
     [SerializeField] private string sharedGroupID = "";
 
     [Header("事件设置")]
-    [Tooltip("对话结束时触发的事件")]
     public UnityEngine.Events.UnityEvent onDialogueEnd = new UnityEngine.Events.UnityEvent();
 
     // 静态内存（整个游戏运行期间共享）

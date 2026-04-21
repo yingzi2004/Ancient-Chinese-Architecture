@@ -1,21 +1,16 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class InspectableItem : MonoBehaviour, IInteractable
 {
     [Header("检视设置")]
-    [Tooltip("检视模型将出现在这个世界坐标 (XYZ)")]
     public Vector3 fixedSpawnPosition;
 
-    [Tooltip("检视用模型预制体（可选，为空则克隆自身）")]
     public GameObject inspectModelPrefab;
 
     [Header("旋转设置")]
-    [Tooltip("右键拖拽时的旋转速度 (手动)")]
     public float manualRotationSpeed = 500.0f;
-    [Tooltip("自动旋转速度 (度/秒)")]
     public float autoRotationSpeed = 30.0f;
 
-    [Tooltip("检视时的缩放比例")]
     public float inspectScale = 1.0f;
 
     // 内部状态

@@ -1,23 +1,15 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using System.Collections;
 
-/// <summary>
-/// 纯粹的玩家第一人称视角心路独白控制器
-/// 将长篇文本独立管理，支持玩家自由点击跳过/继续，完美兼容卷轴等动画节奏的衔接
-/// </summary>
 public class MapMonologueController : MonoBehaviour
 {
     [Header("开幕黑屏独白UI")]
-    [Tooltip("黑屏时的独白底板（对话框）")]
     public GameObject openingPanel;
-    [Tooltip("黑屏时的显示文本 TMP 当前组件")]
     public TextMeshProUGUI openingText;
 
     [Header("群青相间感叹UI")]
-    [Tooltip("卷轴展开后的感叹底板（对话框），由于位置和背景不同故拆分")]
     public GameObject mapOpenPanel;
-    [Tooltip("卷轴展开后的显示文本 TMP 组件")]
     public TextMeshProUGUI mapOpenText;
 
     [Header("开幕黑屏独白（玩家疑惑）")]
@@ -40,7 +32,6 @@ public class MapMonologueController : MonoBehaviour
     };
 
     [Header("打字机及效果设置")]
-    [Tooltip("每个字打字的时间间隔")]
     public float typingSpeed = 0.05f;
     public AudioSource audioSource;
     public AudioClip windBlowClip;
@@ -118,9 +109,6 @@ public class MapMonologueController : MonoBehaviour
         return Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return);
     }
 
-    /// <summary>
-    /// 供外部 ScrollMapController 等主脑调用：播放开场黑屏引导
-    /// </summary>
     public IEnumerator PlayOpeningSequence()
     {
         Debug.Log("【系统自检】====== 成功调用到了黑屏独白！======");
@@ -129,9 +117,6 @@ public class MapMonologueController : MonoBehaviour
         yield return PlaySequence(openingDialogue, openingPanel, openingText, true);
     }
 
-    /// <summary>
-    /// 供外部调用：播放卷轴完全拉开后的感叹词
-    /// </summary>
     public IEnumerator PlayMapOpenSequence()
     {
         yield return PlaySequence(mapOpenDialogue, mapOpenPanel, mapOpenText, false);

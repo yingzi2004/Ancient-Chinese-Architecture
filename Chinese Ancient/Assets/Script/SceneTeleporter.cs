@@ -1,43 +1,27 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
-/// <summary>
-/// 场景传送点：提示 UI 常驻显示在传送点上方（Billboard 面向玩家），
-/// 玩家踏入 Trigger 后按 F 弹出确认弹窗，再按 F 传送，Esc 取消。
-/// 使用方法：空物体挂此脚本 + Collider（勾 Is Trigger） + Rigidbody（自动 Kinematic）。
-/// 提示 UI 用 World Space Canvas 子物体，挂 CanvasGroup。
-/// </summary>
 [RequireComponent(typeof(Rigidbody))]
 public class SceneTeleporter : MonoBehaviour
 {
     [Header("传送设置")]
-    [Tooltip("目标场景名称（必须已添加到 Build Settings）")]
     [SerializeField] private string targetSceneName;
-    [Tooltip("是否启用后台预加载（若传送后发黑，建议关闭）")]
     [SerializeField] private bool usePreload = false;
 
     [Header("常驻标记 UI（World Space Canvas，标识传送点位置）")]
-    [Tooltip("常驻标记根 Transform（控制位置和朝向）")]
     [SerializeField] private Transform markerRoot;
-    [Tooltip("常驻标记 CanvasGroup（用于淡入淡出）")]
     [SerializeField] private CanvasGroup markerGroup;
-    [Tooltip("常驻标记文本（如 '传送点'、场景名）")]
     [SerializeField] private TextMeshProUGUI markerText;
-    [Tooltip("标记悬浮高度")]
     [SerializeField] private float markerHeightOffset = 2.5f;
-    [Tooltip("标记淡入淡出速度")]
     [SerializeField] private float markerFadeSpeed = 4f;
 
     [Header("确认弹窗 UI")]
-    [Tooltip("确认弹窗 CanvasGroup")]
     [SerializeField] private CanvasGroup confirmPanel;
-    [Tooltip("弹窗内容文本")]
     [SerializeField] private TextMeshProUGUI confirmText;
 
     [Header("提示文案")]
-    [Tooltip("常驻标记文字")]
     [SerializeField] private string markerLabel = "传送点";
     [SerializeField] private string confirmMessage = "确认传送到 {0} ？\n\n按 F 确认　　按 Esc 取消";
     [SerializeField] private string loadingMessage = "正在加载...";
@@ -166,9 +150,6 @@ public class SceneTeleporter : MonoBehaviour
 
     // ───────────────────── 传送 ─────────────────────
 
-    /// <summary>
-    /// 玩家踏入触发区时开始后台预加载，不卡顿
-    /// </summary>
     private void PreloadScene()
     {
         if (asyncLoad != null || isLoading) return;

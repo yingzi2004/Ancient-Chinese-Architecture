@@ -1,35 +1,27 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class LanternLighter : MonoBehaviour, IInteractable
 {
     [Header("灯笼组配置")]
-    [Tooltip("【方式一】存放所有大院红灯笼的父节点（如果有的话拖进来）")]
     public Transform lanternsParent;
 
-    [Tooltip("【方式二】如果散落在场景各处不能移动，填入它们的 Tag 标签名称")]
     public string lanternTag = "Lantern";
 
-    [Tooltip("灯笼亮起时替换的发光材质 (带有 Emission 属性)")]
     public Material litMaterial;
 
-    [Tooltip("原本的普通材质 (可选，用于开发测试还原用)")]
     public Material unlitMaterial;
 
     [Header("火折子拾取逻辑")]
-    [Tooltip("火折子模型是否在拾取后隐藏或销毁")]
     public bool destroyOnPickup = true;
     
     [Header("性能优化照明配置")]
-    [Tooltip("是否在灯笼亮起时，动态生成普通光源照亮墙面")]
     public bool addOptimizedLight = true;
     public Color lightColor = new Color(1f, 0.4f, 0.2f); // 暖红偏橙色
     public float lightRange = 8f; // 照亮范围稍微扩大
     public float lightIntensity = 20.0f; // 大幅提高基础光照强度。在URP中如果开启了物理光照单位，5可能等于没亮，需要20甚至几百。
-    [Tooltip("光源相对灯笼【发光模型中心点】的偏移位置。Z轴负数通常是朝着玩家方向拉出。")]
     public Vector3 lightOffset = new Vector3(0f, -0.2f, -0.6f);
 
     [Header("NPC事件配置")]
-    [Tooltip("交付火折子后，等待多少秒后全院灯笼亮起")]
     public float lightUpDelay = 3.0f;
 
     // 是否已经被点亮，防止重复触发
@@ -45,9 +37,6 @@ public class LanternLighter : MonoBehaviour, IInteractable
         }
     }
 
-    /// <summary>
-    /// 【新增】NPC系统专用接口：玩家交付火折子后，由剧情系统或NPC脚本触发此方法
-    /// </summary>
     public void StartLightingSequence()
     {
         if (!isLit)
@@ -64,9 +53,6 @@ public class LanternLighter : MonoBehaviour, IInteractable
         TurnOnAllLanterns();
     }
 
-    /// <summary>
-    /// 被触发或者被 NPC 任务系统调用时，执行全体灯笼材质替换
-    /// </summary>
     public void TurnOnAllLanterns()
     {
         if (litMaterial == null) return;

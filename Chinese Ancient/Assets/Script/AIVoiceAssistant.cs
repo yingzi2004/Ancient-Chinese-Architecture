@@ -1,9 +1,5 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-/// <summary>
-/// AI语音助手 - 集成AI对话与语音合成
-/// 自动将AI回复朗读出来
-/// </summary>
 public class AIVoiceAssistant : MonoBehaviour
 {
     [Header("组件引用")]
@@ -12,15 +8,11 @@ public class AIVoiceAssistant : MonoBehaviour
     [SerializeField] private F1AIChatUI chatUI;
 
     [Header("语音设置")]
-    [Tooltip("是否启用语音朗读")]
     [SerializeField] private bool enableVoice = true;
-    [Tooltip("是否自动朗读AI回复")]
     [SerializeField] private bool autoSpeak = true;
 
     [Header("快捷键")]
-    [Tooltip("切换语音开关的按键")]
     [SerializeField] private KeyCode toggleVoiceKey = KeyCode.F2;
-    [Tooltip("停止当前朗读的按键")]
     [SerializeField] private KeyCode stopSpeakKey = KeyCode.F3;
 
     public bool EnableVoice
@@ -62,9 +54,6 @@ public class AIVoiceAssistant : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 发送消息并朗读回复
-    /// </summary>
     public void SendMessageWithVoice(string message)
     {
         if (chatClient == null)
@@ -90,9 +79,6 @@ public class AIVoiceAssistant : MonoBehaviour
         );
     }
 
-    /// <summary>
-    /// 朗读指定文本
-    /// </summary>
     public void SpeakText(string text)
     {
         if (!enableVoice)
@@ -126,9 +112,6 @@ public class AIVoiceAssistant : MonoBehaviour
         );
     }
 
-    /// <summary>
-    /// 停止朗读
-    /// </summary>
     public void StopSpeaking()
     {
         if (ttsClient != null)
@@ -137,9 +120,6 @@ public class AIVoiceAssistant : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 设置音色
-    /// </summary>
     public void SetVoice(AliyunTTSClient.VoiceType voiceType)
     {
         if (ttsClient != null)
@@ -148,9 +128,6 @@ public class AIVoiceAssistant : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 设置音量
-    /// </summary>
     public void SetVolume(int volume)
     {
         if (ttsClient != null)
@@ -159,9 +136,6 @@ public class AIVoiceAssistant : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 设置语速
-    /// </summary>
     public void SetSpeechRate(int rate)
     {
         if (ttsClient != null)
@@ -170,9 +144,6 @@ public class AIVoiceAssistant : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 设置语调
-    /// </summary>
     public void SetPitchRate(int pitch)
     {
         if (ttsClient != null)
@@ -181,9 +152,6 @@ public class AIVoiceAssistant : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 清理文本，移除不适合朗读的内容
-    /// </summary>
     private string CleanTextForSpeech(string text)
     {
         if (string.IsNullOrWhiteSpace(text))

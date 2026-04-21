@@ -1,97 +1,68 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// 对话管理器
-/// 管理NPC对话的显示和交互
-/// </summary>
 public class DialogueManager : MonoBehaviour
 {
     public static DialogueManager Instance { get; private set; }
 
     [Header("玩家引用")]
-    [Tooltip("玩家控制器（如果为空则自动查找）")]
     public PlayerController playerController;
 
     [Header("UI引用")]
-    [Tooltip("对话面板")]
     public GameObject dialoguePanel;
 
-    [Tooltip("NPC名称文本")]
     public Text npcNameText;
     public TMP_Text npcNameTextTMP;
 
-    [Tooltip("对话内容文本")]
     public Text dialogueText;
     public TMP_Text dialogueTextTMP;
 
-    [Tooltip("立绘图片")]
     public Image portraitImage;
 
     [Header("说话人区分")]
-    [Tooltip("玩家在对话框里的显示名字")]
     public string playerName = "我";
 
-    [Tooltip("是否解析前缀来切换说话人。示例：'我：你好' 或 '小谷：欢迎'；不写前缀默认算NPC说")]
     public bool parseSpeakerPrefix = true;
 
-    [Tooltip("NPC说话时的文字颜色")]
     public Color npcDialogueColor = Color.white;
 
-    [Tooltip("玩家说话时的文字颜色")]
     public Color playerDialogueColor = new Color(0.8f, 0.95f, 1f, 1f);
 
-    [Tooltip("玩家说话时名字栏是否强制显示为 playerName")]
     public bool forcePlayerName = true;
 
-    [Tooltip("当识别到 'NPC:' 前缀时，是否替换成当前NPC名字")]
     public bool replaceNpcTagWithCurrentNpcName = true;
 
-    [Tooltip("当识别到 '玩家:' 前缀时，是否替换成 playerName")]
     public bool replacePlayerTagWithPlayerName = true;
 
-    [Tooltip("前缀最大长度（例如 '小谷：'）")]
     public int maxSpeakerPrefixLength = 8;
 
-    [Tooltip("分隔符（支持 ':' 或 '：'）")]
     public string speakerSeparators = ":：";
 
-    [Tooltip("如果不写前缀，默认使用这个NPC名字（由StartDialogue/StartAutoDialogue传入）")]
     public string defaultNpcName = "NPC";
 
-    [Tooltip("NPC说话时名字栏颜色")]
     public Color npcNameColor = Color.white;
 
-    [Tooltip("玩家说话时名字栏颜色")]
     public Color playerNameColor = Color.white;
 
-    [Tooltip("是否也改变名字栏颜色")]
     public bool tintNameColor = false;
 
-    [Tooltip("选项按钮容器")]
     public Transform optionsContainer;
 
-    [Tooltip("选项按钮预制体")]
     public GameObject optionButtonPrefab;
 
     [Header("设置")]
-    [Tooltip("打字机效果速度")]
     public float typingSpeed = 0.05f;
 
-    [Tooltip("自动关闭延迟（对话结束后）")]
     public float autoCloseDelay = 3f;
 
-    [Tooltip("是否显示‘按键继续’提示文本")]
     public bool showContinuePrompt = true;
 
-    [Tooltip("继续提示文本")]
     public Text continuePromptText;
 
     [Header("按键设置")]
-    [Tooltip("推进对话的按键")]
     public KeyCode advanceKey = KeyCode.L;
 
     private bool isDialogueActive = false;
@@ -224,9 +195,6 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 跳过打字效果，立即显示全部文本
-    /// </summary>
     private void SkipTyping()
     {
         if (typingCoroutine != null)
@@ -259,9 +227,6 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 自动查找UI元素
-    /// </summary>
     private void AutoFindUIElements()
     {
         // 查找DialoguePanel
@@ -427,9 +392,6 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 开始对话
-    /// </summary>
     public void StartDialogue(string npcName, string greeting, DialogueOption[] options, System.Action onComplete = null)
     {
         currentDialogueCallback = onComplete;
@@ -468,11 +430,6 @@ public class DialogueManager : MonoBehaviour
         ShowDialogue(greeting, options);
     }
 
-    /// <summary>
-    /// 开始自动对话序列（无选项）
-    /// 支持传入默认立绘和表情差分数组
-    /// 额外支持立绘与名称延后显示的剧场效果参数
-    /// </summary>
     public void StartAutoDialogue(string npcName, string[] dialogueSequence, Sprite defaultPortrait = null, Sprite[] expressionPortraits = null, System.Action onComplete = null, int portraitRevealIndex = 0, int nameRevealIndex = 0)
     {
         currentDialogueCallback = onComplete;
@@ -545,9 +502,6 @@ public class DialogueManager : MonoBehaviour
         StartCoroutine(PlayDialogueSequence(dialogueSequence));
     }
 
-    /// <summary>
-    /// 播放对话序列协程
-    /// </summary>
     private IEnumerator PlayDialogueSequence(string[] dialogueSequence)
     {
         if (dialogueSequence == null || dialogueSequence.Length == 0)
@@ -575,9 +529,6 @@ public class DialogueManager : MonoBehaviour
         ShowCurrentSentence();
     }
 
-    /// <summary>
-    /// 显示当前句子
-    /// </summary>
     private void ShowCurrentSentence()
     {
         if (currentDialogueSequence == null || currentDialogueIndex >= currentDialogueSequence.Length)
@@ -652,9 +603,6 @@ public class DialogueManager : MonoBehaviour
         typingCoroutine = StartCoroutine(TypeTextWithContinue(currentPreparedText));
     }
 
-    /// <summary>
-    /// 打字机效果（带继续等待）
-    /// </summary>
     private IEnumerator TypeTextWithContinue(string text)
     {
         isTyping = true;
@@ -699,9 +647,6 @@ public class DialogueManager : MonoBehaviour
         waitingForContinue = true;
     }
 
-    /// <summary>
-    /// 推进到下一句对话
-    /// </summary>
     private void AdvanceDialogue()
     {
         Debug.Log("DialogueManager: 玩家按下L键，推进对话");
@@ -731,9 +676,6 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 单句打字机效果
-    /// </summary>
     private IEnumerator TypeTextSingle(string text)
     {
         Debug.Log($"DialogueManager: TypeTextSingle 开始，文本长度: {text?.Length ?? 0}");
@@ -876,9 +818,6 @@ public class DialogueManager : MonoBehaviour
         return true;
     }
 
-    /// <summary>
-    /// 显示对话内容和选项
-    /// </summary>
     private void ShowDialogue(string text, DialogueOption[] options)
     {
         Debug.Log($"DialogueManager: ShowDialogue 被调用，文本: '{text}'，选项数量: {(options != null ? options.Length : 0)}");
@@ -903,9 +842,6 @@ public class DialogueManager : MonoBehaviour
         Debug.Log("DialogueManager: 打字机协程已启动");
     }
 
-    /// <summary>
-    /// 打字机效果协程
-    /// </summary>
     private IEnumerator TypeText(string text, DialogueOption[] options)
     {
         Debug.Log($"DialogueManager: TypeText 开始，文本长度: {text?.Length ?? 0}，选项数量: {(options != null ? options.Length : 0)}");
@@ -936,9 +872,6 @@ public class DialogueManager : MonoBehaviour
         ShowOptions(options);
     }
 
-    /// <summary>
-    /// 显示对话选项
-    /// </summary>
     private void ShowOptions(DialogueOption[] options)
     {
         Debug.Log($"DialogueManager: ShowOptions 被调用，选项数量: {(options != null ? options.Length : 0)}");
@@ -974,9 +907,6 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 创建选项按钮
-    /// </summary>
     private void CreateOptionButton(DialogueOption option)
     {
         if (optionButtonPrefab == null)
@@ -1064,9 +994,6 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 当选择选项时
-    /// </summary>
     private void OnOptionSelected(DialogueOption option)
     {
         Debug.Log($"DialogueManager: 选中选项 - {option.optionText}");
@@ -1102,18 +1029,12 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 自动关闭对话框协程
-    /// </summary>
     private IEnumerator AutoCloseDialogue()
     {
         yield return new WaitForSeconds(autoCloseDelay);
         EndDialogue();
     }
 
-    /// <summary>
-    /// 结束对话
-    /// </summary>
     public void EndDialogue()
     {
         // 清除协程
@@ -1166,14 +1087,8 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 对话是否处于活动状态
-    /// </summary>
     public bool IsDialogueActive => isDialogueActive;
 
-    /// <summary>
-    /// 锁定玩家移动（对话时使用）
-    /// </summary>
     private void LockPlayerMovement()
     {
         if (playerController != null)
@@ -1187,9 +1102,6 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 解锁玩家移动（对话结束时使用）
-    /// </summary>
     private void UnlockPlayerMovement()
     {
         if (playerController != null)

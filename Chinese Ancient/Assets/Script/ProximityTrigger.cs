@@ -1,36 +1,27 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Video;
 
-/// <summary>
-/// 近距离触发系统 - 支持视频封面功能
-/// </summary>
 public class ProximityTrigger : MonoBehaviour
 {
     [Header("玩家设置")]
-    [Tooltip("玩家 Transform，不设置则按 Tag 查找")] 
+ 
     public Transform player;
-    [Tooltip("玩家 Tag（备用自动查找）")] 
+ 
     public string playerTag = "Player";
 
     [Header("触发设置")]
-    [Tooltip("触发距离（米）")] 
+ 
     public float triggerDistance = 4f;
-    [Tooltip("是否只触发一次")]
     public bool triggerOnce = false;
 
     [Header("视频封面设置")]
-    [Tooltip("视频封面纹理（不设置则自动使用当前材质的主纹理）")]
     public Texture coverTexture;
-    [Tooltip("视频播放器（可选，自动获取）")]
     public VideoPlayer videoPlayer;
-    [Tooltip("目标渲染器（可选，自动获取）")]
     public Renderer targetRenderer;
 
     [Header("事件回调")]
-    [Tooltip("进入范围时调用")]
     public UnityEvent onEnterRange;
-    [Tooltip("离开范围时调用")]
     public UnityEvent onExitRange;
 
     private bool isInsideRange = false;

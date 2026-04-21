@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 [System.Serializable]
@@ -11,14 +11,13 @@ public class UIKeyBinding
 
 public class TopUIManager : MonoBehaviour
 {
-    [Header("【UI绑定配置】")]
+    [Header("")]
     public UIKeyBinding[] uiBindings = new UIKeyBinding[] 
     {
         new UIKeyBinding { uiName = "地图", hotKey = KeyCode.M }
     };
 
-    [Header("【其他需要隐藏的UI】")]
-    [Tooltip("当打开地图时，要把哪些顶部的UI隐藏掉，拖到这里")]
+    [Header("")]
     public GameObject[] otherUIToHide;
 
     private PlayerController playerController;

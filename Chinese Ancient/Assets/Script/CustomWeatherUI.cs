@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement; // 新增场景管理
 using UnityEngine.EventSystems; // 新增：处理EventSystem
@@ -6,7 +6,7 @@ using UniStorm; // 必须引入 UniStorm 才能切换天气
 
 public class CustomWeatherUI : MonoBehaviour
 {
-    [Header("【自定义面板设置】")]
+    [Header("")]
     public KeyCode toggleKey = KeyCode.T; // 热键 T
     public GameObject weatherPanel;       // 把你做的天气面板拖进来
 
@@ -92,9 +92,6 @@ public class CustomWeatherUI : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 确保EventSystem和Canvas都正确配置
-    /// </summary>
     private void InitializeUISystem()
     {
         // 确保场景中有EventSystem
@@ -255,10 +252,6 @@ public class CustomWeatherUI : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 给 Button 点击事件用的方法（根据序号换天气）
-    /// 0=晴天，1=雨天... 排序看目标 UniStormSystem 组件里的 All Weather Types
-    /// </summary>
     public void ChangeWeatherByIndex(int index)
     {
         if (UniStormSystem.Instance == null)
@@ -281,9 +274,6 @@ public class CustomWeatherUI : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 让设计师能在 Inspector 面板自由拖拽 WeatherType 来控制按钮
-    /// </summary>
     public void ChangeWeatherByType(WeatherType targetWeather)
     {
         if (UniStormSystem.Instance == null)

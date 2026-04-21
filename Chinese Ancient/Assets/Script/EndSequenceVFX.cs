@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,12 +7,6 @@ using UnityEngine.UI;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-/// <summary>
-/// 结尾过场特效：先模糊 -> 再黑屏 -> 再摇晃。
-/// 
-/// 针对 URP (Universal Render Pipeline) 进行过优化。
-/// 模糊效果现在使用内置的 Depth Of Field，不需要再手动挂载额外的 Shader 或组件。
-/// </summary>
 public class EndSequenceVFX : MonoBehaviour
 {
     public static EndSequenceVFX Instance { get; private set; }
@@ -21,63 +15,49 @@ public class EndSequenceVFX : MonoBehaviour
     public Camera targetCamera;
 
     [Header("阶段 0：初始等待")]
-    [Tooltip("对话结束后，等待多久才开始产生异样（不马上触发）")]
     [Range(0f, 5f)]
     public float initialDelay = 1.0f;
 
     [Header("阶段 1：视角模糊")]
-    [Tooltip("模糊目标强度（URP Depth Of Field 推荐范围 0~2.5）")]
     [Range(0f, 2.5f)]
     public float maxBlur = 1.5f;
 
-    [Tooltip("视线变模糊需要的时间")]
     [Range(0f, 8f)]
     public float blurInDuration = 2.0f;
 
-    [Tooltip("模糊开始多久之后，才开始发生剧烈摇晃")]
     [Range(0f, 5f)]
     public float holdBlurBeforeShake = 1.0f;
 
     [Header("阶段 2：剧烈摇晃（梦碎感）")]
-    [Tooltip("剧烈摇晃持续时长")]
     [Range(0f, 8f)]
     public float shakeDuration = 3.0f;
 
-    [Tooltip("摇晃强度（单位：米，越大抖得越猛）")]
     [Range(0f, 3f)]
     public float shakeStrength = 0.4f;
 
-    [Tooltip("摇晃频率（越大抖得越快）")]
     [Range(1f, 100f)]
     public float shakeFrequency = 35f;
 
     [Header("阶段 3：疲惫眨眼与最终黑屏")]
-    [Tooltip("一共眨几下眼睛（画面变黑再亮）最后闭眼")]
     [Range(1, 6)]
     public int blinkCount = 3;
 
-    [Tooltip("每次眨眼的闭眼/睁眼速度")]
     [Range(0.1f, 1.5f)]
     public float singleBlinkDuration = 0.6f;
 
-    [Tooltip("最终彻底陷入黑暗用时")]
     [Range(0f, 10f)]
     public float fadeToBlackDuration = 1.5f;
 
-    [Tooltip("黑屏保持时长（释放回调前）")]
     [Range(0f, 5f)]
     public float holdBlackDuration = 0.5f;
 
     [Header("额外：原场景背景音乐淡出")]
-    [Tooltip("原本在主场景播放的 BGM（AudioSource）。在晕厥变黑的过程中，自动帮它声音降到0")]
     public AudioSource sceneBgmToFadeOut;
 
     [Header("阶段 4：最终场景跳转 (新版地图过渡)")]
-    [Tooltip("黑屏后，要跳转到的新场景名称（例如 EndingMapScene）。如果不填，则停留在当前场景。")]
     public string targetEndingScene;
 
     [Header("时间")]
-    [Tooltip("是否使用不受TimeScale影响的时间（建议用于结尾过场）")]
     public bool useUnscaledTime = true;
 
     [Header("完成回调")]
@@ -116,17 +96,11 @@ public class EndSequenceVFX : MonoBehaviour
         if (Instance == this) Instance = null;
     }
 
-    /// <summary>
-    /// 只播放特效；播完后触发 onSequenceCompleted。
-    /// </summary>
     public void Play()
     {
         PlayInternal(null);
     }
 
-    /// <summary>
-    /// 播放特效后加载指定场景。
-    /// </summary>
     public void PlayAndLoadScene(string sceneName)
     {
         if (string.IsNullOrWhiteSpace(sceneName))
@@ -138,9 +112,6 @@ public class EndSequenceVFX : MonoBehaviour
         PlayInternal(() => SceneManager.LoadScene(sceneName));
     }
 
-    /// <summary>
-    /// 播放特效后退出游戏。
-    /// </summary>
     public void PlayAndQuit()
     {
         PlayInternal(() => {
@@ -152,9 +123,6 @@ public class EndSequenceVFX : MonoBehaviour
         });
     }
 
-    /// <summary>
-    /// 供代码协程等待：yield return EndSequenceVFX.Instance.PlayRoutine();
-    /// </summary>
     public IEnumerator PlayRoutine()
     {
         bool finished = false;

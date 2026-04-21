@@ -1,47 +1,30 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using System.Collections;
 
-/// <summary>
-/// 一个绝对纯净、独立的地图关闭脚本。
-/// 专为了在新场景(EndingMapScene)中播放最终的合上卷轴动画并退出游戏。
-/// 彻底摆脱 ScrollMapController 的干扰！
-/// </summary>
 public class StandaloneMapCloser : MonoBehaviour
 {
     [Header("卷轴 (zhou1, zhou2) 面板拖入")]
-    [Tooltip("左边的卷轴轴心")]
     public RectTransform leftScroll;
-    [Tooltip("右边的卷轴轴心")]
     public RectTransform rightScroll;
 
     [Header("黑色遮挡图片(黑幕板) 面板拖入")]
-    [Tooltip("左侧的黑色Image遮盖板")]
     public RectTransform leftCover;
-    [Tooltip("右侧的黑色Image遮盖板")]
     public RectTransform rightCover;
 
     [Header("动画时间设置")]
-    [Tooltip("地图刚出现时，从彻底的黑屏渐渐浮现出来的用时")]
     public float mapFadeInDuration = 1.5f;
-    [Tooltip("进入新场景后，地图展示几秒钟才开始收起？")]
     public float waitBeforeClose = 2.0f;
-    [Tooltip("向中间合拢动画的持续时间")]
     public float closeDuration = 3.0f;
-    [Tooltip("左右卷轴合并时，距离屏幕正中心的间隙（防止卷轴互相穿模重叠）。如填入60，则左轴停在-60，右轴停在60。")]
     public float centerOffset = 60f;
 
     [Header("音乐设置 (可选)")]
-    [Tooltip("如果你想在结局地图界面播放一段音乐，请拖入音频片段 (AudioClip)")]
     public AudioClip endingBGM;
-    [Tooltip("进入新场景时，音乐淡入需要多少秒？")]
     public float audioFadeInDuration = 2.0f;
-    [Tooltip("离开地图关游戏时，音乐淡出需要多少秒？")]
     public float audioFadeOutDuration = 1.5f;
 
     [Header("最终退场黑屏(可选)")]
-    [Tooltip("如果你有一张全屏纯黑并且透明度为0的图片，可以拖到这。用来做退出前的极致黑屏淡入。")]
     public Image finalFadeImage;
 
     private AudioSource bgmSource;
@@ -154,9 +137,6 @@ public class StandaloneMapCloser : MonoBehaviour
         return img;
     }
 
-    /// <summary>
-    /// 自动创建一个铺在游戏最底层的纯黑背景，确保不管咋样背景都是黑的
-    /// </summary>
     private void CreateBlackBackground()
     {
         // 创建底层 Canvas
@@ -178,9 +158,6 @@ public class StandaloneMapCloser : MonoBehaviour
         rt.sizeDelta = Vector2.zero;
     }
 
-    /// <summary>
-    /// 自动创建一个最顶层的纯黑画布，并执行淡入。不用再拖 finalFadeImage 了一劳永逸！
-    /// </summary>
     private void CreateAndFadeBlackOverlay()
     {
         // 创建霸道顶层 Canvas

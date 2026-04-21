@@ -1,27 +1,17 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-/// <summary>
-/// 物品高亮泛光提示脚本
-/// 挂载到需要提示玩家寻找的物品上（如火折子、钥匙等）
-/// 会让物品材质自发光并伴随微弱的呼吸灯效果，方便玩家发现
-/// </summary>
 public class ItemGlowHighlight : MonoBehaviour
 {
     [Header("发光设置")]
-    [Tooltip("希望泛光的颜色（推荐暖色，如橙黄色）")]
     public Color glowColor = new Color(1f, 0.6f, 0.2f);
     
-    [Tooltip("呼吸灯闪烁的速度")]
     public float pulseSpeed = 1.5f;
 
-    [Tooltip("发光的最小与最大强度")]
     public float minIntensity = 0.2f;
     public float maxIntensity = 1.2f;
 
     [Header("光源设置 (可选)")]
-    [Tooltip("是否自动添加一个点光源来照亮周围")]
     public bool addPointLight = true;
-    [Tooltip("光源范围半径")]
     public float lightRange = 2f;
 
     private Material originalMaterial;
@@ -82,9 +72,6 @@ public class ItemGlowHighlight : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 当物品被拾取或不需要高亮时调用这个方法关闭特效
-    /// </summary>
     public void DisableGlow()
     {
         if (originalMaterial != null)

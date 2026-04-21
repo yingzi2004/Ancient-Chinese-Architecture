@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,38 +7,28 @@ using UnityEngine.Events;
 [System.Serializable]
 public class DialogNode
 {
-    [Tooltip("当进行到此节点时，NPC会按顺序说出以下的一句对话或多句对话")]
     [TextArea(2, 4)]
     public string[] npcLines;
 
-    [Tooltip("这几句话说完后，抛给玩家的可选分支选项（如果不配，这个阶段对话就直接结束）")]
     public List<DialogChoice> choices = new List<DialogChoice>();
 
-    [Tooltip("【通用扩展】进入此剧情节点时自动触发的事件（比如拖入大伯的灯笼脚本并调用StartLightingSequence）")]
     public UnityEvent onNodeTriggerEvent;
 }
 
 [System.Serializable]
 public class DialogChoice
 {
-    [Tooltip("选项按钮面板上看到的文字")]
     public string optionText;
 
-    [Tooltip("玩家点击此选项后，NPC接下来要进行的剧情对话（层层套用")]
     public DialogNode nextNode;
 }
 
-/// <summary>
-/// NPC互动对话触发?- 玩家靠近后按键触发，支持选项分支
-/// </summary>
 public class NPCInteractTrigger : MonoBehaviour
 {
     [Header("NPC设置")]
-    [Tooltip("NPC名称")]
     public string npcName = "神秘村民";
 
     [Header("对话树（剧情节点与各分支")]
-    [Tooltip("整个对话从这里开始（支持多句聊天，聊完弹出分支）")]
     public DialogNode rootNode = new DialogNode()
     {
         npcLines = new string[] {
@@ -69,72 +59,50 @@ public class NPCInteractTrigger : MonoBehaviour
     };
 
     [Header("多剧情阶段存储（通用状态机）")]
-    [Tooltip("备用的替换剧情树。由外部脚本或拾取事件触发 SwitchAlternateDialogue(索引) 来切入到下一阶段对话。")]
     public List<DialogNode> alternateNodes = new List<DialogNode>();
 
     [Header("触发设置")]
-    [Tooltip("玩家 Transform，不设置则按 Tag 查找")]
     public Transform player;
 
-    [Tooltip("玩家 Tag（备用自动查找）")]
     public string playerTag = "Player";
 
-    [Tooltip("触发距离（米")]
     public float triggerDistance = 3f;
 
-    [Tooltip("按键触发对话")]
     public KeyCode interactKey = KeyCode.L;
 
-    [Tooltip("NPC的Animator（用于控制动画）")]
     public Animator npcAnimator;
 
-    [Tooltip("使用 Bool 参数切换动画（否则使?Trigger")]
     public bool useBoolParameter = false;
 
-    [Tooltip("触发对话时的动画触发器名称（useBoolParameter=false时使用）")]
     public string waveAnimationTrigger = "Wave";
 
-    [Tooltip("挥手?Bool 参数名称（useBoolParameter=true时使用）")]
     public string waveAnimationBool = "Wave";
 
-    [Tooltip("使用 Bool 时，按键触发后多久自动把 Bool 复位?false（秒）。用于避免一直满足条件导致反复切")]
     public float waveBoolAutoResetSeconds = 0.15f;
 
-    [Tooltip("是否只触发一")]
     public bool triggerOnce = true;
 
-    [Tooltip("触发后离开指定距离才能再次触发")]
     public float exitDistanceOffset = 1f;
 
     [Header("独立UI设置")]
-    [Tooltip("必须要赋值：你自己做的NPC专门对话框界面面")]
     public GameObject customDialoguePanel;
-    [Tooltip("必须要赋值：显示NPC名字的文本组")]
     public Text customNameText;
-    [Tooltip("必须要赋值：显示对话内容的文本组")]
     public Text customContentText;
-    [Tooltip("在这里把你做好的这几个选项按钮拖拽填进来！(例如填写2，然后拖2个Button进去)")]
     public List<Button> customOptionButtons = new List<Button>();
 
     [Header("调试设置")]
-    [Tooltip("是否显示调试日志")]
     public bool showDebugLogs = true;
 
-    [Tooltip("调试日志间隔（秒")]
     public float debugLogInterval = 1f;
 
     [Header("提示设置")]
-    [Tooltip("是否显示提示UI")]
     public bool showPromptUI = true;
 
-    [Tooltip("提示面板（可选，自动查找")]
     public GameObject promptPanel;
 
     [Header("事件设置")]
-    [Tooltip("对话结束后是否恢复NPC原本的位置和朝向（如果要让NPC转身走开，请取消勾选）")]
     public bool restoreTransformOnEnd = true;
 
-    [Tooltip("对话结束时触发的事件（可用于让NPC离开等）")]
     public UnityEvent onDialogueEnd;
 
     private bool hasTriggeredOnce = false;
@@ -379,9 +347,6 @@ public class NPCInteractTrigger : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 自定义播放引擎，独立驱动 DialogueManager 的面板，以实现原神般的连贯多段对话与动态选择
-    /// </summary>
     private IEnumerator PlayInteractTree(DialogNode node)
     {
         if (node == null || node.npcLines == null || node.npcLines.Length == 0) 
@@ -712,9 +677,6 @@ public class NPCInteractTrigger : MonoBehaviour
         TriggerDialogue();
     }
 
-    /// <summary>
-    /// 提供外部脚本调用临时插入某段新对话（不修改原本的 rootNode
-    /// </summary>
     public void StartSpecificDialogue(DialogNode customNode, bool replaceRoot = true)
     {
         // 如果正在和NPC对话中又触发了给荷花，那就先强行中断旧对
@@ -746,9 +708,6 @@ public class NPCInteractTrigger : MonoBehaviour
         StartCoroutine(PlayInteractTree(customNode));
     }
 
-    /// <summary>
-    /// 【新增通用功能】外部调用此接口（例如玩家拾取火折子后调用），永久切换该NPC接下来的固定常驻对话
-    /// </summary>
     public void SwitchAlternateDialogue(int alternateIndex)
     {
         if (alternateIndex >= 0 && alternateIndex < alternateNodes.Count)

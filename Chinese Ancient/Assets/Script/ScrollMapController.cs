@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -6,9 +6,6 @@ using DG.Tweening;
 using System.Collections.Generic;
 using TMPro;
 
-/// <summary>
-/// 我们用来纯粹接管点击的脚本（没有任何变灰颜色的副作用）
-/// </summary>
 public class SimpleClickListener : MonoBehaviour, IPointerClickHandler, IPointerDownHandler
 {
     public System.Action onClick;
@@ -27,24 +24,6 @@ public class SimpleClickListener : MonoBehaviour, IPointerClickHandler, IPointer
     }
 }
 
-/// <summary>
-/// 卷轴地图主页控制器 —— 遮挡板方案
-/// 
-/// 原理：两块黑色 Image 盖在内容上方，初始完全遮住画面。
-/// 左板跟随 zhou1 向左，右板跟随 zhou2 向右，露出中间画面。
-/// 
-/// 层级结构（从下往上渲染）：
-/// Scroll-Mask（根 Canvas，Screen Space - Overlay）
-///   ├── canva（底图 + 地形 + 建筑）
-///   │   ├── bg
-///   │   ├── Land / landscapes
-///   │   └── build（min, su, jin, tiantan …）
-///   ├── Image       ← 左遮挡板（CoverLeft）
-///   ├── Image (1)   ← 右遮挡板（CoverRight）
-///   ├── zhou1       ← 左卷轴轴心
-///   ├── zhou2       ← 右卷轴轴心
-///   └── Canvas      ← 可留空 / 放其他 UI
-/// </summary>
 public class ScrollMapController : MonoBehaviour
 {
     [System.Serializable]
@@ -56,7 +35,6 @@ public class ScrollMapController : MonoBehaviour
         public float appearDelay = 0f;
 
         [Header("黑白差分图(可选)")]
-        [Tooltip("【如果有黑白图，拖到这里。未解锁时会丝滑渐现它】")]
         public Sprite bwSprite;
 
         // 运行时动态创建的黑白图层CanvasGroup
@@ -67,41 +45,28 @@ public class ScrollMapController : MonoBehaviour
     [Header("══ 卷轴轴心 ══")]
     [SerializeField] private RectTransform scrollLeft;
     [SerializeField] private RectTransform scrollRight;
-    [Tooltip("卷轴（zhou1、zhou2）向两侧展开的持续时间（秒）")]
     [SerializeField] private float scrollOpenDuration = 3.0f;
-    [Tooltip("左卷轴的目标X坐标（向左移多远）")]
     [SerializeField] private float scrollLeftTargetX = -800f;
-    [Tooltip("右卷轴的目标X坐标（向右移多远）")]
     [SerializeField] private float scrollRightTargetX = 800f;
 
     [Header("══ 遮挡板（控制底图展开的速度）══")]
-    [Tooltip("底图展现（遮挡板拉开）的持续时间（秒）。跟单独的卷轴速度分开！")]
     [SerializeField] private float baseMapRevealDuration = 3.0f;
-    [Tooltip("左侧遮挡板 RectTransform")]
     [SerializeField] private RectTransform coverLeft;
-    [Tooltip("右侧遮挡板 RectTransform")]
     [SerializeField] private RectTransform coverRight;
 
     [Header("══ 地形 ══")]
     [SerializeField] private CanvasGroup terrainGroup;
-    [Tooltip("地形淡入展现的持续时间（秒）")]
     [SerializeField] private float terrainFadeDuration = 0.5f;
 
     [Header("══ 建筑列表 ══")]
     [SerializeField] private List<BuildingEntry> buildings = new List<BuildingEntry>();
-    [Tooltip("核心：第一个建筑开始弹出的时机（秒）！也就是当卷轴拉开到第几秒的时候，建筑开始排队出现")]
     [SerializeField] private float buildingGlobalStartTime = 2.0f;
-    [Tooltip("建筑弹跳放大缩放的持续时间（秒）")]
     [SerializeField] private float buildingScaleDuration = 0.6f;
-    [Tooltip("建筑淡入变实的持续时间（秒）")]
     [SerializeField] private float buildingFadeDuration = 0.4f;
-    [Tooltip("每个建筑依次先后出现的间隔时间（秒）")]
     [SerializeField] private float buildingInterval = 0.3f;
     
     [Header("══ 解锁设置 ══")]
-    [Tooltip("未解锁建筑等待动画播完后，变灰的颜色（请在面板里调成灰色，默认带透明度）")]
     [SerializeField] private Color lockedBuildingColor = new Color(0.6f, 0.6f, 0.6f, 1f);
-    [Tooltip("变灰过渡动画的持续时间")]
     [SerializeField] private float lockedColorFadeDuration = 1.0f;
 
     [Header("══ 标题（可选）══")]
@@ -109,11 +74,8 @@ public class ScrollMapController : MonoBehaviour
     [SerializeField] private float titleFadeDuration = 0.8f;
 
     [Header("══ 镜头引导（动画结束后建筑呼吸提示）══")]
-    [Tooltip("引导目标建筑在 buildings 列表里的索引（0=第一个=土楼）")]
     [SerializeField] private int guideTargetIndex = 0;
-    [Tooltip("引导时建筑呼吸闪烁的缩放幅度（1.0=不缩放，1.03=微微放大3%）")]
     [SerializeField] private float guidePulseScale = 1.03f;
-    [Tooltip("是否启用镜头引导")]
     [SerializeField] private bool enableGuide = true;
 
     [Header("══ 过渡遮罩（可选）══")]
@@ -121,7 +83,6 @@ public class ScrollMapController : MonoBehaviour
     [SerializeField] private float sceneFadeDuration = 0.5f;
 
     [Header("══ 玩家心路独白控制器 ══")]
-    [Tooltip("拖入挂载了 MapMonologueController 组件的物体（负责处理玩家可自由推进的文字独白）")]
     [SerializeField] private MapMonologueController monologueController;
 
     [Header("══ 音效（可选）══")]
@@ -131,11 +92,9 @@ public class ScrollMapController : MonoBehaviour
     [SerializeField] private AudioClip windBlowClip;
 
     [Header("══ 动画控制 ══")]
-    [Tooltip("是否强制在唤出时播放卷轴打开动画？")]
     public bool playOpenAnimation = true;
 
     [Header("══ 进度控制 ══")]
-    [Tooltip("【核心设置】主场景独立测试用。只在运行主场景时把【显示效果】控制在初始关卡，但不覆盖玩家真实的过关存档！")]
     public bool overrideAsFirstLevel = true;
 
     // 全局静态变量：标记本游戏运行期间，是否已经播放过一次主场景的打开动画
@@ -200,9 +159,6 @@ public class ScrollMapController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 瞬间完全打开地图（取消动画）
-    /// </summary>
     private void InstantOpenMap()
     {
         isAnimating = false; // 解除防误触锁
@@ -274,9 +230,6 @@ public class ScrollMapController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 动态生成一个专门的黑白图片涂层，覆盖在原来的建筑图片上面，方便实现“丝滑渐变”
-    /// </summary>
     private void EnsureBWOverlay(BuildingEntry b)
     {
         if (b.bwSprite == null || b.runtimeBWGroup != null) return;
@@ -622,9 +575,6 @@ public class ScrollMapController : MonoBehaviour
         mainSequence.Play();
     }
 
-    /// <summary>
-    /// 镜头引导动画：给目标建筑加上呼吸脉冲，引导玩家点击
-    /// </summary>
     private void PlayGuideAnimation(System.Action onComplete)
     {
         // 【核心修改】：主场景的强制动画引导：永远只引导 0 级（土楼），无视其他进度
@@ -742,10 +692,6 @@ public class ScrollMapController : MonoBehaviour
         isAnimating = false;
     }
 
-    /// <summary>
-    /// 关闭地图动画：卷轴向中间卷起，最后完美黑屏并退出游戏
-    /// 触发方法：可以绑定给 EndSequenceVFX 面板里的 onMapCloseTrigger
-    /// </summary>
     public void CloseMapAnimation()
     {
         // 阻止重复触发
@@ -863,9 +809,6 @@ public class ScrollMapController : MonoBehaviour
         return cg;
     }
 
-    /// <summary>
-    /// 播放开场对话序列：黑屏 -> 对话1 -> 对话2 -> 黑屏淡出 -> 进入主场景
-    /// </summary>
     private System.Collections.IEnumerator PlayOpeningSequence()
     {
         // 1. 确保黑屏（再次确认）
@@ -944,9 +887,6 @@ public class ScrollMapController : MonoBehaviour
         PlayOpenSequence();
     }
 
-    /// <summary>
-    /// 地图打开后的对话序列
-    /// </summary>
     private System.Collections.IEnumerator PlayMapOpenDialogue()
     {
         // 等待一小段时间，让玩家先进地图适应一下

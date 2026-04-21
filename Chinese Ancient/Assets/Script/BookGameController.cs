@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using TMPro;
 
@@ -8,28 +8,18 @@ public class BookGameController : MonoBehaviour
     [SerializeField] private BookPro book;
 
     [Header("阅读位")]
-    [Tooltip("阅读时玩家固定到这个位置和朝向")]
     [SerializeField] private Transform readingAnchor;
-    [Tooltip("不手动摆放空物体时，自动根据书本计算阅读位")]
     [SerializeField] private bool useAutoReadingSpot = true;
-    [Tooltip("自动阅读位距离书本中心的前后偏移")]
     [SerializeField] private float autoReadDistance = 1.2f;
-    [Tooltip("自动阅读位的高度偏移")]
     [SerializeField] private float autoReadHeightOffset = 0f;
-    [Tooltip("可开始阅读的距离")]
     [SerializeField] private float activateDistance = 2.5f;
 
     [Header("提示文本")]
-    [Tooltip("可选：提示框 CanvasGroup（用于自动淡入淡出）")]
     [SerializeField] private CanvasGroup hintGroup;
-    [Tooltip("提示浮现/消失速度")]
     [SerializeField] private float hintFadeSpeed = 6f;
     [Header("阅读中按键提示布局")]
-    [Tooltip("左侧提示文本（显示A上一页）")]
     [SerializeField] private TextMeshProUGUI leftKeyHintText;
-    [Tooltip("右侧提示文本（显示D下一页）")]
     [SerializeField] private TextMeshProUGUI rightKeyHintText;
-    [Tooltip("底部中间提示文本（显示F退出阅读）")]
     [SerializeField] private TextMeshProUGUI exitKeyHintText;
     [SerializeField] private string nearHint = "按 F 开始阅读";
     [SerializeField] private string leftReadHint = "A 上一页";

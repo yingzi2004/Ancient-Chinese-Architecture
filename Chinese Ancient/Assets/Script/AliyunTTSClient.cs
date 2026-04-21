@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,37 +7,24 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
-/// <summary>
-/// 阿里云智能语音合成客户端
-/// 支持文本转语音、多种音色切换
-/// </summary>
 [RequireComponent(typeof(AudioSource))]
 public class AliyunTTSClient : MonoBehaviour
 {
     [Header("阿里云凭证")]
-    [Tooltip("AccessKey ID")]
     [SerializeField] private string accessKeyId = "";
-    [Tooltip("AccessKey Secret")]
     [SerializeField] private string accessKeySecret = "";
-    [Tooltip("App Key（语音服务控制台获取）")]
     [SerializeField] private string appKey = "";
     [Header("Token 手动模式 (可选)")]
-    [Tooltip("如果不填写，将尝试使用 AK/SK 自动获取")]
     [SerializeField] private string manualToken = "";
 
     [Header("语音设置")]
-    [Tooltip("发音人/音色")]
     [SerializeField] private VoiceType voice = VoiceType.Xiaoyun;
-    [Tooltip("音量 (0-100)")]
     [Range(0, 100)]
     [SerializeField] private int volume = 50;
-    [Tooltip("语速 (-500 到 500)")]
     [Range(-500, 500)]
     [SerializeField] private int speechRate = 0;
-    [Tooltip("语调 (-500 到 500)")]
     [Range(-500, 500)]
     [SerializeField] private int pitchRate = 0;
-    [Tooltip("音频格式")]
     [SerializeField] private AudioFormat format = AudioFormat.MP3;
 
     [Header("播放设置")]
@@ -49,9 +36,6 @@ public class AliyunTTSClient : MonoBehaviour
     public bool IsPlaying => audioSource != null && audioSource.isPlaying;
     public bool IsSynthesizing { get; private set; }
 
-    /// <summary>
-    /// 可用的音色类型
-    /// </summary>
     public enum VoiceType
     {
         Xiaoyun,    // 小云 - 标准女声
@@ -98,9 +82,6 @@ public class AliyunTTSClient : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 合成并播放语音
-    /// </summary>
     public void Speak(string text, Action onComplete = null, Action<string> onError = null)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -118,9 +99,6 @@ public class AliyunTTSClient : MonoBehaviour
         StartCoroutine(SynthesizeAndPlay(text, onComplete, onError));
     }
 
-    /// <summary>
-    /// 停止播放
-    /// </summary>
     public void Stop()
     {
         if (audioSource != null && audioSource.isPlaying)
@@ -129,41 +107,26 @@ public class AliyunTTSClient : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 设置音色
-    /// </summary>
     public void SetVoice(VoiceType voiceType)
     {
         voice = voiceType;
     }
 
-    /// <summary>
-    /// 设置音量
-    /// </summary>
     public void SetVolume(int vol)
     {
         volume = Mathf.Clamp(vol, 0, 100);
     }
 
-    /// <summary>
-    /// 设置语速
-    /// </summary>
     public void SetSpeechRate(int rate)
     {
         speechRate = Mathf.Clamp(rate, -500, 500);
     }
 
-    /// <summary>
-    /// 设置语调
-    /// </summary>
     public void SetPitchRate(int pitch)
     {
         pitchRate = Mathf.Clamp(pitch, -500, 500);
     }
 
-    /// <summary>
-    /// 设置凭证
-    /// </summary>
     public void SetCredentials(string akId, string akSecret, string appkey)
     {
         accessKeyId = akId?.Trim();
@@ -522,17 +485,11 @@ public class AliyunTTSClient : MonoBehaviour
         return null;
     }
 
-    /// <summary>
-    /// 获取所有可用音色
-    /// </summary>
     public static string[] GetAllVoiceNames()
     {
         return Enum.GetNames(typeof(VoiceType));
     }
 
-    /// <summary>
-    /// 根据名称设置音色
-    /// </summary>
     public void SetVoiceByName(string voiceName)
     {
         if (Enum.TryParse<VoiceType>(voiceName, true, out VoiceType vt))

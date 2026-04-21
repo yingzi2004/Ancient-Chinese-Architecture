@@ -1,28 +1,20 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class LotusFlower : MonoBehaviour
 {
     [Header("角色与NPC设置")]
-    [Tooltip("玩家的 Transform，如果不填会自动寻找名为 Player 的物体")]
     public Transform player;
-    [Tooltip("玩家的手部节点（绑定在摄像机或角色模型上，用于握住荷花）")]
     public Transform playerHand;
-    [Tooltip("目标 NPC 的 Transform")]
     public Transform npc;
 
     [Header("距离与按键设置")]
-    [Tooltip("摘取荷花的判断距离")]
     public float pickDistance = 3f;
-    [Tooltip("触发摘取动作的按键")]
     public KeyCode pickKey = KeyCode.R;
 
-    [Tooltip("靠近 NPC 交付的判断距离")]
     public float giveDistance = 4f;
-    [Tooltip("交付给 NPC 的按键")]
     public KeyCode giveKey = KeyCode.F;
 
     [Header("完成任务后的对话（必须在这个脚本配好新的对话）")]
-    [Tooltip("当荷花交给NPC时，立刻触发这组新对话，并会永久替换掉NPC默认的旧对话")]
     public DialogNode afterGiveDialogNode;
 
     // 状态标记
@@ -120,7 +112,6 @@ public class LotusFlower : MonoBehaviour
         if (npc != null)
         {
             NPCInteractTrigger trigger1 = npc.GetComponent<NPCInteractTrigger>();
-            NPCDialogueTrigger trigger2 = npc.GetComponent<NPCDialogueTrigger>();
 
             if (trigger1 != null)
             {
@@ -135,17 +126,9 @@ public class LotusFlower : MonoBehaviour
                     trigger1.ManualTrigger();
                 }
             }
-            else if (trigger2 != null)
-            {
-                Debug.Log("<color=yellow>[荷花任务]</color> 目标是老版的 NPCDialogueTrigger，正在呼叫它的对话！");
-                if (DialogueManager.Instance != null)
-                {
-                    DialogueManager.Instance.StartAutoDialogue(trigger2.npcName, new string[]{ "谢谢你把摘下的荷花带过来给我！"});
-                }
-            }
             else
             {
-                Debug.LogError("<color=red>[荷花任务]</color> 找不到任何NPC的对话脚本（NPCInteractTrigger 或 NPCDialogueTrigger）！请检查荷花的 Npc 槽位是否拖错了人！");
+                Debug.LogError("<color=red>[荷花任务]</color> 找不到NPC的对话脚本（NPCInteractTrigger）！请检查荷花的 Npc 槽位是否拖错了人！");
             }
         }
 

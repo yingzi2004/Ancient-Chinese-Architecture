@@ -1,9 +1,5 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-/// <summary>
-/// AI 对话 UI 运行时控制工具
-/// 提供预设主题和样式控制方法，可在代码中调用
-/// </summary>
 public class AIChatUIController : MonoBehaviour
 {
     [Header("依赖")]
@@ -17,9 +13,6 @@ public class AIChatUIController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 设置为古风主题样式
-    /// </summary>
     public void SetAncientChineseTheme()
     {
         if (chatUI == null) return;
@@ -47,9 +40,6 @@ public class AIChatUIController : MonoBehaviour
         chatUI.SetTitleTextColor(new Color(0.95f, 0.85f, 0.65f, 1f));
     }
 
-    /// <summary>
-    /// 设置为现代科技风格
-    /// </summary>
     public void SetModernTechTheme()
     {
         if (chatUI == null) return;
@@ -76,9 +66,6 @@ public class AIChatUIController : MonoBehaviour
         chatUI.SetTitleTextColor(new Color(0.4f, 0.8f, 1f, 1f));
     }
 
-    /// <summary>
-    /// 设置为樱花主题（配合樱花背景图）
-    /// </summary>
     public void SetSakuraTheme()
     {
         if (chatUI == null) return;
@@ -105,9 +92,6 @@ public class AIChatUIController : MonoBehaviour
         chatUI.SetTitleTextColor(new Color(1f, 0.9f, 0.95f, 1f));
     }
 
-    /// <summary>
-    /// 重置为默认样式
-    /// </summary>
     public void ResetToDefault()
     {
         if (chatUI == null) return;
@@ -132,9 +116,6 @@ public class AIChatUIController : MonoBehaviour
         chatUI.SetTitleTextColor(Color.white);
     }
 
-    /// <summary>
-    /// 移动窗口到屏幕中心
-    /// </summary>
     public void CenterWindow()
     {
         if (chatUI == null) return;
@@ -145,9 +126,6 @@ public class AIChatUIController : MonoBehaviour
         chatUI.SetWindowPosition(x, y);
     }
 
-    /// <summary>
-    /// 设置窗口尺寸（小/中/大）
-    /// </summary>
     public void SetWindowSize(string size)
     {
         if (chatUI == null) return;
@@ -166,9 +144,6 @@ public class AIChatUIController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 动态更换背景纹理
-    /// </summary>
     public void SetCustomBackground(Texture2D texture)
     {
         if (chatUI == null) return;
