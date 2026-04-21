@@ -36,9 +36,29 @@ public class DrawPath : MonoBehaviour
     // 认为“绕一圈”所需的最少采样点数量，可以在 Inspector 中调整
     public int requiredPoints = 120;
 
-    // 阶段控制：第一阶段画轮廓，第二阶段点击掉2
+    // 第一阶段画轮廓，第二阶段点击掉2
     private bool firstStageDone = false;
     private bool secondStageDone = false;
+
+    // 交互和视角固定模式
+    [Header("视角固定设置 (类似看书)")]
+    public Transform viewPoint; // 玩家按下F后，将玩家传送到这里并对齐视角
+    
+    [Tooltip("微调视角高度：数值越大，视角越高")]
+    public float heightOffset = 0.5f; 
+    
+    [Tooltip("微调抬头/低头角度：负数是抬头，正数是进一步低头")]
+    public float pitchOffset = 0f;
+
+    [Header("UI 提示")]
+    [Tooltip("按F交互的提示UI对象（比如带有 Text 的 Canvas Group 或直接是 Text 对象）")]
+    public GameObject hintUI;
+
+    private bool isInteracting = false;
+    private PlayerController playerController;
+    private Vector3 savedPlayerPos;
+    private Quaternion savedPlayerRot;
+    private Quaternion savedCameraRot;
 
     void Start()
     {
@@ -76,10 +96,18 @@ public class DrawPath : MonoBehaviour
         if (objectDrop1 != null) objectDrop1.SetActive(false);
         if (objectDrop2 != null) objectDrop2.SetActive(false);
         if (object3 != null)     object3.SetActive(false);
+
+        playerController = FindFirstObjectByType<PlayerController>();
     }
 
     void Update()
     {
+        // 核心：按下 F 键来进入/退出剪纸模式
+        HandleInteractionToggle();
+
+        // 只有进入了固定的交互模式，才能画线或点击
+        if (!isInteracting) return;
+
         // 优先判断第二阶段：只要掉2已经显示并且还没完成第二阶段，就处理点击逻辑
         if (!secondStageDone && objectDrop2 != null && objectDrop2.activeInHierarchy)
         {
@@ -91,25 +119,114 @@ public class DrawPath : MonoBehaviour
         }
     }
 
+    // 视角固定开关逻辑
+    private void HandleInteractionToggle()
+    {
+        if (object1 == null || drawCamera == null) return;
+
+        // 如果还没完成剪纸（第一或第二阶段还没结束）才允许进入
+        if (secondStageDone) 
+        {
+            if (hintUI != null && hintUI.activeSelf) hintUI.SetActive(false);
+            return;
+        }
+
+        float dist = Vector3.Distance(drawCamera.transform.position, object1.transform.position);
+
+        // 如果距离够近且还没进入剪纸模式，则显示提示；否则隐藏
+        if (hintUI != null)
+        {
+            bool shouldShowHint = (dist <= maxDrawDistance) && !isInteracting;
+            if (hintUI.activeSelf != shouldShowHint)
+            {
+                hintUI.SetActive(shouldShowHint);
+            }
+        }
+        
+        // 靠近才能交互
+        if (dist <= maxDrawDistance)
+        {
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                isInteracting = !isInteracting;
+
+                if (isInteracting)
+                {
+                    // 进入交互模式，固定视角并显示鼠标
+                    if (playerController != null)
+                    {
+                        // 保存旧位置和旋转
+                        savedPlayerPos = playerController.transform.position;
+                        savedPlayerRot = playerController.transform.rotation;
+                        if (playerController.cameraTransform != null)
+                            savedCameraRot = playerController.cameraTransform.localRotation;
+
+                        // 应用固定视角位置
+                        if (viewPoint != null)
+                        {
+                            Vector3 targetPos = viewPoint.position + new Vector3(0, heightOffset, 0);
+                            playerController.transform.SetPositionAndRotation(targetPos, viewPoint.rotation);
+                            if (playerController.cameraTransform != null)
+                            {
+                                // 获取 ViewPoint 的 X 轴旋转并加上微调参数（俯仰角）赋给摄像机
+                                playerController.cameraTransform.localRotation = Quaternion.Euler(viewPoint.localEulerAngles.x + pitchOffset, 0f, 0f);
+                                // 同时把玩家整体赋上 ViewPoint 的 Y 轴旋转
+                                playerController.transform.rotation = Quaternion.Euler(0f, viewPoint.eulerAngles.y, 0f);
+                            }
+                        }
+
+                        playerController.isInspecting = true;
+                        playerController.SetCursorState(false); 
+                    }
+                    useScreenCenter = false; // 强行改为使用鼠标来画线
+                    Cursor.visible = true;
+                    Cursor.lockState = CursorLockMode.None;
+                    Debug.Log("剪纸模式：开启正视角交互");
+                }
+                else
+                {
+                    // 退出交互模式，恢复视角移动和位置
+                    if (playerController != null)
+                    {
+                        // 还原位置和旋转
+                        playerController.transform.SetPositionAndRotation(savedPlayerPos, savedPlayerRot);
+                        if (playerController.cameraTransform != null)
+                            playerController.cameraTransform.localRotation = savedCameraRot;
+
+                        playerController.isInspecting = false;
+                        playerController.SetCursorState(true);
+                    }
+                    Cursor.visible = false;
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Debug.Log("剪纸模式：还原视角退出");
+                }
+            }
+        }
+        else
+        {
+            // 离得太远自动退出
+            if (isInteracting)
+            {
+                isInteracting = false;
+                if (playerController != null)
+                {
+                    playerController.transform.SetPositionAndRotation(savedPlayerPos, savedPlayerRot);
+                    if (playerController.cameraTransform != null)
+                        playerController.cameraTransform.localRotation = savedCameraRot;
+
+                    playerController.isInspecting = false;
+                    playerController.SetCursorState(true);
+                }
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+        }
+    }
+
     // 第一阶段：画线裁剪 1 + fanwei，触发 掉1
     void HandleFirstStage()
     {
-        // 如果玩家距离游戏区域（object1）超过设定的最大距离，则不允许画线
-        if (object1 != null && drawCamera != null)
-        {
-            float distToArea = Vector3.Distance(drawCamera.transform.position, object1.transform.position);
-            if (distToArea > maxDrawDistance)
-            {
-                // 可以选择清空已有的线条并直接返回
-                if (Input.GetMouseButtonUp(0))
-                {
-                    points.Clear();
-                    if (lineRenderer != null) lineRenderer.positionCount = 0;
-                }
-                return;
-            }
-        }
-
+        // ... 原本关于距离判断被移到了 HandleInteractionToggle 去了，这里只需要专心画线
         // 鼠标按下，开始绘制，清空之前的轨迹
         if (Input.GetMouseButtonDown(0))
         {
@@ -208,12 +325,15 @@ public class DrawPath : MonoBehaviour
 
         // 掉2 在屏幕上的坐标
         Vector3 drop2ScreenPos = drawCamera.WorldToScreenPoint(objectDrop2.transform.position);
-        Vector2 center = new Vector2(Screen.width / 2f, Screen.height / 2f);
-        float dist = Vector2.Distance(center, new Vector2(drop2ScreenPos.x, drop2ScreenPos.y));
+        
+        // 既然进入了F交互固定模式，用的是鼠标而不是准心
+        Vector2 checkPoint = Input.mousePosition;
 
-        Debug.Log($"DrawPath SecondStage: drop2ScreenPos={drop2ScreenPos}, dist={dist}");
+        float dist = Vector2.Distance(checkPoint, new Vector2(drop2ScreenPos.x, drop2ScreenPos.y));
 
-        // 距离足够近，认为准心点中了掉2
+        Debug.Log($"DrawPath SecondStage: drop2ScreenPos={drop2ScreenPos}, mouse={checkPoint}, dist={dist}");
+
+        // 距离足够近，认为点中了掉2
         if (dist <= drop2ClickRadius)
         {
             // 掉2 开始下落
@@ -228,6 +348,20 @@ public class DrawPath : MonoBehaviour
             if (object3 != null) object3.SetActive(true);
 
             secondStageDone = true;
+
+            // 剪纸全部完成，释放玩家控制权
+            isInteracting = false;
+            if (playerController != null)
+            {
+                playerController.transform.SetPositionAndRotation(savedPlayerPos, savedPlayerRot);
+                if (playerController.cameraTransform != null)
+                    playerController.cameraTransform.localRotation = savedCameraRot;
+
+                playerController.isInspecting = false;
+                playerController.SetCursorState(true);
+            }
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
         }
     }
 

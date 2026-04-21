@@ -20,7 +20,8 @@ public class Drop2RayClick : MonoBehaviour
             if (clickCamera == null) return;
         }
 
-        Vector3 screenPos = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
+        // 因为改为了按F定点操作，现在用鼠标点击而不是准心
+        Vector3 screenPos = Input.mousePosition;
         Ray ray = clickCamera.ScreenPointToRay(screenPos);
         RaycastHit hit;
 

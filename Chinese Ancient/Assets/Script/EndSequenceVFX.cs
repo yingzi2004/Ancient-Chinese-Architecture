@@ -160,20 +160,19 @@ public class EndSequenceVFX : MonoBehaviour
         blackCanvasGroup.alpha = 0f;
         blackCanvasGroup.blocksRaycasts = true;
 
-        // 0) 顿一顿，制造气氛（不马上触发）
+        // 延迟一段时间增加气氛
         if (initialDelay > 0f)
         {
             yield return Wait(initialDelay);
         }
 
-        // --- 从这里开始，摇晃、模糊、眨眼同时发生 ---
-
-        // 1) 开始左右绵长的摇晃 (从头摇到尾)
-        // 自动计算摇晃时长，让它覆盖整个“模糊 + 眨眼 + 变黑全过程”
+        // --- 开始视觉效果序列 ---
+        // AI辅助生成：DeepSeek-V3.2, 2026-04-21
+        // 计算总摇晃时间，覆盖后续效果
         float estimatedTotalTime = blurInDuration + (blinkCount * (singleBlinkDuration + 0.3f)) + fadeToBlackDuration;
         shakeDuration = Mathf.Max(shakeDuration, estimatedTotalTime);
 
-        // --- 新增：背景音乐淡出 ---
+        // --- 背景音乐淡出 ---
         if (sceneBgmToFadeOut != null)
         {
             float startVol = sceneBgmToFadeOut.volume;
@@ -188,27 +187,27 @@ public class EndSequenceVFX : MonoBehaviour
             cShake = StartCoroutine(ShakeCameraRoutine(targetCamera.transform, shakeDuration, shakeStrength, shakeFrequency));
         }
 
-        // 2) 开始模糊
+        // 2) 画面模糊
         Coroutine cFade = null;
         if (dof != null && maxBlur > 0f && blurInDuration > 0f)
         {
             cFade = StartCoroutine(TweenFloat(0f, maxBlur, blurInDuration, v => {
-                // 偶尔有种拉扯涣散感
+                // 添加动态噪点
                 float noise = (Mathf.PerlinNoise(Time.time * 3f, 0) * 0.3f + 0.85f);
                 if (dof != null) dof.gaussianMaxRadius.Override(v * noise);
             }));
         }
 
-        // 稍微等一小下再开始眨眼（比如刚开始摇晃和模糊了 0.5秒后开始眨眼）
+        // 延迟一段时间开始眨眼过渡
         if (holdBlurBeforeShake > 0f)
         {
             yield return Wait(holdBlurBeforeShake);
         }
 
-        // 3) 眨眼变黑（模拟大脑充血/眩晕）
+        // 3) 眨眼和黑屏过渡效果
         for (int i = 0; i < blinkCount; i++)
         {
-            // 闭眼（视线变黑，但不是全黑，留一点光增加挣扎感）
+            // 闭眼阶段
             float targetAlpha = (i == blinkCount - 1) ? 1.0f : 0.85f;
             float currentAlpha = blackCanvasGroup != null ? blackCanvasGroup.alpha : 0f;
 
@@ -217,24 +216,24 @@ public class EndSequenceVFX : MonoBehaviour
                 if (blackCanvasGroup != null) blackCanvasGroup.alpha = v;
             });
             
-            // 闭眼保持一下下，越往后越虚弱（闭眼更久）
+            // 保持闭眼状态，时间递增
             yield return Wait(0.1f + 0.1f * i);
 
             if (i < blinkCount - 1)
             {
-                // 再次艰难睁开（不会完全褪去黑色，保留眩晕）
+                // 睁眼恢复部分视线
                 float backAlpha = Mathf.Min(0.3f + i * 0.15f, 0.7f);
                 yield return TweenFloat(targetAlpha, backAlpha, singleBlinkDuration * 0.5f, v =>
                 {
                     if (blackCanvasGroup != null) blackCanvasGroup.alpha = v;
                 });
 
-                // 睁眼短暂停留
+                // 睁眼状态停留
                 yield return Wait(0.2f);
             }
         }
 
-        // 4) 彻底陷入死寂（盖成全黑）
+        // 4) 完全黑屏
         if (fadeToBlackDuration > 0f)
         {
             float alphaNow = blackCanvasGroup != null ? blackCanvasGroup.alpha : 0f;
@@ -256,14 +255,14 @@ public class EndSequenceVFX : MonoBehaviour
             yield return Wait(holdBlackDuration);
         }
 
-        // 4) 地图重现与关闭（已改为：切换到最终结局场景）
+        // 5) 加载目标场景
         if (!string.IsNullOrEmpty(targetEndingScene))
         {
             UnityEngine.SceneManagement.SceneManager.LoadScene(targetEndingScene);
         }
 
 
-        // 结束：执行回调
+        // 完成回调
         try
         {
             after?.Invoke();
@@ -294,11 +293,11 @@ public class EndSequenceVFX : MonoBehaviour
         
         dof = profile.Add<DepthOfField>(true);
         dof.active = true;
-        // 使用 Gaussian 模式非常适合模拟眩晕模糊
+        
         dof.mode.Override(DepthOfFieldMode.Gaussian);
         dof.gaussianStart.Override(0f);
         dof.gaussianEnd.Override(0f);
-        dof.gaussianMaxRadius.Override(0f); // 0代表不受影响，越大越模糊
+        dof.gaussianMaxRadius.Override(0f);
     }
 
     private void EnsureBlackOverlay()
@@ -308,13 +307,13 @@ public class EndSequenceVFX : MonoBehaviour
             return;
         }
 
-        // 运行时创建一个全屏黑色覆盖层（不需要你手动做UI）
+        // 创建全屏黑屏UI
         var root = new GameObject("EndSequenceOverlay");
         root.transform.SetParent(transform, false);
 
         var canvas = root.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 30000; // 留出空间让最终地图 (比如设为31000) 能盖在上面
+        canvas.sortingOrder = 30000;
 
         root.AddComponent<CanvasScaler>();
         root.AddComponent<GraphicRaycaster>();
@@ -371,29 +370,27 @@ public class EndSequenceVFX : MonoBehaviour
 
         while (t < duration)
         {
-            if (!isPlaying) break; // 防止提早被清理
+            if (!isPlaying) break; 
             float dt = DeltaTime();
             t += dt;
-            // 降低摇晃的频率，制造一种醉酒、沉重、梦境苏醒时的左摇右晃
+            
             phase += dt * (frequency * 0.3f);
 
-            // 淡入淡出控制，免得突然断掉
+            // 缓动曲线
             float k = 1f - Mathf.Pow(Mathf.Clamp01(t / duration), 2f);
 
-            // 彻底去除带有心跳感的高频抖动(burst)，改为缓慢而绵长的偏航
-            // 营造真正的“上下左右”全方位漂浮恍惚感
-            float xOffset = Mathf.Sin(phase) * (strength * 1.5f) * k;          // 左右位移
-            float yOffset = Mathf.Cos(phase * 0.8f) * (strength * 1.5f) * k;   // 大幅增强上下位移
+            // 位移计算
+            float xOffset = Mathf.Sin(phase) * (strength * 1.5f) * k;          
+            float yOffset = Mathf.Cos(phase * 0.8f) * (strength * 1.5f) * k;   
             target.localPosition = originPos + new Vector3(xOffset, yOffset, 0f);
 
-            // 伴随无力地上下点头和左右摇头
-            float pitchOffset = Mathf.Cos(phase * 0.9f) * (strength * 15f) * k; // 大幅增强上下点头
-            float yawOffset = Mathf.Sin(phase * 1.1f) * (strength * 15f) * k;   // 左右摇头
-            float rollOffset = Mathf.Sin(phase * 0.7f) * (strength * 10f) * k;  // 稍微带一点歪头，增加自然感
+            // 旋转计算
+            // AI辅助生成：DeepSeek-V3.2, 2026-04-21
+            float pitchOffset = Mathf.Cos(phase * 0.9f) * (strength * 15f) * k; 
+            float yawOffset = Mathf.Sin(phase * 1.1f) * (strength * 15f) * k;   
+            float rollOffset = Mathf.Sin(phase * 0.7f) * (strength * 10f) * k;  
             
             target.localRotation = originRot * Quaternion.Euler(pitchOffset, yawOffset, rollOffset);
-
-            // 删除了 FOV 的缩放，因为它太像心跳/脉搏了
 
             yield return null;
         }

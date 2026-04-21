@@ -570,13 +570,7 @@ public class DialogueManager : MonoBehaviour
         }
 
         // 清除旧的选项按钮（如果有）
-        if (optionsContainer != null)
-        {
-            foreach (Transform child in optionsContainer)
-            {
-                Destroy(child.gameObject);
-            }
-        }
+        ClearOptions();
 
         // 隐藏继续提示
         if (continuePromptText != null)
@@ -877,13 +871,10 @@ public class DialogueManager : MonoBehaviour
         Debug.Log($"DialogueManager: ShowOptions 被调用，选项数量: {(options != null ? options.Length : 0)}");
 
         // 清除旧的选项按钮
+        ClearOptions();
+
         if (optionsContainer != null)
         {
-            foreach (Transform child in optionsContainer)
-            {
-                Destroy(child.gameObject);
-            }
-
             // 创建新的选项按钮
             if (options != null && options.Length > 0)
             {
@@ -999,13 +990,7 @@ public class DialogueManager : MonoBehaviour
         Debug.Log($"DialogueManager: 选中选项 - {option.optionText}");
 
         // 清除选项
-        if (optionsContainer != null)
-        {
-            foreach (Transform child in optionsContainer)
-            {
-                Destroy(child.gameObject);
-            }
-        }
+        ClearOptions();
 
         // 显示NPC回复，并传入后续选项
         if (!string.IsNullOrEmpty(option.responseText))
@@ -1071,13 +1056,7 @@ public class DialogueManager : MonoBehaviour
         }
 
         // 清除选项
-        if (optionsContainer != null)
-        {
-            foreach (Transform child in optionsContainer)
-            {
-                Destroy(child.gameObject);
-            }
-        }
+        ClearOptions();
 
         if (currentDialogueCallback != null)
         {
@@ -1088,6 +1067,31 @@ public class DialogueManager : MonoBehaviour
     }
 
     public bool IsDialogueActive => isDialogueActive;
+
+    private void ClearOptions()
+    {
+        if (optionsContainer != null)
+        {
+            foreach (Transform child in optionsContainer)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+    }
+
+    private void SetDialogueText(string text, bool append = false)
+    {
+        if (append)
+        {
+            if (dialogueText != null) dialogueText.text += text;
+            if (dialogueTextTMP != null) dialogueTextTMP.text += text;
+        }
+        else
+        {
+            if (dialogueText != null) dialogueText.text = text;
+            if (dialogueTextTMP != null) dialogueTextTMP.text = text;
+        }
+    }
 
     private void LockPlayerMovement()
     {

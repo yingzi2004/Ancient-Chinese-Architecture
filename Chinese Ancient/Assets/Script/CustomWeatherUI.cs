@@ -1,18 +1,23 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement; // 新增场景管理
-using UnityEngine.EventSystems; // 新增：处理EventSystem
-using UniStorm; // 必须引入 UniStorm 才能切换天气
+using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
+using UniStorm; 
+
 
 public class CustomWeatherUI : MonoBehaviour
 {
-    [Header("")]
-    public KeyCode toggleKey = KeyCode.T; // 热键 T
-    public GameObject weatherPanel;       // 把你做的天气面板拖进来
+    [Header("输入设置")]
+    public KeyCode toggleKey = KeyCode.T;
+    public GameObject weatherPanel;       // 把做的天气面板拖进来
 
     private PlayerController playerController;
     private Canvas weatherCanvas;
     private CanvasGroup canvasGroup;
+
+    // AI辅助生成：Kimi K2.6, 2026-04-21
+    // 缓存状态，避免Update中每帧重复检测
+    private bool wasPanelOpenLastFrame = false;
 
     private void OnEnable()
     {
@@ -24,40 +29,42 @@ public class CustomWeatherUI : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    // AI辅助生成：Kimi K2.6, 2026-04-21
+    // 补充生命周期清理，防止对象销毁后事件残留
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // 过图时重新抓取新场景的玩家引用
-        playerController = FindFirstObjectByType<PlayerController>();
-        Debug.Log($"[天气UI] 场景切换后重新获取PlayerController: {(playerController != null ? "成功" : "失败")}");
-
-        // 重新初始化UI系统以适应新场景
-        if (weatherPanel != null)
+        // AI辅助生成：Kimi K2.6, 2026-04-21
+        // 防御性检查：weatherPanel 可能因场景切换被销毁
+        if (weatherPanel == null)
         {
-            InitializeUISystem();
-            Debug.Log("[天气UI] 场景切换后重新初始化UI系统");
-
-            // 场景切换后强制确保Canvas Sort Order最高 ← 传送问题的关键！
-            if (weatherCanvas != null)
-            {
-                weatherCanvas.sortingOrder = 999;
-                Debug.Log($"[天气UI] 【场景传送后】确保Canvas Sort Order = 999");
-            }
+            Debug.LogWarning("[天气UI] weatherPanel 为空，跳过场景加载初始化");
+            return;
         }
 
-        // 如果天气系统这时候还在开着，保证切场景鼠标控制权正常
-        if (weatherPanel != null && weatherPanel.activeSelf)
+        // 过图时重新抓取新场景的玩家引用
+        RefreshPlayerReference();
+
+        // 重新初始化UI系统以适应新场景
+        InitializeUISystem();
+        Debug.Log("[天气UI] 场景切换后重新初始化UI系统");
+
+        // 场景切换后强制确保Canvas Sort Order最高
+        EnsureCanvasSortOrder();
+
+        // 如果天气面板这时候还在开着，保证切场景鼠标控制权正常
+        if (weatherPanel.activeSelf)
         {
             Debug.Log("[天气UI] 天气面板在切换时处于打开状态，正在修复UI交互权限...");
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
-            
-            // 确保CanvasGroup允许交互
-            if (canvasGroup != null)
-            {
-                canvasGroup.blocksRaycasts = true;
-                canvasGroup.interactable = true;
-            }
-            
+
+            SetCanvasGroupInteractable(true);
+
             if (playerController != null)
             {
                 playerController.isInspecting = true;
@@ -72,19 +79,22 @@ public class CustomWeatherUI : MonoBehaviour
 
     void Start()
     {
-        // 先找到玩家，以免被后面漏掉
-        playerController = FindFirstObjectByType<PlayerController>();
-
-        // 游戏一开始，隐藏你的天气面板
-        if (weatherPanel != null) 
+        // AI辅助生成：Kimi K2.6, 2026-04-21
+        // 防御性检查：面板未赋值时直接返回，避免后续 NullReference
+        if (weatherPanel == null)
         {
-            weatherPanel.SetActive(false);
-            
-            // 提前初始化Canvas和EventSystem
-            InitializeUISystem();
+            Debug.LogError("[天气UI] weatherPanel 未赋值！请在Inspector中绑定天气面板。");
+            enabled = false;
+            return;
         }
-        
-        // 关键修复：如果在 OnSceneLoaded 时由 activeSelf=true 错误地把玩家锁死了，这里一定要强行解锁
+
+        RefreshPlayerReference();
+
+        // 游戏一开始，隐藏天气面板
+        weatherPanel.SetActive(false);
+        InitializeUISystem();
+
+        // 关键修复：如果在 OnSceneLoaded 时由 activeSelf=true 错误地把玩家锁死了，这里强行解锁
         if (playerController != null)
         {
             playerController.isInspecting = false;
@@ -92,18 +102,41 @@ public class CustomWeatherUI : MonoBehaviour
         }
     }
 
+    private void RefreshPlayerReference()
+    {
+        playerController = FindFirstObjectByType<PlayerController>();
+        Debug.Log($"[天气UI] 重新获取PlayerController: {(playerController != null ? "成功" : "失败")}");
+    }
+
     private void InitializeUISystem()
     {
-        // 确保场景中有EventSystem
-        if (EventSystem.current == null)
-        {
-            GameObject eventSystemObj = new GameObject("EventSystem");
-            EventSystem es = eventSystemObj.AddComponent<EventSystem>();
-            eventSystemObj.AddComponent<StandaloneInputModule>();
-            Debug.Log("[天气UI] 自动创建了EventSystem");
-        }
+        // AI辅助生成：Kimi K2.6, 2026-04-21
+        // 防御性检查：weatherPanel 可能为空（如被误删）
+        if (weatherPanel == null) return;
 
-        // 获取Canvas并检查必要组件
+        EnsureEventSystem();
+        ResolveCanvas();
+        EnsureGraphicRaycaster();
+        ResolveCanvasGroup();
+        EnsureCanvasSortOrder();
+
+        Debug.Log("[天气UI] UI系统初始化完成");
+    }
+
+    private void EnsureEventSystem()
+    {
+        if (EventSystem.current != null) return;
+
+        GameObject eventSystemObj = new GameObject("EventSystem");
+        eventSystemObj.AddComponent<EventSystem>();
+        eventSystemObj.AddComponent<StandaloneInputModule>();
+        Debug.Log("[天气UI] 自动创建了EventSystem");
+    }
+
+    // AI辅助生成：Kimi K2.6, 2026-04-21
+    // 提取 Canvas 解析逻辑，统一处理自身和父级查找
+    private void ResolveCanvas()
+    {
         weatherCanvas = weatherPanel.GetComponent<Canvas>();
         if (weatherCanvas == null)
         {
@@ -112,43 +145,64 @@ public class CustomWeatherUI : MonoBehaviour
 
         if (weatherCanvas != null)
         {
-            // ======== 关键：确保Canvas Sort Order足够高 ========
-            // 这样即使在传送后，天气UI也不会被其他UI遮挡
-            weatherCanvas.sortingOrder = 999;  // 最高优先级
-            Debug.Log($"[天气UI] Canvas Sort Order 设置为: {weatherCanvas.sortingOrder}");
-
-            // 检查Canvas RenderMode
             Debug.Log($"[天气UI] Canvas RenderMode: {weatherCanvas.renderMode}");
-
-            // 确保Canvas有GraphicRaycaster
-            GraphicRaycaster raycaster = weatherCanvas.GetComponent<GraphicRaycaster>();
-            if (raycaster == null)
-            {
-                weatherCanvas.gameObject.AddComponent<GraphicRaycaster>();
-                Debug.Log("[天气UI] Canvas缺少GraphicRaycaster，已自动添加");
-            }
-
-            // 获取或创建CanvasGroup
-            canvasGroup = weatherPanel.GetComponent<CanvasGroup>();
-            if (canvasGroup == null)
-            {
-                canvasGroup = weatherPanel.AddComponent<CanvasGroup>();
-                Debug.Log("[天气UI] 添加了CanvasGroup用于UI事件管理");
-            }
-
-            // 确保CanvasGroup允许交互
-            canvasGroup.blocksRaycasts = true;
-            canvasGroup.interactable = true;
-
-            // 确保weatherPanel本身处于活跃状态（如果现在处于激活）
-            Debug.Log($"[天气UI] weatherPanel 激活状态: {weatherPanel.activeSelf}, Canvas激活状态: {weatherCanvas.gameObject.activeSelf}");
-
-            Debug.Log("[天气UI] UI系统初始化完成");
         }
         else
         {
             Debug.LogWarning("[天气UI] 警告：无法找到与天气面板相关的Canvas！");
         }
+    }
+
+    private void EnsureGraphicRaycaster()
+    {
+        if (weatherCanvas == null) return;
+
+        GraphicRaycaster raycaster = weatherCanvas.GetComponent<GraphicRaycaster>();
+        if (raycaster == null)
+        {
+            weatherCanvas.gameObject.AddComponent<GraphicRaycaster>();
+            Debug.Log("[天气UI] Canvas缺少GraphicRaycaster，已自动添加");
+        }
+    }
+
+    // AI辅助生成：Kimi K2.6, 2026-04-21
+    // 提取 CanvasGroup 解析逻辑
+    private void ResolveCanvasGroup()
+    {
+        if (weatherPanel == null) return;
+
+        canvasGroup = weatherPanel.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = weatherPanel.AddComponent<CanvasGroup>();
+            Debug.Log("[天气UI] 添加了CanvasGroup用于UI事件管理");
+        }
+
+        SetCanvasGroupInteractable(true);
+    }
+
+    // AI辅助生成：Kimi K2.6, 2026-04-21
+    // 提取 Sort Order 设置，统一入口
+    private void EnsureCanvasSortOrder()
+    {
+        if (weatherCanvas == null) return;
+
+        const int targetSortOrder = 999;
+        if (weatherCanvas.sortingOrder != targetSortOrder)
+        {
+            weatherCanvas.sortingOrder = targetSortOrder;
+        }
+        Debug.Log($"[天气UI] Canvas Sort Order 确保为: {weatherCanvas.sortingOrder}");
+    }
+
+    // AI辅助生成：Kimi K2.6, 2026-04-21
+    // 提取 CanvasGroup 交互状态设置
+    private void SetCanvasGroupInteractable(bool interactable)
+    {
+        if (canvasGroup == null) return;
+
+        canvasGroup.blocksRaycasts = interactable;
+        canvasGroup.interactable = interactable;
     }
 
     void Update()
@@ -159,133 +213,140 @@ public class CustomWeatherUI : MonoBehaviour
             ToggleWeatherPanel();
         }
 
-        // 持续检查UI是否打开，如果打开但PlayerController丢失，主动重新获取
-        if (weatherPanel != null && weatherPanel.activeSelf)
+        // AI辅助生成：Kimi K2.6, 2026-04-21
+        // 仅在面板状态变化时执行修复，避免每帧重复检测
+        bool isPanelOpen = weatherPanel != null && weatherPanel.activeSelf;
+
+        if (isPanelOpen && !wasPanelOpenLastFrame)
         {
-            // 如果PlayerController丢失，重新获取
-            if (playerController == null)
-            {
-                playerController = FindFirstObjectByType<PlayerController>();
-                if (playerController != null)
-                {
-                    playerController.isInspecting = true;
-                    Debug.Log("[天气UI] 自动恢复PlayerController并设置isInspecting=true");
-                }
-            }
+            // 面板刚打开，执行一次性修复
+            OnPanelOpened();
+        }
 
-            // 如果CanvasGroup丢失或配置错误，修复它
-            if (canvasGroup == null)
-            {
-                canvasGroup = weatherPanel.GetComponent<CanvasGroup>();
-                if (canvasGroup == null)
-                {
-                    canvasGroup = weatherPanel.AddComponent<CanvasGroup>();
-                    Debug.Log("[天气UI] 重新添加CanvasGroup");
-                }
-            }
+        wasPanelOpenLastFrame = isPanelOpen;
+    }
 
-            // 确保CanvasGroup始终允许交互（关键！）
-            if (canvasGroup != null && (!canvasGroup.blocksRaycasts || !canvasGroup.interactable))
+    // AI辅助生成：Kimi K2.6, 2026-04-21
+    // 提取面板打开时的修复逻辑，替代 Update 中每帧检测
+    private void OnPanelOpened()
+    {
+        // 如果PlayerController丢失，重新获取
+        if (playerController == null)
+        {
+            RefreshPlayerReference();
+            if (playerController != null)
             {
-                canvasGroup.blocksRaycasts = true;
-                canvasGroup.interactable = true;
-                Debug.LogWarning("[天气UI] 警告：CanvasGroup配置错误，已自动修复");
-            }
-
-            // 传送后的关键检查：确保Canvas Sort Order足够高 ← 解决传送问题
-            if (weatherCanvas != null && weatherCanvas.sortingOrder != 999)
-            {
-                weatherCanvas.sortingOrder = 999;
-                Debug.LogWarning($"[天气UI] 警告：Canvas Sort Order不对，已改为999");
-            }
-
-            // 确保weatherPanel和Canvas都是活跃的
-            if (weatherCanvas != null && !weatherCanvas.gameObject.activeSelf)
-            {
-                Debug.LogWarning("[天气UI] 警告：Canvas被意外禁用");
+                playerController.isInspecting = true;
+                Debug.Log("[天气UI] 自动恢复PlayerController并设置isInspecting=true");
             }
         }
+
+        // 确保CanvasGroup和Sort Order正确
+        if (canvasGroup == null)
+        {
+            ResolveCanvasGroup();
+        }
+        SetCanvasGroupInteractable(true);
+        EnsureCanvasSortOrder();
     }
 
     public void ToggleWeatherPanel()
     {
-        if (weatherPanel == null) return;
+        if (weatherPanel == null)
+        {
+            Debug.LogWarning("[天气UI] weatherPanel 为空，无法切换面板");
+            return;
+        }
 
         bool isOpening = !weatherPanel.activeSelf;
         weatherPanel.SetActive(isOpening);
-        
-        // 每次开关都强制重新获取当前的PlayerController（防止场景切换后引用失效）
-        playerController = FindFirstObjectByType<PlayerController>();
-        if (playerController == null)
-        {
-            Debug.LogWarning("[天气UI] 无法找到PlayerController！UI和游戏逻辑交互会失效");
-        }
 
-        // 如果你平时游戏里是锁定隐藏鼠标的，打开面板时记得解锁并显示鼠标
+        // AI辅助生成：Kimi K2.6, 2026-04-21
+        // 统一使用 RefreshPlayerReference 替代内联 Find
+        RefreshPlayerReference();
+
+        // 鼠标控制
         Cursor.visible = isOpening;
         Cursor.lockState = isOpening ? CursorLockMode.None : CursorLockMode.Locked;
 
-        // 告诉玩家控制器：停下移动和转视角，把鼠标让给UI！
+        // 玩家控制器状态同步
         if (playerController != null)
         {
             playerController.isInspecting = isOpening;
             if (!isOpening)
             {
-                playerController.SetCursorState(true); // 恢复视角的锁定状态，保证可以转视角
+                playerController.SetCursorState(true);
             }
             Debug.Log($"[天气UI] ToggleWeatherPanel -> isInspecting={isOpening}");
         }
 
-        // 确保CanvasGroup允许交互 ← 这是关键！
-        if (canvasGroup != null)
-        {
-            canvasGroup.blocksRaycasts = isOpening;
-            canvasGroup.interactable = isOpening;
-            Debug.Log($"[天气UI] CanvasGroup -> blocksRaycasts={isOpening}, interactable={isOpening}");
-        }
+        // CanvasGroup 交互同步
+        SetCanvasGroupInteractable(isOpening);
+        Debug.Log($"[天气UI] CanvasGroup -> blocksRaycasts={isOpening}, interactable={isOpening}");
 
-        // 打开UI时强制设置Canvas Sort Order为最高 ← 解决传送后点不了的问题
-        if (isOpening && weatherCanvas != null)
+        // 打开时强制设置Canvas Sort Order为最高
+        if (isOpening)
         {
-            weatherCanvas.sortingOrder = 999;
+            EnsureCanvasSortOrder();
             Debug.Log($"[天气UI] 打开面板 -> Canvas Sort Order 强制设置为 999");
         }
+
+
+        wasPanelOpenLastFrame = isOpening;
     }
 
     public void ChangeWeatherByIndex(int index)
     {
+        // AI辅助生成：Kimi K2.6, 2026-04-21
+        // 防御性检查：UniStorm 实例可能未初始化
         if (UniStormSystem.Instance == null)
         {
-            Debug.LogError("场景中找不到 UniStormSystem 实例！");
+            Debug.LogError("[天气系统] 场景中找不到 UniStormSystem 实例！");
             return;
         }
 
         var allWeathers = UniStormSystem.Instance.AllWeatherTypes;
+        if (allWeathers == null)
+        {
+            Debug.LogError("[天气系统] UniStormSystem.AllWeatherTypes 为空！");
+            return;
+        }
+
         if (index >= 0 && index < allWeathers.Count)
         {
-            // 通过获取到的天气类型，让 UniStorm 切换
             WeatherType targetWeather = allWeathers[index];
-            UniStormSystem.Instance.ChangeWeather(targetWeather);
-            Debug.Log($"【天气系统】成功切换天气至: {targetWeather.WeatherTypeName}");
+            if (targetWeather != null)
+            {
+                UniStormSystem.Instance.ChangeWeather(targetWeather);
+                Debug.Log($"[天气系统] 成功切换天气至: {targetWeather.WeatherTypeName}");
+            }
+            else
+            {
+                Debug.LogWarning($"[天气系统] 索引 {index} 对应的天气类型为空！");
+            }
         }
         else
         {
-            Debug.LogWarning("传入的天气序号越界了，请检查按钮绑定的数字！");
+            Debug.LogWarning($"[天气系统] 传入的天气序号 {index} 越界（总数：{allWeathers.Count}），请检查按钮绑定的数字！");
         }
     }
 
     public void ChangeWeatherByType(WeatherType targetWeather)
     {
-        if (UniStormSystem.Instance == null)
+
+        if (targetWeather == null)
         {
-            Debug.LogError("场景中找不到 UniStormSystem 实例！");
+            Debug.LogWarning("[天气系统] 传入的 WeatherType 为空，跳过切换");
             return;
         }
 
-        if (targetWeather != null)
+        if (UniStormSystem.Instance == null)
         {
-            UniStormSystem.Instance.ChangeWeather(targetWeather);
-            Debug.Log($"【天气系统】成功切换天气至: {targetWeather.WeatherTypeName}");
+            Debug.LogError("[天气系统] 场景中找不到 UniStormSystem 实例！");
+            return;
         }
+
+        UniStormSystem.Instance.ChangeWeather(targetWeather);
+        Debug.Log($"[天气系统] 成功切换天气至: {targetWeather.WeatherTypeName}");
     }
 }
