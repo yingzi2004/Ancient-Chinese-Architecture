@@ -29,6 +29,12 @@ public class JadePendant : MonoBehaviour
     [Tooltip("是否支持键盘E键拾取")]
     public bool allowKeyboardPickup = true;
 
+    [Header("关联任务NPC")]
+    [Tooltip("如果该玉佩拾取后要让某个NPC切换对话阶段，拖到这里")]
+    public NPCInteractTrigger targetNPC;
+    [Tooltip("需要让NPC切换到哪个备用对话索引？（默认0）")]
+    public int targetAlternateNodeIndex = 0;
+
     [Header("视觉效果")]
     [Tooltip("拾取时的高亮颜色")]
     public Color highlightColor = Color.cyan;
@@ -165,6 +171,13 @@ public class JadePendant : MonoBehaviour
         if (PlayerPickup.Instance != null)
         {
             PlayerPickup.Instance.AddPendantToInventory(this);
+        }
+
+        // 通知绑定的NPC切换对话剧本
+        if (targetNPC != null)
+        {
+            Debug.Log($"玉佩拾取：正在通知 NPC ({targetNPC.gameObject.name}) 切换到备用对话 {targetAlternateNodeIndex}");
+            targetNPC.SwitchAlternateDialogue(targetAlternateNodeIndex);
         }
 
         // 这里可以添加拾取音效
