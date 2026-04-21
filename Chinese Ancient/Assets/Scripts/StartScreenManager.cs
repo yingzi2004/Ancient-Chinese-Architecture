@@ -5,13 +5,32 @@ using System.Collections;
 
 public class StartScreenManager : MonoBehaviour
 {
-    [Header("Background Images")]
-    public Sprite[] backgroundSprites;
-    public RawImage backgroundRenderer;
-    public float backgroundChangeInterval = 5f;
+    [Header("Floating Panels (四联屏风)")]
+    public RectTransform[] floatingPanels; // 拖入四个屏风的RectTransform
+    public float floatSpeed = 0.5f;        // 浮动速度 (调慢防晕)
+    public float floatAmplitude = 8f;      // 浮动幅度 (减小)
+    private float[] panelTimeOffsets;      // 记录每个屏风的随机初始时间，错开浮动节奏
+    private Vector2[] panelStartPos;       // 记录屏风初始位置
+
+    [Header("Logo Effect (主Logo悬浮)")]
+    public RectTransform logoTransform;    // 拖入清晰的主Logo
+    public float logoFloatSpeed = 0.6f;    // 悬浮速度(超缓慢)
+    public float logoFloatRange = 6f;      // 悬浮幅度
+    private Vector2 logoStartPos;
+
+    [Header("Logo Glow (模糊发光层)")]
+    public CanvasGroup logoGlowCanvasGroup; // 拖入模糊处理过的Logo的CanvasGroup
+    public float glowSpeed = 1.2f;          // 泛光呼吸速度
+    public float minGlow = 0.3f;            // 最小亮度
+    public float maxGlow = 0.9f;            // 最大亮度
+
+    [Header("Fog Effect (雾气游动 - 可选)")]
+    public RectTransform fogTransform;     // 雾气图层
+    public float fogMoveSpeed = 10f;       // 雾气平移速度
+    public float fogMoveRange = 50f;       // 雾气平移范围
+    private Vector2 fogStartPos;
 
     [Header("UI Elements")]
-    public Text titleText;
     public Button startButton;
 
     [Header("Scene Settings")]
@@ -25,44 +44,45 @@ public class StartScreenManager : MonoBehaviour
     public AudioSource backgroundMusic; // 拖拽BackgroundMusic对象到这里
     public float fadeOutDuration = 2f; // 淡出时长（秒）
 
-    private int currentBgIndex = 0;
-    private Coroutine backgroundChangeCoroutine;
     private bool isTransitioning = false; // 防止重复触发
 
     void Start()
     {
         Debug.Log("StartScreenManager Start 开始执行");
 
-        // 设置标题
-        if (titleText != null)
+        // 初始化屏风浮动数据
+        if (floatingPanels != null && floatingPanels.Length > 0)
         {
-            titleText.text = "四方华构录";
-            Debug.Log("标题已设置");
+            panelTimeOffsets = new float[floatingPanels.Length];
+            panelStartPos = new Vector2[floatingPanels.Length];
+            for (int i = 0; i < floatingPanels.Length; i++)
+            {
+                if (floatingPanels[i] != null)
+                {
+                    panelStartPos[i] = floatingPanels[i].anchoredPosition;
+                    // 让每个屏风的起伏错开，营造参差错落的动感
+                    panelTimeOffsets[i] = Random.Range(0f, Mathf.PI * 2f);
+                }
+            }
         }
-        else
+
+        // 初始化主Logo位置
+        if (logoTransform != null)
         {
-            Debug.LogWarning("titleText 为 null！请在Inspector中设置Title对象");
+            logoStartPos = logoTransform.anchoredPosition;
+        }
+
+        // 初始化雾气位置
+        if (fogTransform != null)
+        {
+            fogStartPos = fogTransform.anchoredPosition;
         }
 
         // 设置按钮监听
         if (startButton != null)
         {
             startButton.onClick.AddListener(OnStartButtonClick);
-            Debug.Log("按钮监听器已添加");
         }
-        else
-        {
-            Debug.LogError("startButton 为 null！请在Inspector中设置StartButton对象");
-        }
-
-        // 开始背景图片轮播
-        if (backgroundRenderer != null && backgroundSprites != null && backgroundSprites.Length > 0)
-        {
-            backgroundChangeCoroutine = StartCoroutine(ChangeBackground());
-            Debug.Log("背景轮播已启动，图片数量: " + backgroundSprites.Length);
-        }
-
-        Debug.Log("StartScreenManager Start 执行完成");
     }
 
     void Update()
@@ -70,21 +90,56 @@ public class StartScreenManager : MonoBehaviour
         // 键盘备选方案：按空格键或回车键也可以开始游戏
         if (!isTransitioning && (Input.GetKeyDown(startKey) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)))
         {
-            Debug.Log("检测到键盘输入，触发开始游戏");
             LoadMainScene();
+        }
+
+        if (!isTransitioning)
+        {
+            AnimateUI();
         }
     }
 
-    IEnumerator ChangeBackground()
+    void AnimateUI()
     {
-        while (true)
+        // 1. 屏风上下浮动
+        if (floatingPanels != null && panelStartPos != null)
         {
-            if (backgroundRenderer != null && backgroundSprites != null && backgroundSprites.Length > 0)
+            for (int i = 0; i < floatingPanels.Length; i++)
             {
-                backgroundRenderer.texture = backgroundSprites[currentBgIndex].texture;
-                currentBgIndex = (currentBgIndex + 1) % backgroundSprites.Length;
+                if (floatingPanels[i] != null)
+                {
+                    float newY = panelStartPos[i].y + Mathf.Sin(Time.time * floatSpeed + panelTimeOffsets[i]) * floatAmplitude;
+                    floatingPanels[i].anchoredPosition = new Vector2(panelStartPos[i].x, newY);
+                }
             }
-            yield return new WaitForSeconds(backgroundChangeInterval);
+        }
+
+        // 2. 主Logo超缓慢上下浮动 (不再缩放，只缓慢浮动以防晕眩)
+        if (logoTransform != null)
+        {
+            float newLogoY = logoStartPos.y + Mathf.Sin(Time.time * logoFloatSpeed) * logoFloatRange;
+            logoTransform.anchoredPosition = new Vector2(logoStartPos.x, newLogoY);
+        }
+
+        // 3. 模糊Logo发光层 (控制透明度闪烁)
+        if (logoGlowCanvasGroup != null)
+        {
+            // 发光层保持与主Logo一样的浮动步伐
+            if (logoTransform != null)
+            {
+                logoGlowCanvasGroup.transform.position = logoTransform.position;
+            }
+
+            // 控制透明度变化产生类似于呼吸发光的效果
+            float glowAlpha = Mathf.Lerp(minGlow, maxGlow, (Mathf.Sin(Time.time * glowSpeed) + 1f) / 2f);
+            logoGlowCanvasGroup.alpha = glowAlpha;
+        }
+
+        // 4. 雾气轻微水平游动
+        if (fogTransform != null)
+        {
+            float newX = fogStartPos.x + Mathf.Sin(Time.time * fogMoveSpeed * 0.1f) * fogMoveRange;
+            fogTransform.anchoredPosition = new Vector2(newX, fogStartPos.y);
         }
     }
 
@@ -206,13 +261,5 @@ public class StartScreenManager : MonoBehaviour
             }
         }
         return false;
-    }
-
-    void OnDestroy()
-    {
-        if (backgroundChangeCoroutine != null)
-        {
-            StopCoroutine(backgroundChangeCoroutine);
-        }
     }
 }

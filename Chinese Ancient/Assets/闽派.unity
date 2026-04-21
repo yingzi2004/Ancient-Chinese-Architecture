@@ -1712,22 +1712,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d7f3758a5a54154c8cb7b69ac03a5b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  triggerDelay: 0.5
-  triggerOnce: 1
-  guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
-  guidePortrait: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
-  expressionPortraits: []
-  welcomeDialogue:
-  - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
-  - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
-  - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
-  - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
-  highlightKeywords: []
-  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
-  playEndVFX: 0
-  onDialogueEnd:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &221677308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2701,22 +2685,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d7f3758a5a54154c8cb7b69ac03a5b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  triggerDelay: 0.5
-  triggerOnce: 1
-  guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
-  guidePortrait: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
-  expressionPortraits: []
-  welcomeDialogue:
-  - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
-  - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
-  - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
-  - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
-  highlightKeywords: []
-  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
-  playEndVFX: 0
-  onDialogueEnd:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &372203410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6357,22 +6325,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d7f3758a5a54154c8cb7b69ac03a5b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  triggerDelay: 0.5
-  triggerOnce: 1
-  guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
-  guidePortrait: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
-  expressionPortraits: []
-  welcomeDialogue:
-  - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
-  - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
-  - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
-  - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
-  highlightKeywords: []
-  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
-  playEndVFX: 0
-  onDialogueEnd:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &816104291
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6905,9 +6857,45 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1210241112130092020, guid: a20808725880635478df5d8f37382c2c, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 909.634
+      objectReference: {fileID: 0}
+    - target: {fileID: 1210241112130092020, guid: a20808725880635478df5d8f37382c2c, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 334.78
+      objectReference: {fileID: 0}
+    - target: {fileID: 1210241112130092020, guid: a20808725880635478df5d8f37382c2c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 17.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1210241112130092020, guid: a20808725880635478df5d8f37382c2c, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 72.235
+      objectReference: {fileID: 0}
+    - target: {fileID: 1374746096364626886, guid: a20808725880635478df5d8f37382c2c, type: 3}
+      propertyPath: m_Size
+      value: 0.5929818
+      objectReference: {fileID: 0}
+    - target: {fileID: 1374746096364626886, guid: a20808725880635478df5d8f37382c2c, type: 3}
+      propertyPath: m_Value
+      value: -0.026934559
+      objectReference: {fileID: 0}
+    - target: {fileID: 1609694236208024061, guid: a20808725880635478df5d8f37382c2c, type: 3}
+      propertyPath: m_margin.z
+      value: 654.4339
+      objectReference: {fileID: 0}
     - target: {fileID: 2442288375751312364, guid: a20808725880635478df5d8f37382c2c, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2442288375751312364, guid: a20808725880635478df5d8f37382c2c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -438
+      objectReference: {fileID: 0}
+    - target: {fileID: 2442288375751312364, guid: a20808725880635478df5d8f37382c2c, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 158.89015
       objectReference: {fileID: 0}
     - target: {fileID: 2695773338078281011, guid: a20808725880635478df5d8f37382c2c, type: 3}
       propertyPath: m_AnchorMax.y
@@ -6933,16 +6921,28 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -56.2
       objectReference: {fileID: 0}
+    - target: {fileID: 3631965814380073402, guid: a20808725880635478df5d8f37382c2c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4131411300302677329, guid: a20808725880635478df5d8f37382c2c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 266
+      objectReference: {fileID: 0}
     - target: {fileID: 5681724115022918914, guid: a20808725880635478df5d8f37382c2c, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5681724115022918914, guid: a20808725880635478df5d8f37382c2c, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5681724115022918914, guid: a20808725880635478df5d8f37382c2c, type: 3}
       propertyPath: m_SizeDelta.y
+      value: -17
+      objectReference: {fileID: 0}
+    - target: {fileID: 5681724115022918914, guid: a20808725880635478df5d8f37382c2c, type: 3}
+      propertyPath: m_AnchoredPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6529554734265444632, guid: a20808725880635478df5d8f37382c2c, type: 3}
@@ -6966,7 +6966,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 3631965814380073402, guid: a20808725880635478df5d8f37382c2c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a20808725880635478df5d8f37382c2c, type: 3}
@@ -12353,22 +12354,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d7f3758a5a54154c8cb7b69ac03a5b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  triggerDelay: 0.5
-  triggerOnce: 1
-  guideName: "\u6C11\u4FD7\u5C55\u89C8\u8BB2\u89E3\u5458"
-  guidePortrait: {fileID: 21300000, guid: 7cfd1018251d399469511d7a8a8d5a04, type: 3}
-  expressionPortraits: []
-  welcomeDialogue:
-  - "\u6B22\u8FCE\u6765\u5230\u6C11\u4FD7\u6587\u5316\u5C55\u89C8\u9986\uFF01"
-  - "\u8FD9\u91CC\u5C55\u793A\u4E86\u4E2D\u56FD\u4E30\u5BCC\u591A\u5F69\u7684\u6C11\u4FD7\u6587\u5316\uFF0C\u5305\u62EC\u4F20\u7EDF\u5EFA\u7B51\u3001\u751F\u6D3B\u7528\u5177\u3001\u6587\u5316\u4E60\u4FD7\u7B49\u3002"
-  - "\u60A8\u53EF\u4EE5\u81EA\u7531\u53C2\u89C2\u5404\u4E2A\u5C55\u533A\uFF0C\u4E86\u89E3\u4E0D\u540C\u5730\u533A\u7684\u6C11\u4FD7\u7279\u8272\u3002"
-  - "\u6309 L \u952E\u53EF\u4EE5\u63A8\u8FDB\u5BF9\u8BDD\uFF0C\u795D\u60A8\u53C2\u89C2\u6109\u5FEB\uFF01"
-  highlightKeywords: []
-  highlightColor: {r: 1, g: 0.84, b: 0, a: 1}
-  playEndVFX: 0
-  onDialogueEnd:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &1545286111
 MonoBehaviour:
   m_ObjectHideFlags: 0
