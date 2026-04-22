@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 3d07fde3f75eee0409a1310db133f5f4
+guid: f96bad74427a5fb4195794c8076ff38f
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -108,18 +108,62 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: bgpluss_0
+      rect:
+        serializedVersion: 2
+        x: 174
+        y: 438
+        width: 1692
+        height: 1347
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5cef43a8f9e6e484d906db6ca9736fea
+      internalID: -942606523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bgpluss_1
+      rect:
+        serializedVersion: 2
+        x: 1887
+        y: 1272
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7aee23eff37ef3745a28a64725059749
+      internalID: -1559343665
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 3cc62996b1c478141a8837162a4bff3f
     internalID: 0
     vertices: []
     indices: 
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      bgpluss_0: -942606523
+      bgpluss_1: -1559343665
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
