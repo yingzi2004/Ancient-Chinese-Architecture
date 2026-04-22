@@ -23,6 +23,9 @@ public class LanternLighter : MonoBehaviour, IInteractable
 
     [Header("NPC事件配置")]
     public float lightUpDelay = 3.0f;
+    
+    [Tooltip("当灯笼成功点亮后触发的事件（可拖拽小微的对话触发器到这里，调用它的 SetConditionMet 方法）")]
+    public UnityEngine.Events.UnityEvent onLanternsLit = new UnityEngine.Events.UnityEvent();
 
     // 是否已经被点亮，防止重复触发
     private bool isLit = false;
@@ -78,6 +81,13 @@ public class LanternLighter : MonoBehaviour, IInteractable
 
         Debug.Log("大院掌灯完成：所有灯笼已成功替换为自发光材质！");
         isLit = true; 
+
+        // 触发“灯笼点亮”事件，通知外界（比如小微的对话框触发器）
+        if (onLanternsLit != null)
+        {
+            onLanternsLit.Invoke();
+            Debug.Log("[剧情] 已向小微触发感叹的前置解锁信号。");
+        }
     }
 
     // 核心换材质的方法封装提炼

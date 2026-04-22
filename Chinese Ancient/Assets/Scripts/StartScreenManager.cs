@@ -24,6 +24,21 @@ public class StartScreenManager : MonoBehaviour
     public float minGlow = 0.3f;            // 最小亮度
     public float maxGlow = 0.9f;            // 最大亮度
 
+    [Header("Entrance Animation (自定义出场动画顺序)")]
+    public GameObject clearBackgroundObj;     // 拖入清晰的底图(背后请垫一张常亮的模糊底图防穿帮)
+    public GameObject[] customFadeSequence;   // 自定义任意数量、任意顺序的元素（屏风、装饰等），依次显现
+    public float bgFadeDuration = 1.5f;       // 背景渐入时间
+    public float elementFadeDuration = 1.0f;  // 单个自定义元素渐入时间
+    public float elementStaggerTime = 0.4f;   // 元素之间分别出现的间隔时间
+    public float logoFadeDuration = 2.0f;     // Logo渐入时间
+
+    private CanvasGroup bgCanvasGroup;
+    private CanvasGroup[] sequenceCanvasGroups;
+    private CanvasGroup logoMainCanvasGroup;
+    private CanvasGroup startBtnCanvasGroup;
+    private float glowMultiplier = 0f;        // 初始Logo泛光遮罩为0
+    private bool isEntranceDone = false;      // 出场动画是否完成
+
     [Header("Fog Effect (雾气游动 - 可选)")]
     public RectTransform fogTransform;     // 雾气图层
     public float fogMoveSpeed = 10f;       // 雾气平移速度
@@ -50,26 +65,54 @@ public class StartScreenManager : MonoBehaviour
     {
         Debug.Log("StartScreenManager Start 开始执行");
 
-        // 初始化屏风浮动数据
+        // 初始化屏风浮动数据 (仅做悬浮，不管出场透明度)
         if (floatingPanels != null && floatingPanels.Length > 0)
         {
             panelTimeOffsets = new float[floatingPanels.Length];
             panelStartPos = new Vector2[floatingPanels.Length];
+
             for (int i = 0; i < floatingPanels.Length; i++)
             {
                 if (floatingPanels[i] != null)
                 {
                     panelStartPos[i] = floatingPanels[i].anchoredPosition;
-                    // 让每个屏风的起伏错开，营造参差错落的动感
                     panelTimeOffsets[i] = Random.Range(0f, Mathf.PI * 2f);
                 }
             }
         }
 
-        // 初始化主Logo位置
+        // 初始化清晰背景开场透明 (底部的模糊背景请保持常亮，不要拖入脚本)
+        if (clearBackgroundObj != null)
+        {
+            bgCanvasGroup = GetOrAddCanvasGroup(clearBackgroundObj);
+            if (bgCanvasGroup != null) bgCanvasGroup.alpha = 0f;
+        }
+
+        // 初始化自定义出场序列的透明度
+        if (customFadeSequence != null && customFadeSequence.Length > 0)
+        {
+            sequenceCanvasGroups = new CanvasGroup[customFadeSequence.Length];
+            for (int i = 0; i < customFadeSequence.Length; i++)
+            {
+                if (customFadeSequence[i] != null)
+                {
+                    sequenceCanvasGroups[i] = GetOrAddCanvasGroup(customFadeSequence[i]);
+                    if (sequenceCanvasGroups[i] != null) sequenceCanvasGroups[i].alpha = 0f;
+                }
+            }
+        }
+
+        // 初始化主Logo位置及开场动画组件
         if (logoTransform != null)
         {
             logoStartPos = logoTransform.anchoredPosition;
+            logoMainCanvasGroup = GetOrAddCanvasGroup(logoTransform.gameObject);
+            if (logoMainCanvasGroup != null) logoMainCanvasGroup.alpha = 0f; // 初始全透明
+        }
+
+        if (logoGlowCanvasGroup != null)
+        {
+            logoGlowCanvasGroup.alpha = 0f; 
         }
 
         // 初始化雾气位置
@@ -78,17 +121,101 @@ public class StartScreenManager : MonoBehaviour
             fogStartPos = fogTransform.anchoredPosition;
         }
 
-        // 设置按钮监听
+        // 设置按钮监听与开场透明
         if (startButton != null)
         {
             startButton.onClick.AddListener(OnStartButtonClick);
+            startBtnCanvasGroup = GetOrAddCanvasGroup(startButton.gameObject);
+            if (startBtnCanvasGroup != null) startBtnCanvasGroup.alpha = 0f;
+            startButton.interactable = false; // 动画期间禁止点击
         }
+
+        // 启动出场串联动画序列
+        StartCoroutine(EntranceSequence());
+    }
+
+    private CanvasGroup GetOrAddCanvasGroup(GameObject obj)
+    {
+        if (obj == null) return null;
+        CanvasGroup cg = obj.GetComponent<CanvasGroup>();
+        if (cg == null) cg = obj.AddComponent<CanvasGroup>();
+        return cg;
+    }
+
+    IEnumerator EntranceSequence()
+    {
+        isEntranceDone = false;
+        yield return new WaitForSeconds(0.5f); // 开场后留白半秒缓冲
+
+        // 1. 背景图首先如画卷般渐入展开
+        if (bgCanvasGroup != null)
+        {
+            yield return StartCoroutine(FadeCanvasGroup(bgCanvasGroup, 0f, 1f, bgFadeDuration));
+        }
+
+        // 2. 自定义序列组件依次显形出场
+        if (sequenceCanvasGroups != null)
+        {
+            for (int i = 0; i < sequenceCanvasGroups.Length; i++)
+            {
+                if (sequenceCanvasGroups[i] != null)
+                {
+                    StartCoroutine(FadeCanvasGroup(sequenceCanvasGroups[i], 0f, 1f, elementFadeDuration));
+                    yield return new WaitForSeconds(elementStaggerTime); // 控制一个个出场的时间差
+                }
+            }
+            // 稍等一会儿，让所有元素基本上浮现实体
+            yield return new WaitForSeconds(elementFadeDuration * 0.5f);
+        }
+
+        // 3. Logo与发光层伴着仙气最后显现出场
+        if (logoMainCanvasGroup != null)
+        {
+            StartCoroutine(FadeCanvasGroup(logoMainCanvasGroup, 0f, 1f, logoFadeDuration));
+        }
+        
+        StartCoroutine(FadeGlowMultiplier(0f, 1f, logoFadeDuration)); // 同步开启发光层呼吸
+        
+        yield return new WaitForSeconds(logoFadeDuration * 0.8f);
+
+        // 4. 开始按钮最后微微软隐浮现
+        if (startBtnCanvasGroup != null)
+        {
+            StartCoroutine(FadeCanvasGroup(startBtnCanvasGroup, 0f, 1f, 1.0f));
+            if (startButton != null) startButton.interactable = true; // 终于允许玩家猛点啦！
+        }
+
+        isEntranceDone = true;
+    }
+
+    IEnumerator FadeCanvasGroup(CanvasGroup cg, float startAlpha, float endAlpha, float duration)
+    {
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            if (cg != null) cg.alpha = Mathf.Lerp(startAlpha, endAlpha, t / duration);
+            yield return null;
+        }
+        if (cg != null) cg.alpha = endAlpha;
+    }
+
+    IEnumerator FadeGlowMultiplier(float start, float end, float duration)
+    {
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            glowMultiplier = Mathf.Lerp(start, end, t / duration);
+            yield return null;
+        }
+        glowMultiplier = end;
     }
 
     void Update()
     {
-        // 键盘备选方案：按空格键或回车键也可以开始游戏
-        if (!isTransitioning && (Input.GetKeyDown(startKey) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)))
+        // 键盘备选方案：按空格键或回车键也可以开始游戏(要在开场动画后才能按，以防断点)
+        if (!isTransitioning && isEntranceDone && (Input.GetKeyDown(startKey) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)))
         {
             LoadMainScene();
         }
@@ -101,7 +228,7 @@ public class StartScreenManager : MonoBehaviour
 
     void AnimateUI()
     {
-        // 1. 屏风上下浮动
+        // 1. 屏风上下浮动 (浮动特效不受透明度出场影响！随时都在唯美漂浮)
         if (floatingPanels != null && panelStartPos != null)
         {
             for (int i = 0; i < floatingPanels.Length; i++)
@@ -114,7 +241,7 @@ public class StartScreenManager : MonoBehaviour
             }
         }
 
-        // 2. 主Logo超缓慢上下浮动 (不再缩放，只缓慢浮动以防晕眩)
+        // 2. 主Logo超缓慢上下浮动 (与屏风错落开来继续独立悬浮)
         if (logoTransform != null)
         {
             float newLogoY = logoStartPos.y + Mathf.Sin(Time.time * logoFloatSpeed) * logoFloatRange;
@@ -130,9 +257,9 @@ public class StartScreenManager : MonoBehaviour
                 logoGlowCanvasGroup.transform.position = logoTransform.position;
             }
 
-            // 控制透明度变化产生类似于呼吸发光的效果
+            // 控制呼吸发光，乘上出场动画控制的glowMultiplier，使开场时不出戏平铺
             float glowAlpha = Mathf.Lerp(minGlow, maxGlow, (Mathf.Sin(Time.time * glowSpeed) + 1f) / 2f);
-            logoGlowCanvasGroup.alpha = glowAlpha;
+            logoGlowCanvasGroup.alpha = glowAlpha * glowMultiplier;
         }
 
         // 4. 雾气轻微水平游动
