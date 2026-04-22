@@ -59,6 +59,7 @@ public class AliyunTTSClient : MonoBehaviour
         William,    // William - 英文男声
         Aitong,     // 艾彤 - 儿童音
         Aiwei,      // 艾薇 - 萝莉女声
+        Aibao,      // 艾宝 - 萝莉女声
         Shanshan,   // 姗姗 - 粤语女声
         Xiaoyue,    // 小玥 - 四川话女声
     }
