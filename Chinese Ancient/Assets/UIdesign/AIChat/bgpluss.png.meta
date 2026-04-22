@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: bc877ae2346981749bd79ee2491db530
+guid: f96bad74427a5fb4195794c8076ff38f
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -69,12 +69,12 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 1024
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
     compressionQuality: 50
-    crunchedCompression: 1
+    crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
     ignorePlatformSupport: 0
@@ -82,14 +82,14 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
-    maxTextureSize: 1024
+    maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: 12
+    textureFormat: -1
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
-    overridden: 1
+    overridden: 0
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: su bg_0
+      name: bgpluss_0
       rect:
         serializedVersion: 2
-        x: 59
-        y: 608
-        width: 1369
-        height: 1021
+        x: 174
+        y: 438
+        width: 1692
+        height: 1347
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -124,8 +124,29 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 671bb897a758f964bacd77a71ee9d2cf
-      internalID: 2141098226
+      spriteID: 5cef43a8f9e6e484d906db6ca9736fea
+      internalID: -942606523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bgpluss_1
+      rect:
+        serializedVersion: 2
+        x: 1887
+        y: 1272
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7aee23eff37ef3745a28a64725059749
+      internalID: -1559343665
       vertices: []
       indices: 
       edges: []
@@ -133,7 +154,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 4e680b2fb1ff4aa49a8552e7df685e8d
+    spriteID: 3cc62996b1c478141a8837162a4bff3f
     internalID: 0
     vertices: []
     indices: 
@@ -141,7 +162,8 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      su bg_0: 2141098226
+      bgpluss_0: -942606523
+      bgpluss_1: -1559343665
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

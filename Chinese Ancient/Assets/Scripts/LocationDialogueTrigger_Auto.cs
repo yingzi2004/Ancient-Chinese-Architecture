@@ -42,6 +42,13 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
 
     [SerializeField] private string sharedGroupID = "";
 
+    [Header("前置条件 (可选)")]
+    [Tooltip("是否需要前置事件（如交还火折子、修好灯笼）完成后，玩家进入此处才能听小微说话？")]
+    public bool requireExternalCondition = false;
+    
+    [Tooltip("前置条件是否已满足（可在外界交互成功后调用 SetConditionMet 开启）")]
+    public bool isConditionMet = false;
+
     [Header("事件设置")]
     public UnityEngine.Events.UnityEvent onDialogueEnd = new UnityEngine.Events.UnityEvent();
 
@@ -306,6 +313,13 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
 
         Debug.Log($"[{locationName}] 检测到碰撞，对象: {other.name}");
 
+        // 0. 外部前置任务检查（例如交出火折子亮灯笼后才能触发）
+        if (requireExternalCondition && !isConditionMet)
+        {
+            Debug.Log($"[{locationName}] 前置任务暂未满足，不弹对话，跳过");
+            return;
+        }
+
         // 1. 本地单次触发检查
         if (triggerOnce && hasTriggered)
         {
@@ -455,5 +469,23 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
         SetupDialogueManager();
         hasTriggered = false;
         TriggerDialogue();
+    }
+
+    /// <summary>
+    /// 被外部事件调用：标记任务已完成，并且如果玩家正身处触发器范围内，自动立刻弹对话开始！
+    /// </summary>
+    public void SetConditionMet()
+    {
+        if (requireExternalCondition && !isConditionMet)
+        {
+            isConditionMet = true;
+            Debug.Log($"[{locationName}] 前置任务已满足，触发器状态：{isConditionMet}。允许和小微对话了！");
+
+            // （可选）体贴功能：如果玩家交火折子的时候刚好就站在这段对话触发器圈子里，就让他直接触发对白
+            if (isPlayerInTrigger && !hasTriggered)
+            {
+                Invoke(nameof(TriggerDialogue), triggerDelay);
+            }
+        }
     }
 }
