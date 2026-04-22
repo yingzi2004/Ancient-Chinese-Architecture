@@ -876,7 +876,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 1190152916}
     m_Modifications:
     - target: {fileID: -8936389048066810559, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       propertyPath: m_LocalScale.x
@@ -908,27 +908,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 18.02
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -1.3186144
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.56435907
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.9999923
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: 0.003921453
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       propertyPath: m_LocalRotation.z
@@ -5295,6 +5295,8 @@ MonoBehaviour:
   globalPreventSameDialogue: 0
   playEndVFX: 0
   sharedGroupID: 
+  requireExternalCondition: 0
+  isConditionMet: 0
   onDialogueEnd:
     m_PersistentCalls:
       m_Calls: []
@@ -15452,6 +15454,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1193753712}
+  - {fileID: 69259912}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -0.449, y: 0, z: 0}
 --- !u!1 &1191798871 stripped
@@ -27435,7 +27438,6 @@ SceneRoots:
   - {fileID: 203844589}
   - {fileID: 245774127}
   - {fileID: 1160234427}
-  - {fileID: 69259911}
   - {fileID: 1190152916}
   - {fileID: 482518508}
   - {fileID: 943213735}
