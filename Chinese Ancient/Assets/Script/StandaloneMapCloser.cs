@@ -2,6 +2,8 @@
 using UnityEngine.UI;
 using DG.Tweening;
 using System.Collections;
+using TMPro;
+using UnityEngine.SceneManagement;
 
 public class StandaloneMapCloser : MonoBehaviour
 {
@@ -27,10 +29,46 @@ public class StandaloneMapCloser : MonoBehaviour
     [Header("最终退场黑屏(可选)")]
     public Image finalFadeImage;
 
+    [Header("卷轴关闭后对话设置")]
+    public GameObject dialoguePanel;
+    public TextMeshProUGUI dialogueText;
+    [TextArea(2, 5)]
+    public string[] dialogueLines = new string[]
+    {
+        "这就是中国古建筑的魅力吧，虽然岁月流转，但它们的精神长存。",
+        "每一块砖瓦，每一根梁柱，都在诉说着过去的故事。",
+        "这次的旅程让我收获颇丰，期待下一次的相遇……"
+    };
+    public float typingSpeed = 0.05f;
+    public AudioSource dialogueAudioSource;
+    public AudioClip windBlowClip;
+    [Header("跳转场景名")]
+    public string nextSceneName = "start";
+
+    private bool isTyping = false;
+    private bool skipTyping = false;
+
     private AudioSource bgmSource;
+
+    private void Update()
+    {
+        if (isTyping && IsAdvanceInputDown())
+        {
+            skipTyping = true;
+        }
+    }
+
+    private bool IsAdvanceInputDown()
+    {
+        return Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return);
+    }
 
     private IEnumerator Start()
     {
+        // 最开始先强制隐藏对话文本底板，防止场景原本开启时露出 "New Text"
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+        if (dialogueText != null) dialogueText.text = "";
+
         // 自动创建底层黑背景
         CreateBlackBackground();
 
@@ -105,11 +143,102 @@ public class StandaloneMapCloser : MonoBehaviour
             seq.Join(rightCover.DOAnchorPosX(targetX, closeDuration).SetEase(Ease.InOutSine));
         }
 
-        // 3. 动画执行完毕后的谢幕：强制淡入全屏黑屏！
+        // 3. 动画执行完毕后的谢幕：触发对话然后再跳转！
         seq.OnComplete(() =>
         {
-            CreateAndFadeBlackOverlay();
+            StartCoroutine(PlayDialogueAndExit());
         });
+    }
+
+    private IEnumerator PlayDialogueAndExit()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        // 强行提拔 UI 层级
+        ForceUIRenderState(dialoguePanel, dialogueText);
+
+        if (dialoguePanel != null) dialoguePanel.SetActive(true);
+
+        for (int i = 0; i < dialogueLines.Length; i++)
+        {
+            if (i == dialogueLines.Length - 1 && dialogueAudioSource != null && windBlowClip != null)
+            {
+                dialogueAudioSource.PlayOneShot(windBlowClip);
+            }
+
+            yield return StartCoroutine(TypeLine(dialogueLines[i]));
+
+            yield return null;
+            while (!IsAdvanceInputDown())
+            {
+                yield return null;
+            }
+        }
+
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+
+        CreateAndFadeBlackOverlay();
+    }
+
+    private IEnumerator TypeLine(string line)
+    {
+        isTyping = true;
+        skipTyping = false;
+
+        if (dialogueText != null)
+        {
+            dialogueText.color = new Color(dialogueText.color.r, dialogueText.color.g, dialogueText.color.b, 1f);
+            dialogueText.enabled = true;
+            dialogueText.gameObject.SetActive(true);
+            dialogueText.rectTransform.localScale = Vector3.one;
+            dialogueText.rectTransform.anchoredPosition3D = new Vector3(dialogueText.rectTransform.anchoredPosition3D.x, dialogueText.rectTransform.anchoredPosition3D.y, 0f);
+
+            dialogueText.text = line;
+            dialogueText.maxVisibleCharacters = 0;
+            dialogueText.ForceMeshUpdate(true);
+
+            int totalChars = dialogueText.textInfo.characterCount;
+            for (int i = 0; i <= totalChars; i++)
+            {
+                if (skipTyping)
+                {
+                    dialogueText.maxVisibleCharacters = totalChars;
+                    break;
+                }
+                
+                dialogueText.maxVisibleCharacters = i;
+                yield return new WaitForSeconds(typingSpeed);
+            }
+        }
+        
+        isTyping = false;
+    }
+
+    private void ForceUIRenderState(GameObject panel, TextMeshProUGUI txt)
+    {
+        if (panel == null || txt == null) return;
+
+        txt.overflowMode = TextOverflowModes.Overflow;
+        txt.enableWordWrapping = true;
+
+        Canvas canvas = panel.GetComponent<Canvas>();
+        if (canvas == null) canvas = panel.AddComponent<Canvas>();
+        
+        CanvasGroup cg = panel.GetComponent<CanvasGroup>();
+        if (cg != null)
+        {
+            cg.alpha = 1f;
+            cg.gameObject.SetActive(true);
+        }
+
+        canvas.overrideSorting = true;
+        canvas.sortingOrder = 32768; // 压在所有层之上
+        canvas.pixelPerfect = false;
+
+        txt.maskable = false;
+
+        if (panel.GetComponent<GraphicRaycaster>() == null)
+            panel.AddComponent<GraphicRaycaster>();
     }
 
     private Image CreateTopBlackOverlay()
@@ -194,10 +323,17 @@ public class StandaloneMapCloser : MonoBehaviour
 
     private void QuitGame()
     {
+        if (!string.IsNullOrEmpty(nextSceneName))
+        {
+            SceneManager.LoadScene(nextSceneName);
+        }
+        else
+        {
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
+            UnityEditor.EditorApplication.isPlaying = false;
 #else
-        Application.Quit();
+            Application.Quit();
 #endif
+        }
     }
 }

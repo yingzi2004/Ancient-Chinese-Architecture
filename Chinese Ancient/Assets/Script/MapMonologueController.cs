@@ -4,22 +4,9 @@ using System.Collections;
 
 public class MapMonologueController : MonoBehaviour
 {
-    [Header("开幕黑屏独白UI")]
-    public GameObject openingPanel;
-    public TextMeshProUGUI openingText;
-
     [Header("群青相间感叹UI")]
     public GameObject mapOpenPanel;
     public TextMeshProUGUI mapOpenText;
-
-    [Header("开幕黑屏独白（玩家疑惑）")]
-    [TextArea(2, 5)]
-    public string[] openingDialogue = new string[]
-    {
-        "咦…… 这是哪里？头有点晕……",
-        "我记得我是跟着古建筑考察队，去寻访苏州园林、北京天坛这些经典建筑的，怎么突然到了这个地方？",
-        "一阵风吹过，一张泛黄的古地图飘到你面前……"
-    };
 
     [Header("卷轴展开后独白（玩家感叹）")]
     [TextArea(2, 5)]
@@ -42,10 +29,8 @@ public class MapMonologueController : MonoBehaviour
     private void Start()
     {
         // 暴力用代码锁定渲染状态，不管你怎么拉框或怎么扔层级，强行把它按在最屏幕上！
-        ForceUIRenderState(openingPanel, openingText);
         ForceUIRenderState(mapOpenPanel, mapOpenText);
 
-        if (openingPanel != null) openingPanel.SetActive(false);
         if (mapOpenPanel != null) mapOpenPanel.SetActive(false);
     }
 
@@ -107,14 +92,6 @@ public class MapMonologueController : MonoBehaviour
     private bool IsAdvanceInputDown()
     {
         return Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return);
-    }
-
-    public IEnumerator PlayOpeningSequence()
-    {
-        Debug.Log("【系统自检】====== 成功调用到了黑屏独白！======");
-        if (openingPanel == null) Debug.LogError("【严重致命缺漏】你的 Opening Panel 还没拖拽赋值！运行个寂寞！");
-        if (openingText == null) Debug.LogError("【严重致命缺漏】你的 Opening Text 还没拖拽赋值！字显示个鬼！");
-        yield return PlaySequence(openingDialogue, openingPanel, openingText, true);
     }
 
     public IEnumerator PlayMapOpenSequence()
