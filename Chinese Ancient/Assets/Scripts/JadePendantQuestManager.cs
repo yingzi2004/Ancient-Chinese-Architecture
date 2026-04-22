@@ -117,7 +117,7 @@ public class JadePendantQuestManager : MonoBehaviour
         Debug.Log($"进度: {pendantsCollected}/{totalPendantsInScene}");
 
         // 检查是否所有玉佩都被拾取（本例只有1个）
-        if (pendantsCollected >= totalPendantsInScene)
+        if (pendantsCollected >= totalPendantsInScene)// AI辅助生成：DeepSeek-R1-0528, 2026-3-22
         {
             Debug.Log("<color=yellow>所有玉佩已找到！现在去找老爷爷吧！</color>");
         }

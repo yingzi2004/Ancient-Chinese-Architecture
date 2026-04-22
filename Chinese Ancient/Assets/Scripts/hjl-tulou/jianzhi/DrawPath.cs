@@ -334,7 +334,7 @@ public class DrawPath : MonoBehaviour
         Debug.Log($"DrawPath SecondStage: drop2ScreenPos={drop2ScreenPos}, mouse={checkPoint}, dist={dist}");
 
         // 距离足够近，认为点中了掉2
-        if (dist <= drop2ClickRadius)
+        if (dist <= drop2ClickRadius)  // 电脑客户端访问，2026年3月19号
         {
             // 掉2 开始下落
             ObjectManager manager = objectDrop2.GetComponent<ObjectManager>();
@@ -343,13 +343,11 @@ public class DrawPath : MonoBehaviour
                 manager.StartFalling();
             }
 
-            // 隐藏 2，显示 3
             if (object2 != null) object2.SetActive(false);
             if (object3 != null) object3.SetActive(true);
 
             secondStageDone = true;
 
-            // 剪纸全部完成，释放玩家控制权
             isInteracting = false;
             if (playerController != null)
             {
