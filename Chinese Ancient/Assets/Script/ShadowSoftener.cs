@@ -1,24 +1,18 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
 public class ShadowSoftener : MonoBehaviour {
-
     void OnEnable() {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
-
     void OnDisable() {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
-
     void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
         ApplyLightingFix();
     }
-
     void Start() {
         ApplyLightingFix();
     }
-
     void ApplyLightingFix() {
         Light[] lights = FindObjectsOfType<Light>();
         foreach(var l in lights) {
@@ -27,7 +21,6 @@ public class ShadowSoftener : MonoBehaviour {
                 l.shadows = LightShadows.Soft; // 强制使用软阴影
             }
         }
-        
         // 当开启天气系统时，不应锁死高亮的全局环境光，这会导致夜间过亮。
         // 若完全不应用，则删除或注释以下两行即可。
         // 如果仍想单独对夜间压暗，可以引入对UniStormSystem的时间判断，但通常建议交由天气系统自身处理环境光渐变。

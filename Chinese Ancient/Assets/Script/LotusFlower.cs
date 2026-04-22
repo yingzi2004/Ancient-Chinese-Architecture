@@ -1,32 +1,26 @@
-﻿using UnityEngine;
-
+using UnityEngine;
 public class LotusFlower : MonoBehaviour
 {
     [Header("角色与NPC设置")]
     public Transform player;
     public Transform playerHand;
     public Transform npc;
-
     [Header("距离与按键设置")]
     public float pickDistance = 3f;
     public KeyCode pickKey = KeyCode.R;
-
     public float giveDistance = 4f;
     public KeyCode giveKey = KeyCode.F;
-
     [Header("完成任务后的对话（必须在这个脚本配好新的对话）")]
     public DialogNode afterGiveDialogNode;
-
     // 状态标记
     private bool isPicked = false;
     private bool isGiven = false;
-
     private void Start()
     {
         if (player == null)
         {
             GameObject pObj = GameObject.FindGameObjectWithTag("Player");
-            if (pObj != null) 
+            if (pObj != null)
             {
                 player = pObj.transform;
             }
@@ -39,11 +33,9 @@ public class LotusFlower : MonoBehaviour
             }
         }
     }
-
     private void Update()
     {
         if (player == null) return;
-
         // 状态 1：还没摘取荷花，此时判断玩家和荷花的距离
         if (!isPicked)
         {
@@ -78,16 +70,14 @@ public class LotusFlower : MonoBehaviour
             }
         }
     }
-
     private void PickLotus()
     {
         isPicked = true;
-        
         // 挂载到玩家手上
         if (playerHand != null)
         {
             transform.SetParent(playerHand);
-            // 将荷花的局部坐标和旋转清零，使其准确贴合在“手”的位置
+            // 将荷花的局部坐标和旋转清零，使其准确贴合在"手"的位置
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
         }
@@ -95,24 +85,19 @@ public class LotusFlower : MonoBehaviour
         {
             // 如果没指定特定的手部节点，就直接挂在玩家身上，并稍微往前偏移
             transform.SetParent(player);
-            transform.localPosition = new Vector3(0.5f, -0.5f, 1f); 
+            transform.localPosition = new Vector3(0.5f, -0.5f, 1f);
             transform.localRotation = Quaternion.identity;
         }
-
         Debug.Log("<color=cyan>[荷花任务]</color> 已摘取荷花！请返回寻找NPC。");
     }
-
     private void GiveLotusToNPC()
     {
         isGiven = true;
-        
         Debug.Log("<color=cyan>[荷花任务]</color> 荷花已交付给NPC，触发对话并消失！");
-
         // 触发 NPC 身上的对话代码
         if (npc != null)
         {
             NPCInteractTrigger trigger1 = npc.GetComponent<NPCInteractTrigger>();
-
             if (trigger1 != null)
             {
                 Debug.Log("<color=yellow>[荷花任务]</color> 成功获取到 NPCInteractTrigger，准备播放对话...");
@@ -131,11 +116,9 @@ public class LotusFlower : MonoBehaviour
                 Debug.LogError("<color=red>[荷花任务]</color> 找不到NPC的对话脚本（NPCInteractTrigger）！请检查荷花的 Npc 槽位是否拖错了人！");
             }
         }
-
         // 荷花交付后直接消失
         gameObject.SetActive(false);
     }
-
     private void OnDrawGizmosSelected()
     {
         // 在编辑器里画两个圈方便你调试距离

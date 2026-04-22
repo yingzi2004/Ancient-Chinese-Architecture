@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class ItemGlowHighlight : MonoBehaviour
 {
     [Header("发光设置")]
     public Color glowColor = new Color(1f, 0.6f, 0.2f);
-    
+
     public float pulseSpeed = 1.5f;
 
     public float minIntensity = 0.2f;
@@ -43,7 +43,7 @@ public class ItemGlowHighlight : MonoBehaviour
             pointLight.range = lightRange;
             pointLight.intensity = minIntensity;
             // 提高渲染渲染优先级，防止光照被剔除
-            pointLight.renderMode = LightRenderMode.ForcePixel; 
+            pointLight.renderMode = LightRenderMode.ForcePixel;
             Debug.Log($"[{gameObject.name}] 已添加辅助点光源");
         }
     }
@@ -52,8 +52,8 @@ public class ItemGlowHighlight : MonoBehaviour
     {
         // 使用正弦波函数 (Sine) 计算呼吸节奏，在极值之间平滑过渡
         // Mathf.Sin 返回 -1 到 1，将其映射到 0 到 1
-        float sineWave = (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f; 
-        
+        float sineWave = (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f;
+
         // 插值计算当前发光强度
         currentIntensity = Mathf.Lerp(minIntensity, maxIntensity, sineWave);
 
@@ -84,7 +84,7 @@ public class ItemGlowHighlight : MonoBehaviour
         {
             pointLight.enabled = false;
         }
-        
+
         // 关闭脚本的Update更新
         this.enabled = false;
     }

@@ -74,7 +74,7 @@ public class BoatController : MonoBehaviour
         if (player != null)
         {
             float distance = Vector3.Distance(transform.position, player.transform.position);
-            
+
             if (Input.GetKeyDown(KeyCode.F))
             {
                 if (distance <= interactDistance)
@@ -148,8 +148,8 @@ public class BoatController : MonoBehaviour
         // 强行同步位置，不要依赖父子层级的自动跟随（有些老版本的CharacterController在禁用后会有坐标缓存问题）
         if (player != null && playerStandPoint != null)
         {
-             player.transform.position = playerStandPoint.position;
-             // 注意不要直接去覆盖旋转，因为玩家视角的鼠标脚本会处理 X Y 轴旋转
+            player.transform.position = playerStandPoint.position;
+            // 注意不要直接去覆盖旋转，因为玩家视角的鼠标脚本会处理 X Y 轴旋转
         }
     }
 
@@ -167,20 +167,20 @@ public class BoatController : MonoBehaviour
         player.isOnBoat = true;
 
         // 移除原有的移动干预，如果在船上，强制关掉CharacterController避免它把人物卡留在原地
-        if (playerController != null) 
+        if (playerController != null)
         {
             playerController.enabled = false;
         }
-        
+
         player.transform.SetParent(transform);
-        
+
         // 确保站立点一定是船的子物体，否则它会留在岸边导致人无法跟着船走！
         if (playerStandPoint != null && !playerStandPoint.IsChildOf(transform))
         {
             Debug.LogWarning("PlayerStandPoint 不是船的子物体！已自动将其设置为船的子物体。");
             playerStandPoint.SetParent(transform);
         }
-        
+
         // 如果没有指定站立点，就生成一个默认的
         if (playerStandPoint == null)
         {
@@ -214,7 +214,7 @@ public class BoatController : MonoBehaviour
     }
 
     // 可以选择使用 UI 提示玩家按 F 上船
-    /* 
+    /*
     private void OnGUI()
     {
         if (!isPlayerOnBoard && player != null)

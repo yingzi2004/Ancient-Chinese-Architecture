@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class LocationDialogueTrigger_Auto : MonoBehaviour
@@ -31,7 +31,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
 
     [Header("沉浸式表现设定 (可选)")]
     [SerializeField] private int portraitRevealIndex = 0;
-    
+
     [SerializeField] private int nameRevealIndex = 0;
 
     [Header("重复与组控制")]
@@ -45,7 +45,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
     [Header("前置条件 (可选)")]
     [Tooltip("是否需要前置事件（如交还火折子、修好灯笼）完成后，玩家进入此处才能听小微说话？")]
     public bool requireExternalCondition = false;
-    
+
     [Tooltip("前置条件是否已满足（可在外界交互成功后调用 SetConditionMet 开启）")]
     public bool isConditionMet = false;
 
@@ -401,7 +401,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
         // 开始对话 - 使用配置的NPC显示名称和处理后的富文本台词，并传递延后显示的索引
         dialogueManager.StartAutoDialogue(npcDisplayName, processedLines, portraitSprite, expressionPortraits, () => {
             Debug.Log($"[{locationName}] 对话结束回调触发！正在调用 onDialogueEnd ({onDialogueEnd?.GetPersistentEventCount() ?? 0} 个监听器)");
-            
+
             if (playEndVFX && EndSequenceVFX.Instance != null)
             {
                 Debug.Log($"[{locationName}] 正在播放黑屏震动模糊特效...");
@@ -420,7 +420,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
         {
             triggeredGroupIDs.Add(sharedGroupID);
         }
-        
+
         if (globalPreventSameDialogue)
         {
             playedDialogueHashes.Add(GetDialogueHash());
@@ -449,17 +449,17 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
     public void ResetTrigger()
     {
         hasTriggered = false;
-        
+
         if (!string.IsNullOrEmpty(sharedGroupID))
         {
             triggeredGroupIDs.Remove(sharedGroupID);
         }
-        
+
         if (globalPreventSameDialogue)
         {
             playedDialogueHashes.Remove(GetDialogueHash());
         }
-        
+
         Debug.Log($"[{locationName}] 触发器及其关联的全局记录已重置");
     }
 
