@@ -187,7 +187,7 @@ public class WenziCotrol : MonoBehaviour
             TMP_CharacterInfo charInfo = targetText.textInfo.characterInfo[i];
             if (charInfo.isVisible)
             {
-                yield return StartCoroutine(AnimateSingleCharacter(i, localOffset));
+                yield return StartCoroutine(AnimateSingleCharacter(i, localOffset)); // DeepSeek-R1-0528，电脑客户端访问，2026年3月11号
             }
 
             yield return new WaitForSeconds(interval);

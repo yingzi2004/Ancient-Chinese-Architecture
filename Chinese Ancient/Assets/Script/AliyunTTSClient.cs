@@ -59,6 +59,7 @@ public class AliyunTTSClient : MonoBehaviour
         William,    // William - 英文男声
         Aitong,     // 艾彤 - 儿童音
         Aiwei,      // 艾薇 - 萝莉女声
+        Aibao,      // 艾宝 - 萝莉女声
         Shanshan,   // 姗姗 - 粤语女声
         Xiaoyue,    // 小玥 - 四川话女声
     }
@@ -178,6 +179,7 @@ public class AliyunTTSClient : MonoBehaviour
                 }
 
                 // 创建 Token 请求
+                // AI辅助生成：DeepSeek-R1-0528, 2026年3月9日 - 修复1：使用正确的Token API URL
                 string tokenUrl = CreateTokenUrl(accessKeyId, accessKeySecret);
                 using (UnityWebRequest tokenRequest = UnityWebRequest.Get(tokenUrl))
                 {
@@ -274,7 +276,7 @@ public class AliyunTTSClient : MonoBehaviour
             // 强制设置为2D声音，确保能听到
             audioSource.spatialBlend = 0f; 
             audioSource.mute = false;
-            audioSource.volume = volume / 100f; // 确保音量正确
+            audioSource.volume = volume / 100f; // AI辅助生成：DeepSeek-R1-0528, 2026年3月9日 - 修复2：修正音量计算，volume是0-100范围
 
 
             Debug.Log($"[AliyunTTS] 播放音频: 长度={clip.length}s, 通道={clip.channels}, 频率={clip.frequency}");

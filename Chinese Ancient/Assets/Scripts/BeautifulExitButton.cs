@@ -266,7 +266,7 @@ public class BeautifulExitButton : MonoBehaviour
         pulseSequence = DOTween.Sequence();
         pulseSequence.Append(rectTransform.DOScale(originalScale * (1f + pulseAmount), 1f / pulseSpeed).SetEase(Ease.InOutSine));
         pulseSequence.Append(rectTransform.DOScale(originalScale, 1f / pulseSpeed).SetEase(Ease.InOutSine));
-        pulseSequence.SetLoops(-1, LoopType.Restart);
+        pulseSequence.SetLoops(-1, LoopType.Restart);// AI辅助生成：DeepSeek-R1-0528, 2026-3-22
     }
 
     void StopPulseAnimation()

@@ -379310,8 +379310,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
+      propertyPath: Hour
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
+      propertyPath: Minute
+      value: 31
+      objectReference: {fileID: 0}
+    - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: TabNumber
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114507485514613272, guid: e6e4cc78e996ac840bff5d152fe7b66d, type: 3}
       propertyPath: PlayerCamera

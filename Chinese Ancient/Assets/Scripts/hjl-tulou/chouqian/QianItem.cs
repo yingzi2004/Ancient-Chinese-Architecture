@@ -103,7 +103,7 @@ public class QianItem : MonoBehaviour
     }
 
     // 当准心点击它时被调用由CrosshairInteract调用
-    public void OnClicked(Transform playerCamera)
+    public void OnClicked(Transform playerCamera)// DeepSeek-R1-0528，电脑客户端访问，2026年3月16号
     {
         if (isExtracted)
         {
@@ -131,7 +131,7 @@ public class QianItem : MonoBehaviour
             Vector3 directionToCamera = playerCamera.position - targetPosition;
             if(directionToCamera != Vector3.zero) 
             {
-                targetRotation = Quaternion.LookRotation(-directionToCamera); 
+                targetRotation = Quaternion.LookRotation(-directionToCamera);  
             }
 
             // 显示弹窗

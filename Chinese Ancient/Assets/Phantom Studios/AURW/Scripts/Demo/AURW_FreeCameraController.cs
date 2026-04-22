@@ -63,7 +63,7 @@ namespace aurw
             float targetSpeed = Input.GetKey(sprintKey) ? sprintSpeed : walkSpeed;
 
             // Suaviza el cambio de velocidad
-            _currentSpeed = Mathf.Lerp(_currentSpeed, targetSpeed, acceleration * Time.deltaTime);
+            _currentSpeed = Mathf.Lerp(_currentSpeed, targetSpeed, acceleration * Time.deltaTime);// DeepSeek-R1-0528, 2026Äê3ÔÂ11ºÅ
 
             Vector3 move = Vector3.zero;
             if (Input.GetKey(KeyCode.W)) move += transform.forward;
