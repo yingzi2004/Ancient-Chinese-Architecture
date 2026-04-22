@@ -4941,7 +4941,7 @@ MonoBehaviour:
           m_CallState: 2
   player: {fileID: 1724057531}
   playerTag: Player
-  triggerDistance: 54
+  triggerDistance: 5
   interactKey: 108
   npcAnimator: {fileID: 0}
   useBoolParameter: 0
@@ -5341,6 +5341,8 @@ MonoBehaviour:
   globalPreventSameDialogue: 0
   playEndVFX: 0
   sharedGroupID: 
+  requireExternalCondition: 0
+  isConditionMet: 0
   onDialogueEnd:
     m_PersistentCalls:
       m_Calls: []
@@ -5548,8 +5550,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1157180808}
   m_HandleRect: {fileID: 0}
   m_Direction: 0
-  m_Value: 0.31121394
-  m_Size: 0.56836635
+  m_Value: 0.311214
+  m_Size: 0.56836647
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -7968,6 +7970,8 @@ MonoBehaviour:
   globalPreventSameDialogue: 0
   playEndVFX: 0
   sharedGroupID: 
+  requireExternalCondition: 0
+  isConditionMet: 0
   onDialogueEnd:
     m_PersistentCalls:
       m_Calls: []
@@ -8384,6 +8388,8 @@ MonoBehaviour:
   globalPreventSameDialogue: 0
   playEndVFX: 0
   sharedGroupID: 
+  requireExternalCondition: 0
+  isConditionMet: 0
   onDialogueEnd:
     m_PersistentCalls:
       m_Calls:
