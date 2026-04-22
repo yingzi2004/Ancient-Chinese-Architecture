@@ -152,7 +152,6 @@ public class ScrollMapController : MonoBehaviour
             }
             if (monologueController != null)
             {
-                if (monologueController.openingPanel != null) monologueController.openingPanel.SetActive(false);
                 if (monologueController.mapOpenPanel != null) monologueController.mapOpenPanel.SetActive(false);
             }
             InstantOpenMap();
@@ -853,7 +852,7 @@ public class ScrollMapController : MonoBehaviour
             monologueController.windBlowClip = this.windBlowClip;
             
             // 协程会暂停在这里，直到玩家点完了所有的字幕才会进入下一行黑屏淡出卷轴动画
-            yield return StartCoroutine(monologueController.PlayOpeningSequence());
+            yield return StartCoroutine(monologueController.PlayMapOpenSequence());
         }
 
         // 7. 等待一小段时间
