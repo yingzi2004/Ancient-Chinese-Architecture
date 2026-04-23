@@ -9,12 +9,11 @@ public class FindCulpritsTool : EditorWindow
     {
         Debug.Log("<color=green><b>====== 正在全图扫描寻找病灶，绝对不会改变你的原本材质 ======</b></color>");
 
-        // 1. 揪出“飞升”的老鼠屎 (检查刚体)
         Rigidbody[] rbs = FindObjectsOfType<Rigidbody>(true);
         bool foundPhysicsBug = false;
         foreach (var rb in rbs)
         {
-            // 只要没勾选运动学（受重力/弹力影响），就给我全部列出来！
+
             if (!rb.isKinematic)
             {
                 Debug.LogError($"🚨【可疑的物理刚体！】👉 物体: <b>{rb.gameObject.name}</b>受物理引擎控制（未开启 isKinematic）。看看是不是它在乱飞！", rb.gameObject);
@@ -23,11 +22,8 @@ public class FindCulpritsTool : EditorWindow
         }
         if (!foundPhysicsBug) Debug.Log("<color=yellow>没有揪出明显的物理刚体问题，飞升可能来自于动画脚本或父节点。</color>");
 
-
-        // 2. 揪出“Material 被销毁”的报错元凶
         bool foundTMPBug = false;
-        
-        // 扫 3D TMP
+ 
         TextMeshPro[] tmps3d = FindObjectsOfType<TextMeshPro>(true);
         foreach (var tmp in tmps3d)
         {
@@ -36,7 +32,7 @@ public class FindCulpritsTool : EditorWindow
                 Debug.LogError($"🚨【抓到 UI 报错元凶！】👉 3D文字: <b>{tmp.gameObject.name}</b>。<br>它的材质 (Material) 已经丢失或彻底损坏，一旦 UI 刷新它就会触发 Material destroyed 报错！<br>请点击这条报错，重新给它选一下 Font Asset。", tmp.gameObject);
                 foundTMPBug = true;
             }
-            // 误贴 ProBuilder 材质的情况
+
             MeshRenderer mr = tmp.GetComponent<MeshRenderer>();
             if (mr != null && mr.sharedMaterial != null && mr.sharedMaterial.name.Contains("pb_"))
             {
@@ -45,7 +41,6 @@ public class FindCulpritsTool : EditorWindow
             }
         }
 
-        // 扫 UI TMP
         TextMeshProUGUI[] tmpsUI = FindObjectsOfType<TextMeshProUGUI>(true);
         foreach (var tmp in tmpsUI)
         {
