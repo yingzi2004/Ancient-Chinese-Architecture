@@ -10,11 +10,9 @@ public class SimpleItemPickup : MonoBehaviour, IInteractable
     public void Interact()
     {
         Debug.Log($"[物品拾取] 玩家拾取了: {gameObject.name}");
-        // 第一步：隐藏火折子模型，假装它进了背包（必须先隐藏，防止后续事件报错打断或者导致物理残留）
         if (hideOnPickup)
         {
-            // 不直接使用 SetActive(false)，因为如果后续连接的事件里有需要在该物体上等待的协程，或者别的脚本还需要引用它就会被打断
-            // 最佳实践：关闭它的网格渲染和贴图发光，并关闭碰撞体
+
             Renderer[] renderers = GetComponentsInChildren<Renderer>();
             foreach (Renderer r in renderers)
             {
@@ -34,7 +32,7 @@ public class SimpleItemPickup : MonoBehaviour, IInteractable
             ItemGlowHighlight glow = GetComponent<ItemGlowHighlight>();
             if (glow != null) glow.DisableGlow();
         }
-        // 第二步：触发我们在面板上连好的各种事件（比如大伯的剧情阶段+1）
+
         if (onPickupEvent != null)
         {
             onPickupEvent.Invoke();

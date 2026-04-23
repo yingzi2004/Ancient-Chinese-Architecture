@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UniStorm;
 public class CustomNightLighting : MonoBehaviour
 {
@@ -16,7 +16,7 @@ public class CustomNightLighting : MonoBehaviour
         if (UniStormSystem.Instance.CurrentTimeOfDay == UniStormSystem.CurrentTimeOfDayEnum.Night)
         {
             // 因为 UniStorm 会在自己的 Update() 里覆盖 RenderSettings 的值，
-            // 所以我们需要在 LateUpdate() 里再次对它进行"二次压暗"修正。
+            
             if (overrideNightColor)
             {
                 // 直接强制使用纯色扁平光照，忽略 UniStorm 的环境天光
