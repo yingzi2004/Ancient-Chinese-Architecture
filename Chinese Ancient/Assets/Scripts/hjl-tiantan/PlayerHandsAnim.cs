@@ -13,7 +13,7 @@ public class PlayerHandsAnim : MonoBehaviour
     public int bowCount = 3; // 拜的次数
 
     [Header("弯腰参数")]
-    // 拜下去的角度（相对相机往前倾斜的度数，数字越大拜得越深）
+    // 拜下去的角度
     public float bowAngle = 60f;
 
     [Header("礼成天空文字特效")]
@@ -49,12 +49,12 @@ public class PlayerHandsAnim : MonoBehaviour
 
         if (playerCtrl != null)
         {
-            playerCtrl.isInspecting = true; // 借用 inspecting 状态禁止鼠标在此期间乱动镜头
+            playerCtrl.isInspecting = true; //借用 inspecting 状态禁止鼠标在此期间乱动镜头
         }
 
         // 准备弯腰
         Quaternion originalCamRot = mainCamera.localRotation;
-        // 动态计算往下拜的目标旋转度数（以相机的视角往前绕X轴倾倒 bowAngle 度）
+        // 动态计算往下拜的目标旋转度数
         Quaternion targetCamBowRot = originalCamRot * Quaternion.Euler(bowAngle, 0, 0);
 
         yield return new WaitForSeconds(1.0f); // 稍微等一下再开始拜
@@ -107,9 +107,6 @@ public class PlayerHandsAnim : MonoBehaviour
     // 控制天空文字与粒子浮现的协程
     private IEnumerator ShowSkyTextRoutine()
     {
-        // ===================================
-        // 文字逐渐浮现 (淡入 2 秒)
-        // ===================================
         float t = 0;
         float fadeDuration = 2f;
         float floatUpDistance = 3f; // 同时往上漂浮一点点增加仙气
@@ -126,14 +123,8 @@ public class PlayerHandsAnim : MonoBehaviour
 
         skyTextCanvasGroup.alpha = 1f;
 
-        // ===================================
-        // 停留 6 秒
-        // ===================================
         yield return new WaitForSeconds(6f);
 
-        // ===================================
-        // 文字逐渐消失 (淡出 2 秒)
-        // ===================================
         t = 0;
         Vector3 startFadeOutPos = skyTextCanvasGroup.transform.position;
         while (t < fadeDuration)
@@ -141,11 +132,9 @@ public class PlayerHandsAnim : MonoBehaviour
             t += Time.deltaTime;
             float percent = t / fadeDuration;
             skyTextCanvasGroup.alpha = 1f - percent;
-            // 继续往上漂一丝丝
             skyTextCanvasGroup.transform.position = startFadeOutPos + Vector3.up * (percent * floatUpDistance);
             yield return null;
         }
-
         skyTextCanvasGroup.alpha = 0f;
     }
 }

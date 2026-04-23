@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
@@ -23,9 +23,9 @@ public class BeautifulExitButton : MonoBehaviour
     public Image iconImage;
 
     [Header("颜色配置")]
-    public Color normalColor = new Color(1f, 0.42f, 0.42f);      // 红色 #FF6B6B
-    public Color highlightColor = new Color(1f, 0.53f, 0.53f);    // 浅红色 #FF8888
-    public Color pressedColor = new Color(0.8f, 0.33f, 0.33f);    // 深红色 #CC5555
+    public Color normalColor = new Color(1f, 0.42f, 0.42f);     
+    public Color highlightColor = new Color(1f, 0.53f, 0.53f);    
+    public Color pressedColor = new Color(0.8f, 0.33f, 0.33f);    
     public Color textColor = Color.white;
 
     [Header("动画效果")]
@@ -90,7 +90,6 @@ public class BeautifulExitButton : MonoBehaviour
 
     void InitializeComponents()
     {
-        // 获取或添加组件
         if (exitButton == null)
             exitButton = GetComponent<Button>();
         if (buttonImage == null)
@@ -98,7 +97,7 @@ public class BeautifulExitButton : MonoBehaviour
         if (rectTransform == null)
             rectTransform = GetComponent<RectTransform>();
 
-        // 获取Text组件（可能在子对象中）
+        // 获取Text组件
         if (buttonText == null)
             buttonText = GetComponentInChildren<Text>();
 
@@ -262,7 +261,6 @@ public class BeautifulExitButton : MonoBehaviour
     {
         StopPulseAnimation();
 
-        // 使用DOTween创建脉冲动画
         pulseSequence = DOTween.Sequence();
         pulseSequence.Append(rectTransform.DOScale(originalScale * (1f + pulseAmount), 1f / pulseSpeed).SetEase(Ease.InOutSine));
         pulseSequence.Append(rectTransform.DOScale(originalScale, 1f / pulseSpeed).SetEase(Ease.InOutSine));
@@ -283,7 +281,6 @@ public class BeautifulExitButton : MonoBehaviour
 
     void OnDestroy()
     {
-        // 清理DOTween动画
         rectTransform.DOKill();
         StopPulseAnimation();
 

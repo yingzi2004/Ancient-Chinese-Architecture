@@ -120,7 +120,7 @@ public class StartScreenManager : MonoBehaviour
             startButton.onClick.AddListener(OnStartButtonClick);
             startBtnCanvasGroup = GetOrAddCanvasGroup(startButton.gameObject);
             if (startBtnCanvasGroup != null) startBtnCanvasGroup.alpha = 0f;
-            startButton.interactable = false; // 动画期间禁止点击
+            startButton.interactable = false; 
         }
 
         StartCoroutine(EntranceSequence());
@@ -169,7 +169,7 @@ public class StartScreenManager : MonoBehaviour
         if (startBtnCanvasGroup != null)
         {
             StartCoroutine(FadeCanvasGroup(startBtnCanvasGroup, 0f, 1f, 1.0f));
-            if (startButton != null) startButton.interactable = true; // 终于允许玩家猛点啦！
+            if (startButton != null) startButton.interactable = true; 
         }
 
         isEntranceDone = true;

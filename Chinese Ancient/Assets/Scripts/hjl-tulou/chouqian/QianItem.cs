@@ -1,4 +1,4 @@
-// AI辅助生成：DeepSeek-R1-0528, 2026-04-23 (第一处优化：代码结构优化)
+// AI辅助生成：DeepSeek-R1-0528, 2026-04-23
 using UnityEngine;
 
 public class QianItem : MonoBehaviour
@@ -11,7 +11,7 @@ public class QianItem : MonoBehaviour
 
     [Header("抽出动画设置")]
     public float moveSpeed = 5f;          // 飞出速度
-    public float distanceToPlayer = 1.5f; // 停留在距离玩家多远的地方 (已调大距离)
+    public float distanceToPlayer = 1.5f; // 停留在距离玩家多远的地方 
     
     [Header("解签信息弹窗")]
     public GameObject interpretationPopup; // 用来挂载弹窗的UI对象
@@ -66,7 +66,7 @@ public class QianItem : MonoBehaviour
 
     void Update()
     {
-        // AI辅助生成：DeepSeek-R1-0528, 2026-04-23 (第二处优化：平滑移动逻辑注释优化)
+        // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
         // 无论是在飞出还是飞回，平滑移动到目标点
         transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * moveSpeed);
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * moveSpeed);
@@ -82,7 +82,6 @@ public class QianItem : MonoBehaviour
         {
             if (materials[i].HasProperty("_EmissionColor"))
             {
-                // 在原有发光基础叠加微弱黄光，不破坏原有贴图面貌
                 materials[i].SetColor("_EmissionColor", originalEmissionColors[i] + highlightColor);
             }
         }
@@ -104,12 +103,10 @@ public class QianItem : MonoBehaviour
         }
     }
 
-    // 当准心点击它时被调用由CrosshairInteract调用
     public void OnClicked(Transform playerCamera)
     {
         if (isExtracted)
         {
-            // 如果已经抽出过，再次点击则飞回原位
             isExtracted = false;
             targetPosition = startPosition;
             targetRotation = startRotation;
@@ -122,14 +119,14 @@ public class QianItem : MonoBehaviour
         }
         else
         {
-            // 如果还未抽出，则飞到面前
-            OnHoverExit(); // 取消高亮，注意这个必须要放在isExtracted = true前面，否则会被拦截
+
+            OnHoverExit();
             isExtracted = true;
 
-            // 计算目标位置（摄像机正前方特定距离）
+            // 计算目标位置
             targetPosition = playerCamera.position + playerCamera.forward * distanceToPlayer;
             
-            // 计算目标旋转（让签子正面朝对摄像机）
+            // 计算目标旋转
             Vector3 directionToCamera = playerCamera.position - targetPosition;
             if(directionToCamera != Vector3.zero) 
             {

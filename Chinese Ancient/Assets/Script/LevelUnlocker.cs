@@ -66,14 +66,13 @@ public class LevelUnlocker : MonoBehaviour
         {
             Debug.LogWarning("[LevelUnlocker] PopupMapController not found in scene.");
         }
-        // 无论如何，弹出屏幕文字提示
+        //弹出屏幕文字提示
         ShowHintMessage();
     }
     private void ShowHintMessage()
     {
         bool hasShown = false;
         Debug.Log($"<color=orange>[LevelUnlocker - 调试]</color> 准备弹出文字，预设文本为：{hintMessage}");
-        // 如果拖了旧版Text
         if (legacyText != null)
         {
             legacyText.text = hintMessage;
@@ -81,7 +80,6 @@ public class LevelUnlocker : MonoBehaviour
             hasShown = true;
             Debug.Log("<color=cyan> -> 成功启用了 Legacy Text</color>");
         }
-        // 如果拖了TextMeshPro
         if (tmpText != null)
         {
             tmpText.text = hintMessage;
@@ -89,7 +87,6 @@ public class LevelUnlocker : MonoBehaviour
             hasShown = true;
             Debug.Log("<color=cyan> -> 成功启用了 TMP Text</color>");
         }
-        // 如果拖了老的 3D TextMesh
         if (textMesh != null)
         {
             textMesh.text = hintMessage;

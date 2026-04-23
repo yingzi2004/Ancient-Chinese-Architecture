@@ -40,12 +40,11 @@ public class JadePendantQuestManager : MonoBehaviour
     [Tooltip("下一个场景的名称")]
     public string nextSceneName = "";
 
-    // 任务状态
+
     private bool questStarted = false;
     private bool questCompleted = false;
     private int pendantsCollected = 0;
 
-    // 所有玉佩引用
     private List<JadePendant> allPendants = new List<JadePendant>();
 
     void Awake()
@@ -62,13 +61,10 @@ public class JadePendantQuestManager : MonoBehaviour
 
     void Start()
     {
-        // 查找场景中所有玉佩
         FindAllPendants();
 
-        // 开始任务
         StartQuest();
 
-        // 显示任务UI
         if (showQuestUI)
         {
             ShowQuestUI();
@@ -94,7 +90,6 @@ public class JadePendantQuestManager : MonoBehaviour
         Debug.Log($"[{questName}] {questStartMessage}");
         Debug.Log(questDescription);
 
-        // 这里可以添加任务开始的特效或音效
     }
     // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
     public void OnJadePendantPickedUp(JadePendant pendant)
@@ -107,7 +102,6 @@ public class JadePendantQuestManager : MonoBehaviour
         Debug.Log($"进度: {pendantsCollected}/{totalPendantsInScene}");
 
         // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
-        // 检查是否所有玉佩都被拾取（本例只有1个）
         if (pendantsCollected >= totalPendantsInScene)
         {
             Debug.Log("<color=yellow>所有玉佩已找到！现在去找老爷爷吧！</color>");
@@ -129,7 +123,7 @@ public class JadePendantQuestManager : MonoBehaviour
         // 隐藏任务UI
         HideQuestUI();
 
-        // 保存完成状态
+
         PlayerPrefs.SetInt($"{questName}_Completed", 1);
         PlayerPrefs.Save();
 
@@ -157,13 +151,11 @@ public class JadePendantQuestManager : MonoBehaviour
     private void UpdateQuestUI()
     {
         Debug.Log($"任务进度更新: {pendantsCollected}/{totalPendantsInScene}");
-        // 这里可以更新UI上的进度显示
     }
 
     private void HideQuestUI()
     {
         Debug.Log("任务UI隐藏");
-        // 这里可以隐藏任务UI面板
     }
 
     public float GetQuestProgress()
@@ -180,7 +172,6 @@ public class JadePendantQuestManager : MonoBehaviour
     {
         if (showQuestUI && !questCompleted)
         {
-            // 显示任务进度
             GUIStyle style = new GUIStyle();
             style.fontSize = 18;
             style.normal.textColor = Color.white;

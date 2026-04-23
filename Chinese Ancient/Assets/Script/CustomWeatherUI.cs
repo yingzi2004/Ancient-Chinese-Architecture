@@ -7,12 +7,11 @@ public class CustomWeatherUI : MonoBehaviour
 {
     [Header("输入设置")]
     public KeyCode toggleKey = KeyCode.T;
-    public GameObject weatherPanel;       // 把做的天气面板拖进来
+    public GameObject weatherPanel;       
     private PlayerController playerController;
     private Canvas weatherCanvas;
     private CanvasGroup canvasGroup;
     // AI辅助生成：Kimi K2.6, 2026-04-21
-    // 缓存状态，避免Update中每帧重复检测
     private bool wasPanelOpenLastFrame = false;
     private void OnEnable()
     {

@@ -43,16 +43,13 @@ public class F1AIChatUI : MonoBehaviour
     }
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // 还是换回实用至上的"延迟一帧"大法
-        // 因为必须等新场景里的 PlayerController 走完它的 Start() 锁死鼠标后，我们再出手把它抢回来！
         StartCoroutine(DelayRestoreState());
     }
     private IEnumerator DelayRestoreState()
     {
-        yield return null; // 延迟一帧，这是制胜关键
-        // 找回玩家
+        yield return null; 
+
         playerController = FindFirstObjectByType<PlayerController>();
-        // 恢复鼠标控制权
         if (isOpen)
         {
             UpdateCursorState();
@@ -83,7 +80,6 @@ public class F1AIChatUI : MonoBehaviour
             lines.Add("[系统] 按 F1 可打开/关闭 AI 对话。");
             RefreshChatDisplay();
         }
-        // 绑定按钮事件
         if (sendButton != null) sendButton.onClick.AddListener(OnSendClicked);
         if (clearButton != null) clearButton.onClick.AddListener(OnClearClicked);
         if (voiceButton != null) voiceButton.onClick.AddListener(OnVoiceToggleClicked);
@@ -91,12 +87,10 @@ public class F1AIChatUI : MonoBehaviour
     }
     private void Update()
     {
-        // 监听开关按键
         if (Input.GetKeyDown(toggleKey))
         {
             ToggleWindow();
         }
-        // 按回车键发送，并且确保在聊天窗口激活时才生效
         if (isOpen && Input.GetKeyDown(KeyCode.Return))
         {
             // 如果同时按下Shift，允许在输入框中换行而不是发送；如果没有按下，则发送。
@@ -114,10 +108,9 @@ public class F1AIChatUI : MonoBehaviour
             RefreshChatDisplay();
             return;
         }
-        if (chatClient.IsRequesting) return; // 正在请求中不允许再次发送
+        if (chatClient.IsRequesting) return;
         string message = inputField.text == null ? string.Empty : inputField.text.Trim();
         if (string.IsNullOrWhiteSpace(message)) return;
-        // 清空输入框并保持焦点（可选）
         if (inputField != null)
         {
             inputField.text = string.Empty;
@@ -130,7 +123,6 @@ public class F1AIChatUI : MonoBehaviour
             message,
             onSuccess: reply =>
             {
-                // 拦截并处理隐藏指令
                 reply = ProcessAICommands(reply);
                 ReplaceLastAiPlaceholder(reply);
                 RefreshChatDisplay();
@@ -155,9 +147,8 @@ public class F1AIChatUI : MonoBehaviour
         foreach (Match match in matches)
         {
             string cmd = match.Groups[1].Value.Trim();
-            // 把这个暗号从对话文本里删掉，免得让玩家看到
             finalReply = finalReply.Replace(match.Value, "").Trim();
-            // 1. 处理天气相关指令
+            //处理天气相关指令
             if (cmd.StartsWith("Weather_"))
             {
                 string weatherType = cmd.Substring(8);
@@ -191,7 +182,7 @@ public class F1AIChatUI : MonoBehaviour
                     }
                 }
             }
-            // 2. 处理传送相关指令
+            //处理传送相关指令
             else if (cmd.StartsWith("Teleport_"))
             {
                 string location = cmd.Substring(9);
@@ -217,24 +208,22 @@ public class F1AIChatUI : MonoBehaviour
                 }
                 else
                 {
-                    // 兜底处理
                     targetSceneName = "Scene_" + location;
                 }
 
                 Debug.Log("AI执行传送到场景：" + targetSceneName);
 
                 PopupMapController mapController = FindFirstObjectByType<PopupMapController>();
-                bool isUnlocked = true; // 暂时不检查解锁状态
+                bool isUnlocked = true; 
 
                 if (isUnlocked && !string.IsNullOrEmpty(targetSceneName))
                 {
-                    // 【传送修复】跟AI说完话传送走，要保证游戏不在暂停状态或者死锁
+                    //跟AI说完话传送走，要保证游戏不在暂停状态或者死锁
                     Time.timeScale = 1f;
                     Cursor.visible = true;
                     Cursor.lockState = CursorLockMode.None;
-                    // 【致命 Bug 修复】：必须等待当前一帧(可能是UI或者网络事件帧)彻底执行完，
-                    // 让旧的 EventSystem 收尾结束，然后再销毁旧场景！
-                    // 不然会导致新场景的 UI 事件被永久卡死而"点不动"。
+                    //必须等待当前一帧(可能是UI或者网络事件帧)彻底执行完，
+                    // 让旧的 EventSystem 收尾结束，然后再销毁旧场景
                     StartCoroutine(DeferredLoadScene(targetSceneName));
                 }
             }
@@ -243,7 +232,7 @@ public class F1AIChatUI : MonoBehaviour
     }
     private IEnumerator DeferredLoadScene(string targetScene)
     {
-        yield return null; // 核心：等这帧里所有后续代码跟UI输入流安全收发完毕！
+        yield return null; 
         SceneManager.LoadScene(targetScene);
     }
     private void OnClearClicked()
@@ -285,20 +274,15 @@ public class F1AIChatUI : MonoBehaviour
     {
         if (chatHistoryText != null)
         {
-            // 将所有行拼接并显示
             chatHistoryText.text = string.Join("\n", lines);
-            // 延迟一帧强制滚动到最底部
             StartCoroutine(ScrollToBottom());
         }
     }
     private IEnumerator ScrollToBottom()
     {
-        // 关键修复：TextMeshPro在跨场景或频繁更新时，有时自身的重绘没跟上Canvas的生命周期
-        // 等待UI布局完全重建，必须通过等待帧的末尾，而不是随便一帧
         yield return new WaitForEndOfFrame();
         if (scrollRect != null && scrollRect.gameObject != null && scrollRect.gameObject.activeInHierarchy)
         {
-            // 在强制更新前稍作等待防御，并捕获因TMP内部资源被意外销毁产生的报错
             try
             {
                 Canvas.ForceUpdateCanvases();
@@ -310,7 +294,6 @@ public class F1AIChatUI : MonoBehaviour
             }
         }
     }
-    // ============ 运行时功能接口 ============
     public void ToggleWindow()
     {
         isOpen = !isOpen;
@@ -401,7 +384,7 @@ public class F1AIChatUI : MonoBehaviour
     {
         if (chatClient != null) chatClient.SetModel(modelName);
     }
-    // ============ 为了兼容以前的 AIChatUIController 的空方法 (避免报错) ============
+    //为了兼容以前的AIChatUIController的空方法 
     public void SetBackgroundColor(Color color) { /* 旧版OnGUI特有，Canvas已弃用 */ }
     public void SetContentBackgroundColor(Color color) { /* 旧版OnGUI特有，Canvas已弃用 */ }
     public void SetTextColor(Color color) { /* 旧版OnGUI特有，使用TMP替代 */ }

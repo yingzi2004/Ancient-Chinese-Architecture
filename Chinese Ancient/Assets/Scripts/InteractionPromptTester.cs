@@ -23,34 +23,27 @@ public class InteractionPromptTester : MonoBehaviour
         Camera cam = Camera.main;
         if (cam == null) return;
 
-        // 获取物体在屏幕上的位置
         Vector3 screenPos = cam.WorldToScreenPoint(transform.position + offset);
 
-        // 检查是否在摄像机前方
         if (screenPos.z < 0)
         {
             return;
         }
 
-        // 转换Y轴
         float displayY = Screen.height - screenPos.y;
 
-        // 提示框尺寸
         float boxWidth = 200;
         float boxHeight = 50;
         float boxX = screenPos.x - boxWidth / 2;
         float boxY = displayY - boxHeight / 2;
 
-        // 确保在屏幕内
         boxX = Mathf.Clamp(boxX, 10, Screen.width - boxWidth - 10);
         boxY = Mathf.Clamp(boxY, 10, Screen.height - boxHeight - 10);
 
-        // 绘制背景
         GUIStyle boxStyle = new GUIStyle(GUI.skin.box);
         boxStyle.normal.background = MakeTexture(2, 2, new Color(0, 0, 0, 0.8f));
         GUI.Box(new Rect(boxX, boxY, boxWidth, boxHeight), "", boxStyle);
 
-        // 绘制文字
         GUIStyle textStyle = new GUIStyle();
         textStyle.fontSize = 20;
         textStyle.fontStyle = FontStyle.Bold;
@@ -74,7 +67,6 @@ public class InteractionPromptTester : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        // 在Scene视图中绘制图标，方便找到这个物体
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position + offset, 0.5f);
     }

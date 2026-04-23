@@ -133,9 +133,7 @@ public class QwenChatClient : MonoBehaviour, IQwenChatService
     private IEnumerator SendRequestRoutine(string endpoint, string apiKey, string model, string userMessage, Action<string> onSuccess, Action<string> onError)
     {
         IsRequesting = true;
-        // ... build json ...
         var messages = BuildMessages(userMessage);
-        // Simple JSON construction to avoid complex serialization issues
         string messagesJson = "[";
         for (int i = 0; i < messages.Count; i++)
         {

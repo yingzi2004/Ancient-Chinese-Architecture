@@ -19,7 +19,7 @@ public class GardenManager : MonoBehaviour
     [Header("--- UI 引用 ---")]
     public CanvasGroup infoPanelGroup; // 介绍面板的透明度控制
     public TextMeshProUGUI infoText;   // 介绍文字组件
-    public TextMeshProUGUI statusText; // 【新】专门用来显示"蹦出来"的提示文字
+    public TextMeshProUGUI statusText; // 专门用来显示"蹦出来"的提示文字
     [Header("--- 音效与特效 ---")]
     public AudioSource audioSource;
     public AudioClip successClip;
@@ -35,20 +35,20 @@ public class GardenManager : MonoBehaviour
         if (statusText != null)
         {
             statusText.text = ""; // 初始清空提示
-            // --- 修复：防止提示文字被框体截断 ---
+            //防止提示文字被框体截断
             statusText.overflowMode = TextOverflowModes.Overflow;
             statusText.enableWordWrapping = true;
         }
         if (infoText != null)
         {
-            // --- 修复：防止Bio介绍文字被截断 ---
+            //防止Bio介绍文字被截断
             infoText.overflowMode = TextOverflowModes.Overflow;
             infoText.enableWordWrapping = true;
             infoText.maxVisibleCharacters = 99999; // 确保默认全显
         }
         if (gardens != null && gardens.Count > 0)
         {
-            // 初始化：为每个园林准备存储旋转角度的空间，并赋予随机初值
+            //为每个园林准备存储旋转角度的空间，并赋予随机初值
             foreach (var garden in gardens) {
                 if (garden.savedRotations == null || garden.savedRotations.Length != pieces.Count) {
                     garden.savedRotations = new float[pieces.Count];
@@ -72,7 +72,7 @@ public class GardenManager : MonoBehaviour
     private void LoadGardenData(int index) {
         currentIndex = index;
         GardenData currentGarden = gardens[currentIndex];
-        // 1. 处理 UI 文字面板（如果拼好了直接显示，没拼好则隐藏）
+        //处理 UI 文字面板（如果拼好了直接显示，没拼好则隐藏）
         if (currentGarden.isFinished) {
             infoPanelGroup.alpha = 1f;
             infoPanelGroup.interactable = true;
@@ -83,7 +83,7 @@ public class GardenManager : MonoBehaviour
             infoPanelGroup.interactable = false;
             infoPanelGroup.blocksRaycasts = false;
         }
-        // 2. 切割图片并【还原】该关卡之前保存的角度
+        //切割图片并【还原】该关卡之前保存的角度
         float pieceWidth = 1f / COLS;
         float pieceHeight = 1f / ROWS;
         for (int i = 0; i < pieces.Count; i++) {
@@ -95,7 +95,7 @@ public class GardenManager : MonoBehaviour
             {
                 // 刷新贴图
                 pieces[i].SetPiece(currentGarden.texture, x, y, pieceWidth, pieceHeight);
-                // 【核心】从数据中读取并恢复角度
+                //从数据中读取并恢复角度
                 float savedAngle = currentGarden.savedRotations[i];
                 pieces[i].transform.localEulerAngles = new Vector3(0, 0, savedAngle);
                 // 别忘了告诉 Piece 脚本更新它的 isCorrect 状态
@@ -120,14 +120,12 @@ public class GardenManager : MonoBehaviour
     }
     void HandleWinLogic() {
         StopAllCoroutines();
-        // 1. 显示介绍面板 (直接渐渐显示原设定好的 bio 内容，不需要打字机)
         if (infoText != null)
         {
             infoText.text = gardens[currentIndex].bio;
-            infoText.maxVisibleCharacters = 99999; // 双重保险：确保不是0
+            infoText.maxVisibleCharacters = 99999; 
         }
         StartCoroutine(FadeInInfoPanel());
-        // 2. 检查全通关，播放音效并显示打字提示
         bool allFinished = true;
         foreach (var g in gardens) {
             if (!g.isFinished) {
@@ -143,7 +141,6 @@ public class GardenManager : MonoBehaviour
             PlaySound(successClip);
             message = $"{gardens[currentIndex].name} 修复完成！";
         }
-        // 启动提示文字的打字机效果
         if (statusText != null) {
             StartCoroutine(TypewriterStatusText(message));
         }
@@ -153,7 +150,6 @@ public class GardenManager : MonoBehaviour
             audioSource.PlayOneShot(clip);
         }
     }
-    // 以前的 FadeInEffect 改名专门负责 InfoPanel
     System.Collections.IEnumerator FadeInInfoPanel() {
         infoPanelGroup.alpha = 0f;
         while (infoPanelGroup.alpha < 1) {
@@ -164,31 +160,33 @@ public class GardenManager : MonoBehaviour
         infoPanelGroup.interactable = true;
         infoPanelGroup.blocksRaycasts = true;
     }
-    // 【新】专门给 StatusText 用的打字机逻辑 (已升级防截断版)
+    // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
+    //专门给 StatusText 用的打字机逻辑
     System.Collections.IEnumerator TypewriterStatusText(string fullText) {
         statusText.gameObject.SetActive(true);
-        // 1. 先设置内容并强制刷新排版
+        //先设置内容并强制刷新排版
         statusText.text = fullText;
         statusText.maxVisibleCharacters = 0;
         statusText.ForceMeshUpdate(true);
-        // 2. 获取真实排版字符数
+        //获取真实排版字符数
         int totalChars = statusText.textInfo.characterCount;
-        // 3. 逐字显示
+        // 逐字显示
         for (int i = 0; i <= totalChars; i++) {
             statusText.maxVisibleCharacters = i;
             yield return new WaitForSeconds(typingSpeed);
         }
-        // 4. 确保显示完整
+        //确保显示完整
         statusText.maxVisibleCharacters = 99999;
+        // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
         foreach (char c in fullText) {
             statusText.text += c;
             yield return new WaitForSeconds(typingSpeed);
         }
-        // 可选：显示几秒后自动消失
+        //显示几秒后自动消失
         yield return new WaitForSeconds(3f);
         statusText.text = "";
     }
-    // 保存当前碎块的角度到数据列表中（切换前调用）
+    // 保存当前碎块的角度到数据列表中
     private void SaveCurrentState() {
         if (gardens == null || gardens.Count == 0) return;
         for (int i = 0; i < pieces.Count; i++) {
@@ -198,7 +196,7 @@ public class GardenManager : MonoBehaviour
             }
         }
     }
-    // --- 按钮调用接口 ---
+    //按钮调用接口
     public void PreviousGarden() {
         SaveCurrentState(); // 第一步：保存当前的进度
         int nextIdx = currentIndex - 1;

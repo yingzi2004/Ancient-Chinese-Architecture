@@ -39,7 +39,7 @@ public class InputDebugHelper : MonoBehaviour
     {
         if (!showDebugInfo) return;
 
-        // 背景框
+
         float boxWidth = 400;
         float boxHeight = 120;
         float boxX = screenPosition.x;
