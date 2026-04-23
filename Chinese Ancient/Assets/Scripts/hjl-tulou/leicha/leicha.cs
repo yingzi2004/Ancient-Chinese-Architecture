@@ -36,7 +36,6 @@ public class LeichaController : MonoBehaviour
     void Update()
     {
         // 超时取消 Slot1 状态
-        // DeepSeek-R1-0528，电脑客户端访问，2026年3月11号
         if (slot1Selected && Time.time - slot1SelectTime > selectionTimeout)
         {
             slot1Selected = false;
