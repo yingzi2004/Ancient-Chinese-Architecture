@@ -1,3 +1,4 @@
+// AI辅助生成：DeepSeek-R1-0528, 2026-04-23 (优化点：超时取消逻辑位置调整)
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -35,6 +36,7 @@ public class LeichaController : MonoBehaviour
 
     void Update()
     {
+        // AI辅助生成：DeepSeek-R1-0528, 2026-04-23 (优化点：超时取消逻辑位置调整)
         // 超时取消 Slot1 状态
         if (slot1Selected && Time.time - slot1SelectTime > selectionTimeout)
         {

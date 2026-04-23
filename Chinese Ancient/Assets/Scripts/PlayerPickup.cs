@@ -1,10 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-/// <summary>
-/// 玩家拾取系统 - 挂载到玩家对象上
-/// 管理玩家拾取到的物品
-/// </summary>
 public class PlayerPickup : MonoBehaviour
 {
     public static PlayerPickup Instance { get; private set; }
@@ -49,9 +45,7 @@ public class PlayerPickup : MonoBehaviour
         HandleInput();
     }
 
-    /// <summary>
-    /// 处理输入
-    /// </summary>
+
     private void HandleInput()
     {
         // 拾取键 - 由玉佩脚本处理，这里主要用于其他拾取逻辑
@@ -63,9 +57,7 @@ public class PlayerPickup : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 添加玉佩到背包
-    /// </summary>
+
     public void AddPendantToInventory(JadePendant pendant)
     {
         if (pendant != null && !pickedUpPendants.Contains(pendant))
@@ -78,9 +70,7 @@ public class PlayerPickup : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 移除玉佩从背包
-    /// </summary>
+
     public void RemovePendantFromInventory(JadePendant pendant)
     {
         if (pickedUpPendants.Contains(pendant))
@@ -90,25 +80,19 @@ public class PlayerPickup : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 获取当前拾取的玉佩数量
-    /// </summary>
+
     public int GetPendantCount()
     {
         return pickedUpPendants.Count;
     }
 
-    /// <summary>
-    /// 检查是否拥有玉佩
-    /// </summary>
+ 
     public bool HasPendant()
     {
         return pickedUpPendants.Count > 0;
     }
 
-    /// <summary>
-    /// 拿出一个玉佩交给NPC
-    /// </summary>
+
     public JadePendant GetPendantForNPC()
     {
         if (pickedUpPendants.Count > 0)
@@ -120,27 +104,21 @@ public class PlayerPickup : MonoBehaviour
         return null;
     }
 
-    /// <summary>
-    /// 丢弃当前手持的玉佩
-    /// </summary>
+
     private void DropCurrentPendant()
     {
         // 丢弃逻辑（可选实现）
         Debug.Log("丢弃玉佩功能暂未实现");
     }
 
-    /// <summary>
-    /// 显示拾取消息
-    /// </summary>
+
     private void ShowPickupMessage(string message)
     {
         Debug.Log(message);
         // 可以在这里添加UI提示
     }
 
-    /// <summary>
-    /// 在场景视图中显示拾取范围（编辑器可视化）
-    /// </summary>
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;

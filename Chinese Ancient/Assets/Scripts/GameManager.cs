@@ -1,3 +1,4 @@
+// AI辅助生成：DeepSeek-R1-0528, 2026-04-23
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,7 +26,6 @@ public class GameManager : MonoBehaviour
     int step;
     bool _gameover;
 
-    // Start is called before the first frame update
     void Start()
     {
         Instance = this;
@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
 
         string config = Resources.Load<TextAsset>("config").text;
         var fruits = JsonUtility.FromJson<FruitConfig>(config);
-
+        // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
         List<string> randomList = new List<string>();
         List<string> originList = new List<string>();
         originList.AddRange(fruits.FruitList);
@@ -73,7 +73,6 @@ public class GameManager : MonoBehaviour
 
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (_gameover)
@@ -89,6 +88,7 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
             if (_currentTarget != null && _rotateCardList.Count < 2 && !_rotateCardList.Contains(_currentTarget))
             {
                 step++;
@@ -103,7 +103,7 @@ public class GameManager : MonoBehaviour
     {
         _rotateCardList.Add(card);
     }
-
+ // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
     public void CompareCards(Card card)
     {
         _compareCardList.Add(card);
@@ -143,12 +143,10 @@ public class GameManager : MonoBehaviour
             yield return EndSequenceVFX.Instance.PlayRoutine();
         }
 
-        // 获取上一个场景的名称，如果没有保存则默认返回"SampleScene"
         string previousScene = PlayerPrefs.GetString("PreviousScene", "SampleScene");
 
         Debug.Log($"返回到场景: {previousScene}");
 
-        // 加载上一个场景
         SceneManager.LoadScene(previousScene);
     }
 

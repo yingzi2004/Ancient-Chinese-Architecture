@@ -1,9 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// 交互提示测试器 - 用于测试OnGUI提示是否正常显示
-/// 将此脚本挂载到任何GameObject上，测试提示是否显示
-/// </summary>
+
 public class InteractionPromptTester : MonoBehaviour
 {
     [Header("测试设置")]
