@@ -20474,7 +20474,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   triggerOnce: 1
-  triggerOncePerGameSession: 1
+  triggerOncePerGameSession: 0
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
   portraitSprite: {fileID: 21300000, guid: ed6dc30c2dc67894b95e7ad48fef27fa, type: 3}
@@ -24517,7 +24517,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1439302376}
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 8.782}
+  m_LocalPosition: {x: 0, y: 0, z: 8.8051}
   m_LocalScale: {x: 0.00042238014, y: 0.00042238025, z: 0.00042238014}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -24526,8 +24526,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -2.169, y: -0.416}
-  m_SizeDelta: {x: 2376, y: 1080}
+  m_AnchoredPosition: {x: -2.169, y: -0.446}
+  m_SizeDelta: {x: 3675.7476, y: 2102.7617}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1439302378
 CanvasGroup:
@@ -26271,7 +26271,7 @@ Transform:
   m_GameObject: {fileID: 1635759389}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10.17, y: -0.013768315, z: 8.12}
+  m_LocalPosition: {x: 11.878, y: -0.013768315, z: 8.12}
   m_LocalScale: {x: 1, y: 1, z: 1.21}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -26302,7 +26302,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   triggerOnce: 1
-  triggerOncePerGameSession: 1
+  triggerOncePerGameSession: 0
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
   portraitSprite: {fileID: 21300000, guid: ed6dc30c2dc67894b95e7ad48fef27fa, type: 3}
@@ -26344,8 +26344,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.503849, y: 1, z: 1.5881805}
-  m_Center: {x: 0.009178162, y: 0, z: -0.07949066}
+  m_Size: {x: 1.9925525, y: 1, z: 2.0814633}
+  m_Center: {x: 0.07660043, y: 0, z: 0.16715112}
 --- !u!1 &1651091847
 GameObject:
   m_ObjectHideFlags: 0
@@ -27066,7 +27066,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   triggerOnce: 1
-  triggerOncePerGameSession: 1
+  triggerOncePerGameSession: 0
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
   portraitSprite: {fileID: 21300000, guid: ed6dc30c2dc67894b95e7ad48fef27fa, type: 3}
@@ -27108,8 +27108,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4764376, y: 1.06439, z: 1.5705948}
-  m_Center: {x: 0.022883892, y: 0.032194972, z: -0.070697784}
+  m_Size: {x: 4.119928, y: 1.06439, z: 1.5705948}
+  m_Center: {x: 0.4668119, y: 0.032194972, z: -0.070697784}
 --- !u!43 &1805109134
 Mesh:
   m_ObjectHideFlags: 0
@@ -28820,7 +28820,7 @@ Transform:
   m_GameObject: {fileID: 2044520013}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 18.958, y: -0.013768315, z: 8.402}
+  m_LocalPosition: {x: 19.61, y: -0.013768315, z: 7.69}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -28851,7 +28851,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   triggerOnce: 1
-  triggerOncePerGameSession: 1
+  triggerOncePerGameSession: 0
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
   portraitSprite: {fileID: 21300000, guid: ed6dc30c2dc67894b95e7ad48fef27fa, type: 3}
@@ -28900,8 +28900,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.503849, y: 1, z: 1.5881805}
-  m_Center: {x: 0.009178162, y: 0, z: -0.07949066}
+  m_Size: {x: 2.7754946, y: 1, z: 3.2491875}
+  m_Center: {x: 0.64500093, y: 0, z: 0.7510128}
 --- !u!1 &2046152621
 GameObject:
   m_ObjectHideFlags: 0

@@ -5053,7 +5053,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   triggerOnce: 1
-  triggerOncePerGameSession: 1
+  triggerOncePerGameSession: 0
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
   portraitSprite: {fileID: 21300000, guid: d0675f73109c3e4498154f48a6726c41, type: 3}
@@ -7060,7 +7060,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 324498065}
   m_HandleRect: {fileID: 0}
   m_Direction: 0
-  m_Value: 0.28736922
+  m_Value: 0.28736877
   m_Size: 0.56465256
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -20268,7 +20268,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   triggerOnce: 1
-  triggerOncePerGameSession: 1
+  triggerOncePerGameSession: 0
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
   portraitSprite: {fileID: 21300000, guid: d0675f73109c3e4498154f48a6726c41, type: 3}
@@ -24292,7 +24292,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1591395304}
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 6.76}
+  m_LocalPosition: {x: 0, y: 0, z: 8.238}
   m_LocalScale: {x: 0.00042238014, y: 0.00042238025, z: 0.00042238014}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -24301,8 +24301,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -17.311, y: 14.543}
-  m_SizeDelta: {x: 2376, y: 1080}
+  m_AnchoredPosition: {x: -17.311, y: 14.1513}
+  m_SizeDelta: {x: 5911.382, y: 2935.3528}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1591395306
 CanvasGroup:
