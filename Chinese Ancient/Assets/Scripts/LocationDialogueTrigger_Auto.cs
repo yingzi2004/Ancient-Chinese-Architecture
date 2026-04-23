@@ -1,10 +1,13 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class LocationDialogueTrigger_Auto : MonoBehaviour
 {
     [Header("触发设置")]
     [SerializeField] private bool triggerOnce = true;
+    
+    [Tooltip("跨场景全局单次触发（推荐开场引导使用）：勾选后，即使玩家在场景间来回切转，整个游戏进程中也绝对只会触发一次。依靠下方的 Location Name 区分，请确保本场景内它的命名是唯一的。")]
+    [SerializeField] private bool triggerOncePerGameSession = false;
 
     [SerializeField] private float triggerDelay = 0.3f;
 
@@ -55,6 +58,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
     // 静态内存（整个游戏运行期间共享）
     private static System.Collections.Generic.HashSet<string> playedDialogueHashes = new System.Collections.Generic.HashSet<string>();
     private static System.Collections.Generic.HashSet<string> triggeredGroupIDs = new System.Collections.Generic.HashSet<string>();
+    private static System.Collections.Generic.HashSet<string> globalTriggeredLocationIDs = new System.Collections.Generic.HashSet<string>();
 
     private string GetDialogueHash()
     {
@@ -327,6 +331,14 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
             return;
         }
 
+        // 1.5 跨场景全局单次触发检查（依靠 场景名+LocationName 锁定唯一身份）
+        string globalId = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name + "_" + locationName;
+        if (triggerOncePerGameSession && globalTriggeredLocationIDs.Contains(globalId))
+        {
+            Debug.Log($"[{locationName}] 跨场景单次控制生效：玩家之前已从本场景触发过该引导对白，切回场景不重复播放，跳过");
+            return;
+        }
+
         // 2. 组级触发检查 (不同位置的同组触发器实现"一方触发，全组静默")
         if (!string.IsNullOrEmpty(sharedGroupID) && triggeredGroupIDs.Contains(sharedGroupID))
         {
@@ -415,6 +427,13 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
         }, portraitRevealIndex, nameRevealIndex);
         hasTriggered = true;
 
+        // 存入跨场景唯一凭证
+        if (triggerOncePerGameSession)
+        {
+            string globalId = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name + "_" + locationName;
+            globalTriggeredLocationIDs.Add(globalId);
+        }
+
         // 记入系统的组级防漏和全局去重字典
         if (!string.IsNullOrEmpty(sharedGroupID) && triggerOnce)
         {
@@ -449,6 +468,9 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
     public void ResetTrigger()
     {
         hasTriggered = false;
+
+        string globalId = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name + "_" + locationName;
+        globalTriggeredLocationIDs.Remove(globalId);
 
         if (!string.IsNullOrEmpty(sharedGroupID))
         {
