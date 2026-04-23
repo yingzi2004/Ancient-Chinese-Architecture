@@ -9,8 +9,6 @@ public class UIManager : MonoBehaviour
 
     Text _step;
 
-
-
     // Start is called before the first frame update
     void Start()
     {
@@ -18,17 +16,14 @@ public class UIManager : MonoBehaviour
         Instance = this;
     }
 
-
     public void ShowStep(int step)
     {
         _step.text = "STEP:" + step;
     }
 
-
-
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }

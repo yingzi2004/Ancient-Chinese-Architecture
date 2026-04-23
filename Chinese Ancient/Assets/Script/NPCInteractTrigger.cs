@@ -1,34 +1,27 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
-
 [System.Serializable]
 public class DialogNode
 {
     [TextArea(2, 4)]
     public string[] npcLines;
-
     public List<DialogChoice> choices = new List<DialogChoice>();
-
     public UnityEvent onNodeTriggerEvent;
 }
-
 [System.Serializable]
 public class DialogChoice
 {
     public string optionText;
-
     public DialogNode nextNode;
 }
-
 public class NPCInteractTrigger : MonoBehaviour
 {
     [Header("NPC设置")]
     public string npcName = "神秘村民";
-
-    [Header("对话树（剧情节点与各分支")]
+    [Header("对话树（剧情节点与各分支）")]
     public DialogNode rootNode = new DialogNode()
     {
         npcLines = new string[] {
@@ -57,105 +50,72 @@ public class NPCInteractTrigger : MonoBehaviour
             }
         }
     };
-
     [Header("多剧情阶段存储（通用状态机）")]
     public List<DialogNode> alternateNodes = new List<DialogNode>();
-
     [Header("触发设置")]
     public Transform player;
-
     public string playerTag = "Player";
-
     public float triggerDistance = 3f;
-
     public KeyCode interactKey = KeyCode.L;
-
     public Animator npcAnimator;
-
     public bool useBoolParameter = false;
-
     public string waveAnimationTrigger = "Wave";
-
     public string waveAnimationBool = "Wave";
-
     public float waveBoolAutoResetSeconds = 0.15f;
-
     public bool triggerOnce = true;
-
     public float exitDistanceOffset = 1f;
-
     [Header("独立UI设置")]
     public GameObject customDialoguePanel;
     public Text customNameText;
     public Text customContentText;
     public List<Button> customOptionButtons = new List<Button>();
-
     [Header("调试设置")]
     public bool showDebugLogs = true;
-
     public float debugLogInterval = 1f;
-
     [Header("提示设置")]
     public bool showPromptUI = true;
-
     public GameObject promptPanel;
-
     [Header("事件设置")]
     public bool restoreTransformOnEnd = true;
-
     public UnityEvent onDialogueEnd;
-
     private bool hasTriggeredOnce = false;
     private bool isInsideRange = false;
     private float exitDistance;
     private float debugLogTimer = 0f;
     private Coroutine waveResetCoroutine;
     private bool dialogueStarted = false;
-    
     // 存储对话前NPC的原始位置与朝向，以便对话结束后恢复
-    
-
     private Vector3 originalPosition;
     private Quaternion originalRotation;
     private bool positionSaved = false;
     private bool originalRootMotion = false;
     private bool originalIsKinematic = false;
-
-
     private void Start()
     {
-            Debug.Log($"<color=green>[NPC]</color> Trigger");
-
+        Debug.Log($"<color=green>[NPC]</color> Trigger");
         exitDistance = triggerDistance + exitDistanceOffset;
-
         if (npcAnimator == null)
         {
             npcAnimator = GetComponentInChildren<Animator>();
         }
-
         if (player == null)
         {
             FindPlayer();
         }
-
         if (showPromptUI)
         {
             FindPromptPanel();
         }
-
         if (promptPanel != null)
         {
             promptPanel.SetActive(false);
         }
-
         if (customDialoguePanel != null)
         {
             customDialoguePanel.SetActive(false); // 还没触发就隐藏面板！
         }
-
-            Debug.Log($"<color=green>[NPC]</color> Trigger");
+        Debug.Log($"<color=green>[NPC]</color> Trigger");
     }
-
     private void FindPlayer()
     {
         if (!string.IsNullOrEmpty(playerTag))
@@ -167,30 +127,25 @@ public class NPCInteractTrigger : MonoBehaviour
                 return;
             }
         }
-
         PlayerController playerController = FindObjectOfType<PlayerController>();
         if (playerController != null)
         {
             player = playerController.transform;
             return;
         }
-
         CharacterController characterController = FindObjectOfType<CharacterController>();
         if (characterController != null)
         {
             player = characterController.transform;
             return;
         }
-
         if (Camera.main != null)
         {
             player = Camera.main.transform;
             return;
         }
-
         Debug.LogError($"<color=red>[NPC互动触发器]</color> 未找到玩家对象！");
     }
-
     private void FindPromptPanel()
     {
         if (promptPanel == null)
@@ -202,14 +157,11 @@ public class NPCInteractTrigger : MonoBehaviour
             }
         }
     }
-
     private void Update()
     {
         if (player == null) return;
-
         float distance = Vector3.Distance(transform.position, player.position);
         bool withinRange = distance <= triggerDistance;
-
         if (showDebugLogs)
         {
             debugLogTimer += Time.deltaTime;
@@ -219,7 +171,6 @@ public class NPCInteractTrigger : MonoBehaviour
                 Debug.Log($"<color=cyan>[NPC]</color> NPC: {npcName}, dist: {distance:F2}");
             }
         }
-
         // 玩家进入范围
         if (withinRange && !isInsideRange)
         {
@@ -229,7 +180,6 @@ public class NPCInteractTrigger : MonoBehaviour
                 promptPanel.SetActive(true);
             }
         }
-
         // 在范围内按键交互
         if (Input.GetKeyDown(interactKey))
         {
@@ -242,16 +192,12 @@ public class NPCInteractTrigger : MonoBehaviour
                 if (!triggerOnce || !hasTriggeredOnce)
                 {
                     if (showDebugLogs) Debug.Log($"<color=green>[NPC互动触发器]</color> 开始对话！");
-                    
                     // 在转身面向玩家之前，先记录原始位置与朝向
-                    
                     CaptureTransform();
-                FacePlayer();
+                    FacePlayer();
                     PlayWaveAnimation();
                     TriggerDialogue();
-
                     hasTriggeredOnce = true;
-
                     if (showPromptUI && promptPanel != null)
                     {
                         promptPanel.SetActive(false);
@@ -259,20 +205,17 @@ public class NPCInteractTrigger : MonoBehaviour
                 }
             }
         }
-
         // 玩家离开范围
         else if (!withinRange && isInsideRange)
         {
             if (distance >= exitDistance)
             {
                 isInsideRange = false;
-
                 if (dialogueStarted)
                 {
                     EndDialogue(true);
                     StopAllCoroutines();
                 }
-
                 if (showPromptUI && promptPanel != null)
                 {
                     promptPanel.SetActive(false);
@@ -280,7 +223,6 @@ public class NPCInteractTrigger : MonoBehaviour
             }
         }
     }
-
     private void FacePlayer()
     {
         if (player != null)
@@ -293,11 +235,9 @@ public class NPCInteractTrigger : MonoBehaviour
             }
         }
     }
-
     private void PlayWaveAnimation()
     {
         if (npcAnimator == null) return;
-
         if (useBoolParameter)
         {
             if (!string.IsNullOrEmpty(waveAnimationBool))
@@ -319,7 +259,6 @@ public class NPCInteractTrigger : MonoBehaviour
             }
         }
     }
-
     private IEnumerator ResetWaveBoolAfterDelay(float seconds)
     {
         yield return new WaitForSeconds(seconds);
@@ -329,50 +268,42 @@ public class NPCInteractTrigger : MonoBehaviour
         }
         waveResetCoroutine = null;
     }
-
     private void TriggerDialogue()
     {
         if (!dialogueStarted)
         {
             dialogueStarted = true;
-
-            // 锁定玩家视角和移?(针对 Move.cs 中的 PlayerController)
+            // 锁定玩家视角和移动(针对 Move.cs 中的 PlayerController)
             if (player != null)
             {
                 PlayerController pc = player.GetComponent<PlayerController>();
                 if (pc != null) pc.isInspecting = true;
             }
-
             StartCoroutine(PlayInteractTree(rootNode));
         }
     }
-
     private IEnumerator PlayInteractTree(DialogNode node)
     {
-        if (node == null || node.npcLines == null || node.npcLines.Length == 0) 
+        if (node == null || node.npcLines == null || node.npcLines.Length == 0)
         {
             EndDialogue();
             yield break;
         }
-
         // 【新增通用机制】如果这个对话节点上绑定了事件（如大伯拿到火折子去点灯），立刻触发！
         if (node.onNodeTriggerEvent != null)
         {
             node.onNodeTriggerEvent.Invoke();
         }
-
-        // 用我们刚刚独立生成（或连好的）的组件体系！它?DialogueManager 再也没有一毛钱关系
+        // 用我们刚刚独立生成（或连好的）的组件体系！它跟DialogueManager 再也没有一毛钱关系
         var panel = customDialoguePanel;
         var npcText = customNameText;
         var contentText = customContentText;
         var optionBtns = customOptionButtons;
-
         if (panel == null || contentText == null)
         {
             EndDialogue();
             yield break;
         }
-
         // 设置环境，清理旧按键
         panel.SetActive(true);
         if (optionBtns != null)
@@ -384,39 +315,34 @@ public class NPCInteractTrigger : MonoBehaviour
             }
         }
         if (npcText != null) npcText.text = npcName;
-
-        // 2. 依次按顺序播?npcLines 里的句子（按鼠标?L 继续
+        // 2. 依次按顺序播放 npcLines 里的句子（按鼠标点击L 继续）
         for (int i = 0; i < node.npcLines.Length; i++)
         {
             contentText.text = "";
             string currentSentence = node.npcLines[i];
-
-            // ==== 检测名字：原神风格?名字：台? ====
+            // ==== 检测名字：原神风格-名字：台词 =====
             if (npcText != null)
             {
                 int colonIndex = currentSentence.IndexOf("："); // 中文冒号
                 if (colonIndex == -1) colonIndex = currentSentence.IndexOf(":"); // 英文半角冒号
-
                 if (colonIndex > 0)
                 {
-                    // 找到了冒号，把冒号前面的截取出来当名
+                    // 找到了冒号，把冒号前面的截取出来当名字
                     npcText.text = currentSentence.Substring(0, colonIndex);
                     // 冒号后面的当台词
                     currentSentence = currentSentence.Substring(colonIndex + 1);
                 }
                 else
                 {
-                    // 没找着冒号，默认名字归
+                    // 没找着冒号，默认名字归位
                     npcText.text = npcName;
                 }
             }
-
             // 逐字简易打字机
             bool skipTyping = false;
             for (int ch = 0; ch < currentSentence.Length; ch++)
             {
                 contentText.text += currentSentence[ch];
-
                 // 用timer模拟打字速度，同时更精确捕获跳过输入
                 float timer = 0f;
                 // 打字速度 0.03秒一个字
@@ -430,26 +356,23 @@ public class NPCInteractTrigger : MonoBehaviour
                     }
                     yield return null;
                 }
-
                 if (skipTyping)
                 {
                     contentText.text = currentSentence;
                     break;
                 }
             }
-
-            // 等待一帧，防止上面按下跳过时马上触发了下一句的检
+            // 等待一帧，防止上面按下跳过时马上触发了下一句的检测
             yield return null;
-            // 等待玩家按下 L 继续或者结束本
+            // 等待玩家按下 L 继续或者结束本句
             bool advanced = false;
-            yield return null; 
-            while (!advanced) // 在这里等待玩家按?L
+            yield return null;
+            while (!advanced) // 在这里等待玩家按下L
             {
                 if (Input.GetKeyDown(interactKey) || Input.GetMouseButtonDown(0)) advanced = true;
                 yield return null;
             }
         }
-
         // 3. 这段话全部说完，检查有没有分支选项
         if (node.choices != null && node.choices.Count > 0)
         {
@@ -457,7 +380,6 @@ public class NPCInteractTrigger : MonoBehaviour
             int highlightedIndex = 0; // 当前选中的选项索引
             List<Image> spawnedBtnImages = new List<Image>();
             List<Component> spawnedBtnTexts = new List<Component>();
-
             // 绑定您在这个列表里手动配好的按钮
             for (int i = 0; i < node.choices.Count; i++)
             {
@@ -467,15 +389,12 @@ public class NPCInteractTrigger : MonoBehaviour
                     // 获取您在Inspector中拖进槽位里的那几个按钮之一
                     Button btn = optionBtns[i];
                     btn.gameObject.SetActive(true); // 保证这个选项按钮显示出来
-                    
                     Image img = btn.GetComponent<Image>();
                     if (img != null) spawnedBtnImages.Add(img);
-
-                    // 兼容旧版 Text 或新?TextMeshPro
+                    // 兼容旧版 Text 或新版 TextMeshPro
                     Text legacyText = btn.GetComponentInChildren<Text>();
                     TMPro.TextMeshProUGUI tmpText = btn.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-
-                    if (legacyText != null) 
+                    if (legacyText != null)
                     {
                         legacyText.text = node.choices[i].optionText;
                         spawnedBtnTexts.Add(legacyText);
@@ -485,8 +404,7 @@ public class NPCInteractTrigger : MonoBehaviour
                         tmpText.text = node.choices[i].optionText;
                         spawnedBtnTexts.Add(tmpText);
                     }
-
-                    btn.onClick.RemoveAllListeners(); // 先清一下之前的事件，防止多次绑
+                    btn.onClick.RemoveAllListeners(); // 先清一下之前的事件，防止多次绑定
                     btn.onClick.AddListener(() => {
                         selectedIndex = captureIndex;
                     });
@@ -494,34 +412,32 @@ public class NPCInteractTrigger : MonoBehaviour
                 else
                 {
                     Debug.LogWarning($"<color=yellow>[NPC]</color> mismatch {node.choices.Count}");
-}
+                }
             }
-
             // 等待玩家用滚轮切换或者F键确认（原来的鼠标点击依然兜底保留）
             while (selectedIndex == -1)
             {
                 // 获取鼠标滚轮输入
                 float scroll = Input.GetAxis("Mouse ScrollWheel");
-                if (scroll > 0f) // 向上
+                if (scroll > 0f) // 向上滚
                 {
                     highlightedIndex--;
                     if (highlightedIndex < 0) highlightedIndex = node.choices.Count - 1;
                 }
-                else if (scroll < 0f) // 向下
+                else if (scroll < 0f) // 向下滚
                 {
                     highlightedIndex++;
                     if (highlightedIndex >= node.choices.Count) highlightedIndex = 0;
                 }
-
-                // 更新高亮变色与缩放效
+                // 更新高亮变色与缩放效果
                 for (int i = 0; i < spawnedBtnImages.Count; i++)
                 {
                     if (spawnedBtnImages[i] != null)
                     {
                         if (i == highlightedIndex)
                         {
-                            // 选中时：按钮变金黄明亮，稍微放大，字体加粗变
-                            spawnedBtnImages[i].color = new Color(1f, 0.85f, 0.4f, 1f); 
+                            // 选中时：按钮变金黄明亮，稍微放大，字体加粗变色
+                            spawnedBtnImages[i].color = new Color(1f, 0.85f, 0.4f, 1f);
                             spawnedBtnImages[i].transform.localScale = new Vector3(1.05f, 1.05f, 1f);
                             if (i < spawnedBtnTexts.Count && spawnedBtnTexts[i] != null)
                             {
@@ -531,7 +447,7 @@ public class NPCInteractTrigger : MonoBehaviour
                         }
                         else
                         {
-                            // 未选中时：半透明暗态，正常大小，字体白
+                            // 未选中时：半透明暗态，正常大小，字体白色
                             spawnedBtnImages[i].color = new Color(1f, 1f, 1f, 0.4f);
                             spawnedBtnImages[i].transform.localScale = Vector3.one;
                             if (i < spawnedBtnTexts.Count && spawnedBtnTexts[i] != null)
@@ -542,16 +458,13 @@ public class NPCInteractTrigger : MonoBehaviour
                         }
                     }
                 }
-
                 // 按下键盘 F 键确认选择当前高亮
                 if (Input.GetKeyDown(interactKey) || Input.GetKeyDown(KeyCode.F))
                 {
                     selectedIndex = highlightedIndex;
                 }
-
                 yield return null;
             }
-
             // 选完后清空选项
             if (optionBtns != null)
             {
@@ -560,8 +473,7 @@ public class NPCInteractTrigger : MonoBehaviour
                     if (btn != null) btn.gameObject.SetActive(false);
                 }
             }
-
-            // 递归进入下一
+            // 递归进入下一层
             yield return StartCoroutine(PlayInteractTree(node.choices[selectedIndex].nextNode));
         }
         else
@@ -569,17 +481,12 @@ public class NPCInteractTrigger : MonoBehaviour
             EndDialogue();
         }
     }
-
-
-
-
     private void CaptureTransform()
     {
         if (!positionSaved)
         {
             originalPosition = transform.position;
             originalRotation = transform.rotation;
-            
             if (npcAnimator != null)
             {
                 originalRootMotion = npcAnimator.applyRootMotion;
@@ -591,23 +498,18 @@ public class NPCInteractTrigger : MonoBehaviour
                 originalIsKinematic = rb.isKinematic;
                 rb.isKinematic = true;
             }
-
             positionSaved = true;
         }
     }
-
     private void RestoreTransform()
     {
         if (positionSaved)
         {
             UnityEngine.AI.NavMeshAgent agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
             if (agent != null) agent.enabled = false;
-
             transform.position = originalPosition;
             transform.rotation = originalRotation;
-
             if (agent != null) agent.enabled = true;
-
             if (npcAnimator != null)
             {
                 npcAnimator.applyRootMotion = originalRootMotion;
@@ -617,11 +519,9 @@ public class NPCInteractTrigger : MonoBehaviour
             {
                 rb.isKinematic = originalIsKinematic;
             }
-
             positionSaved = false;
         }
     }
-
     private void EndDialogue(bool skipEvent = false)
     {
         dialogueStarted = false;
@@ -629,39 +529,33 @@ public class NPCInteractTrigger : MonoBehaviour
         {
             customDialoguePanel.SetActive(false);
         }
-
         // 解除玩家视角锁定
         if (player != null)
         {
             PlayerController pc = player.GetComponent<PlayerController>();
             if (pc != null) pc.isInspecting = false;
         }
-
-        // 把NPC变回他原本的朝向/位置（避免一直盯着玩家
+        // 把NPC变回他原本的朝向/位置（避免一直盯着玩家）
         if (restoreTransformOnEnd)
         {
             RestoreTransform();
         }
-
         // 触发对话结束事件
         if (!skipEvent)
         {
             onDialogueEnd?.Invoke();
         }
     }
-
     private void legacyUpdateStyle(Text t, bool highlight)
     {
         t.color = highlight ? Color.black : Color.white;
         t.fontStyle = highlight ? FontStyle.Bold : FontStyle.Normal;
     }
-
     private void tmpUpdateStyle(TMPro.TextMeshProUGUI t, bool highlight)
     {
         t.color = highlight ? Color.black : Color.white;
         t.fontStyle = highlight ? TMPro.FontStyles.Bold : TMPro.FontStyles.Normal;
     }
-
     public void ManualTrigger()
     {
         if (dialogueStarted)
@@ -669,45 +563,35 @@ public class NPCInteractTrigger : MonoBehaviour
             EndDialogue(true);
             StopAllCoroutines();
         }
-
-        
         CaptureTransform();
         FacePlayer();
         PlayWaveAnimation();
         TriggerDialogue();
     }
-
     public void StartSpecificDialogue(DialogNode customNode, bool replaceRoot = true)
     {
-        // 如果正在和NPC对话中又触发了给荷花，那就先强行中断旧对
-        if (dialogueStarted) 
+        // 如果正在和NPC对话中又触发了给荷花，那就先强行中断旧对话
+        if (dialogueStarted)
         {
             EndDialogue(true);
             StopAllCoroutines(); // 停掉正在打字的旧对话
         }
-
         if (replaceRoot)
         {
-            rootNode = customNode; // 永久替换之后聊天的内容
+            rootNode = customNode; // 永久替换之后的聊天内容
         }
-
         dialogueStarted = true;
-
-        
         CaptureTransform();
         FacePlayer();
         PlayWaveAnimation();
-
-        // 锁定玩家视角和移?(针对 Move.cs 中的 PlayerController)
+        // 锁定玩家视角和移动(针对 Move.cs 中的 PlayerController)
         if (player != null)
         {
             PlayerController pc = player.GetComponent<PlayerController>();
             if (pc != null) pc.isInspecting = true;
         }
-
         StartCoroutine(PlayInteractTree(customNode));
     }
-
     public void SwitchAlternateDialogue(int alternateIndex)
     {
         if (alternateIndex >= 0 && alternateIndex < alternateNodes.Count)
@@ -718,19 +602,16 @@ public class NPCInteractTrigger : MonoBehaviour
             Debug.Log($"<color=green>[NPC剧情切换]</color> {npcName} 的剧情对话已切换到第 {alternateIndex} 阶段！");
         }
     }
-
     public void ResetTrigger()
     {
         hasTriggeredOnce = false;
         isInsideRange = false;
         dialogueStarted = false;
     }
-
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, triggerDistance);
-
         float extDist = triggerDistance + exitDistanceOffset;
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, extDist);

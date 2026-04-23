@@ -22,7 +22,7 @@ public class CrosshairInteract : MonoBehaviour
             {
                 qian = hit.collider.GetComponentInParent<QianItem>();
             }
-            
+
             if (qian != null)
             {
                 if (currentTarget != qian)

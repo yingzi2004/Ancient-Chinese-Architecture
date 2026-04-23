@@ -112,7 +112,7 @@ public class StartScreenManager : MonoBehaviour
 
         if (logoGlowCanvasGroup != null)
         {
-            logoGlowCanvasGroup.alpha = 0f; 
+            logoGlowCanvasGroup.alpha = 0f;
         }
 
         // 初始化雾气位置
@@ -173,9 +173,9 @@ public class StartScreenManager : MonoBehaviour
         {
             StartCoroutine(FadeCanvasGroup(logoMainCanvasGroup, 0f, 1f, logoFadeDuration));
         }
-        
+
         StartCoroutine(FadeGlowMultiplier(0f, 1f, logoFadeDuration)); // 同步开启发光层呼吸
-        
+
         yield return new WaitForSeconds(logoFadeDuration * 0.8f);
 
         // 4. 开始按钮最后微微软隐浮现

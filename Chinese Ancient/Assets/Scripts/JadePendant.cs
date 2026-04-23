@@ -137,7 +137,6 @@ public class JadePendant : MonoBehaviour
     {
         if (!canBePickedUp || !allowClickPickup) return;
 
-
         // 检查距离
         if (IsPlayerInRange())
         {

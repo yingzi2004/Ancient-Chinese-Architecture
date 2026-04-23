@@ -7,7 +7,7 @@ public class CubeClick : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0)) // ×ó¼üµã»÷
+        if (Input.GetMouseButtonDown(0)) // å·¦é”®ç‚¹å‡»
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
