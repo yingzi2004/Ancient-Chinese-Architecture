@@ -20,7 +20,6 @@ public class ItemGlowHighlight : MonoBehaviour
 
     void Start()
     {
-        // 1. 获取自身的材质球，开启自发光宏
         Renderer rend = GetComponent<Renderer>();
         if (rend != null)
         {
@@ -34,7 +33,6 @@ public class ItemGlowHighlight : MonoBehaviour
             Debug.LogWarning($"[{gameObject.name}] 没有找到Renderer组件，无法修改材质发光。");
         }
 
-        // 2. 添加实际的物理光源（点光源），增加环境真实感
         if (addPointLight)
         {
             pointLight = gameObject.AddComponent<Light>();
@@ -50,14 +48,12 @@ public class ItemGlowHighlight : MonoBehaviour
 
     void Update()
     {
-        // 使用正弦波函数 (Sine) 计算呼吸节奏，在极值之间平滑过渡
-        // Mathf.Sin 返回 -1 到 1，将其映射到 0 到 1
+
         float sineWave = (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f;
 
         // 插值计算当前发光强度
         currentIntensity = Mathf.Lerp(minIntensity, maxIntensity, sineWave);
 
-        // 1. 更新材质发光颜色
         if (originalMaterial != null)
         {
             // Unity HDR 颜色 = 颜色 * 强度
@@ -65,7 +61,6 @@ public class ItemGlowHighlight : MonoBehaviour
             originalMaterial.SetColor("_EmissionColor", finalColor);
         }
 
-        // 2. 更新灯光强度
         if (pointLight != null)
         {
             pointLight.intensity = currentIntensity;
@@ -91,7 +86,6 @@ public class ItemGlowHighlight : MonoBehaviour
 
     private void OnDestroy()
     {
-        // 销毁时清理临时实例化的材质球，防止内存泄漏
         if (originalMaterial != null)
         {
             Destroy(originalMaterial);

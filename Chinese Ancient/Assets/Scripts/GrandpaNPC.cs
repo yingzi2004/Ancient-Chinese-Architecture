@@ -1,9 +1,7 @@
+// AI辅助生成：DeepSeek-R1-0528, 2026-04-23
 using UnityEngine;
 
-/// <summary>
-/// 老爷爷NPC脚本 - 挂载到老爷爷角色上
-/// 可以接收玩家归还的玉佩
-/// </summary>
+
 public class GrandpaNPC : MonoBehaviour
 {
     public static GrandpaNPC Instance { get; private set; }
@@ -33,11 +31,11 @@ public class GrandpaNPC : MonoBehaviour
     [TextArea(5, 10)]
     public string[] gratitudeDialogueSequence = new string[]
     {
-        "噢！这不是我的玉佩吗？",                          // 第1句 - 老爷爷
-        "太感谢你了，小伙子！",                             // 第2句 - 我
-        "这玉佩是我祖上传下来的，对我意义重大。",           // 第3句 - 老爷爷
-        "您太客气了，这是我应该做的。",                     // 第4句 - 我
-        "你真是个好孩子，你的善良我永远不会忘记！"          // 第5句 - 老爷爷
+        "噢！这不是我的玉佩吗？",                          
+        "太感谢你了，小伙子！",                            
+        "这玉佩是我祖上传下来的，对我意义重大。",          
+        "您太客气了，这是我应该做的。",                     
+        "你真是个好孩子，你的善良我永远不会忘记！"          
     };
 
     [Tooltip("已完成任务后的对话")]
@@ -75,7 +73,6 @@ public class GrandpaNPC : MonoBehaviour
 
     void Start()
     {
-        // 如果没有设置玩家引用，尝试通过标签查找
         if (playerTransform == null)
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -85,7 +82,6 @@ public class GrandpaNPC : MonoBehaviour
             }
             else
             {
-                // 尝试查找Main Camera
                 Camera mainCam = Camera.main;
                 if (mainCam != null)
                 {
@@ -94,10 +90,8 @@ public class GrandpaNPC : MonoBehaviour
             }
         }
 
-        // 查找任务管理器
         questManager = FindObjectOfType<JadePendantQuestManager>();
-
-        // 获取或添加Collider
+        // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
         npcCollider = GetComponent<Collider>();
         if (npcCollider == null)
         {
@@ -110,19 +104,16 @@ public class GrandpaNPC : MonoBehaviour
 
     void Update()
     {
-        // 检测玩家是否在范围内
+        // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
         isPlayerInRange = CheckPlayerInRange();
 
-        // 检查对话是否正在播放
         if (DialogueManager.Instance != null)
         {
             isDialoguePlaying = DialogueManager.Instance.IsDialogueActive;
         }
 
-        // 处理交互输入
         if (isPlayerInRange && Input.GetKeyDown(interactionKey))
         {
-            // 如果对话正在播放，不允许触发新的交互
             if (isDialoguePlaying)
             {
                 Debug.Log("对话正在进行中，请等待对话结束");
@@ -133,9 +124,7 @@ public class GrandpaNPC : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 检查玩家是否在交互范围内
-    /// </summary>
+
     private bool CheckPlayerInRange()
     {
         if (playerTransform == null) return false;
@@ -144,9 +133,6 @@ public class GrandpaNPC : MonoBehaviour
         return distance <= interactionRange;
     }
 
-    /// <summary>
-    /// 鼠标点击交互
-    /// </summary>
     void OnMouseDown()
     {
         if (!allowClickInteraction) return;
@@ -168,9 +154,7 @@ public class GrandpaNPC : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 与老爷爷交互
-    /// </summary>
+
     private void Interact()
     {
         if (questCompleted)
@@ -197,7 +181,6 @@ public class GrandpaNPC : MonoBehaviour
         }
         else
         {
-            // 玩家没有玉佩，只触发一次对话
             if (!hasTriggeredNoPendantDialogue)
             {
                 ShowDialogue(dialogueNoPendant);
@@ -211,9 +194,6 @@ public class GrandpaNPC : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 完成任务
-    /// </summary>
     private void CompleteQuest()
     {
         Debug.Log("任务完成：归还玉佩给老爷爷！");
@@ -255,9 +235,7 @@ public class GrandpaNPC : MonoBehaviour
         questCompleted = true;
     }
 
-    /// <summary>
-    /// 启动感谢对话序列
-    /// </summary>
+
     private void StartGratitudeDialogue()
     {
         if (hasTriggeredGratitudeDialogue)
@@ -317,9 +295,7 @@ public class GrandpaNPC : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 显示对话（简单模式，用于交互对话）
-    /// </summary>
+
     private void ShowDialogue(string dialogue)
     {
         // 防止重复触发
@@ -347,9 +323,6 @@ public class GrandpaNPC : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 显示奖励
-    /// </summary>
     private void ShowReward()
     {
         Debug.Log($"获得奖励: {rewardText}");
@@ -360,9 +333,6 @@ public class GrandpaNPC : MonoBehaviour
         // - 播放音效
     }
 
-    /// <summary>
-    /// 绘制交互范围（编辑器可视化）
-    /// </summary>
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
@@ -464,9 +434,7 @@ public class GrandpaNPC : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 创建纯色纹理
-    /// </summary>
+
     private Texture2D MakeTexture(int width, int height, Color col)
     {
         Color[] pix = new Color[width * height];

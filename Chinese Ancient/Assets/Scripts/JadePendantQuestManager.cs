@@ -1,10 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-/// <summary>
-/// 玉佩任务管理器 - 管理整个玉佩拾取任务的流程
-/// 挂载到场景中的空GameObject上
-/// </summary>
+
 public class JadePendantQuestManager : MonoBehaviour
 {
     public static JadePendantQuestManager Instance { get; private set; }
@@ -78,9 +75,7 @@ public class JadePendantQuestManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 查找场景中所有玉佩
-    /// </summary>
+
     private void FindAllPendants()
     {
         JadePendant[] foundPendants = FindObjectsOfType<JadePendant>();
@@ -90,9 +85,7 @@ public class JadePendantQuestManager : MonoBehaviour
         Debug.Log($"找到 {totalPendantsInScene} 个玉佩");
     }
 
-    /// <summary>
-    /// 开始任务
-    /// </summary>
+
     public void StartQuest()
     {
         if (questStarted) return;
@@ -103,10 +96,7 @@ public class JadePendantQuestManager : MonoBehaviour
 
         // 这里可以添加任务开始的特效或音效
     }
-
-    /// <summary>
-    /// 当玉佩被拾取时调用
-    /// </summary>
+    // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
     public void OnJadePendantPickedUp(JadePendant pendant)
     {
         if (questCompleted) return;
@@ -116,6 +106,7 @@ public class JadePendantQuestManager : MonoBehaviour
         Debug.Log(pickupMessage);
         Debug.Log($"进度: {pendantsCollected}/{totalPendantsInScene}");
 
+        // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
         // 检查是否所有玉佩都被拾取（本例只有1个）
         if (pendantsCollected >= totalPendantsInScene)
         {
@@ -123,9 +114,6 @@ public class JadePendantQuestManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 当任务完成时调用（玉佩归还给老爷爷）
-    /// </summary>
     public void OnQuestCompleted()
     {
         if (questCompleted) return;
@@ -145,60 +133,44 @@ public class JadePendantQuestManager : MonoBehaviour
         PlayerPrefs.SetInt($"{questName}_Completed", 1);
         PlayerPrefs.Save();
 
-        // 可选：加载下一个场景
         if (loadNextSceneOnComplete && !string.IsNullOrEmpty(nextSceneName))
         {
             StartCoroutine(LoadNextSceneAfterDelay());
         }
     }
 
-    /// <summary>
-    /// 延迟加载下一个场景
-    /// </summary>
+
     private System.Collections.IEnumerator LoadNextSceneAfterDelay()
     {
         yield return new WaitForSeconds(2f);
         UnityEngine.SceneManagement.SceneManager.LoadScene(nextSceneName);
     }
 
-    /// <summary>
-    /// 显示任务UI
-    /// </summary>
+
     private void ShowQuestUI()
     {
         Debug.Log($"任务UI显示: {questName}");
         // 这里可以集成UI系统显示任务面板
     }
 
-    /// <summary>
-    /// 更新任务UI
-    /// </summary>
+
     private void UpdateQuestUI()
     {
         Debug.Log($"任务进度更新: {pendantsCollected}/{totalPendantsInScene}");
         // 这里可以更新UI上的进度显示
     }
 
-    /// <summary>
-    /// 隐藏任务UI
-    /// </summary>
     private void HideQuestUI()
     {
         Debug.Log("任务UI隐藏");
         // 这里可以隐藏任务UI面板
     }
 
-    /// <summary>
-    /// 获取任务进度
-    /// </summary>
     public float GetQuestProgress()
     {
         return totalPendantsInScene > 0 ? (float)pendantsCollected / totalPendantsInScene : 0f;
     }
 
-    /// <summary>
-    /// 检查任务是否完成
-    /// </summary>
     public bool IsQuestCompleted()
     {
         return questCompleted;

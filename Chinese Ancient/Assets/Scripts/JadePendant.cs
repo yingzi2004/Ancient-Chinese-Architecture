@@ -1,8 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// 玉佩物品脚本 - 挂载到玉佩3D模型上
-/// </summary>
+
 public class JadePendant : MonoBehaviour
 {
     [Header("玉佩设置")]
@@ -91,6 +89,7 @@ public class JadePendant : MonoBehaviour
             col = gameObject.AddComponent<BoxCollider>();
             col.isTrigger = true;
         }
+        // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
 
         // 查找任务管理器
         questManager = FindObjectOfType<JadePendantQuestManager>();
@@ -130,9 +129,6 @@ public class JadePendant : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 鼠标点击拾取
-    /// </summary>
     void OnMouseDown()
     {
         if (!canBePickedUp || !allowClickPickup) return;
@@ -147,10 +143,7 @@ public class JadePendant : MonoBehaviour
             Debug.LogWarning($"[{gameObject.name}] 距离太远，无法拾取！当前距离: {GetDistanceToPlayer():F2}米，需要: {pickupRange}米以内");
         }
     }
-
-    /// <summary>
-    /// 拾取玉佩
-    /// </summary>
+    // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
     public void Pickup()
     {
         if (!canBePickedUp)
@@ -179,8 +172,6 @@ public class JadePendant : MonoBehaviour
             targetNPC.SwitchAlternateDialogue(targetAlternateNodeIndex);
         }
 
-        // 这里可以添加拾取音效
-        // AudioSource.PlayClipAtPoint(pickupSound, transform.position);
 
         // 禁用碰撞体和渲染
         if (col != null) col.enabled = false;
@@ -189,10 +180,6 @@ public class JadePendant : MonoBehaviour
         canBePickedUp = false;
         this.enabled = false;
     }
-
-    /// <summary>
-    /// 检查玩家是否在拾取范围内
-    /// </summary>
     private bool IsPlayerInRange()
     {
         if (playerTransform == null)
@@ -204,18 +191,12 @@ public class JadePendant : MonoBehaviour
         return distance <= pickupRange;
     }
 
-    /// <summary>
-    /// 获取到玩家的距离
-    /// </summary>
     private float GetDistanceToPlayer()
     {
         if (playerTransform == null) return float.MaxValue;
         return Vector3.Distance(transform.position, playerTransform.position);
     }
 
-    /// <summary>
-    /// 高亮显示物体
-    /// </summary>
     private void HighlightObject()
     {
         if (isHighlighted) return;
@@ -228,9 +209,6 @@ public class JadePendant : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 移除高亮效果
-    /// </summary>
     private void RemoveHighlight()
     {
         if (!isHighlighted) return;
@@ -250,9 +228,7 @@ public class JadePendant : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 在Scene视图中绘制拾取范围
-    /// </summary>
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
@@ -329,9 +305,7 @@ public class JadePendant : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 创建纯色纹理
-    /// </summary>
+
     private Texture2D MakeTexture(int width, int height, Color col)
     {
         Color[] pix = new Color[width * height];

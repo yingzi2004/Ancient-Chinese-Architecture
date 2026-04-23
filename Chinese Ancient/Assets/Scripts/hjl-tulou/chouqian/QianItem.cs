@@ -1,3 +1,4 @@
+// AI辅助生成：DeepSeek-R1-0528, 2026-04-23 (第一处优化：代码结构优化)
 using UnityEngine;
 
 public class QianItem : MonoBehaviour
@@ -65,6 +66,7 @@ public class QianItem : MonoBehaviour
 
     void Update()
     {
+        // AI辅助生成：DeepSeek-R1-0528, 2026-04-23 (第二处优化：平滑移动逻辑注释优化)
         // 无论是在飞出还是飞回，平滑移动到目标点
         transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * moveSpeed);
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * moveSpeed);

@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// 输入调试助手 - 帮助检测键盘输入是否正常工作
-/// 将此脚本添加到场景中任意GameObject上
-/// </summary>
 public class InputDebugHelper : MonoBehaviour
 {
     [Header("显示设置")]

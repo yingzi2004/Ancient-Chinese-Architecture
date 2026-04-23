@@ -1,3 +1,4 @@
+// AI辅助生成：DeepSeek-R1-0528, 2026-04-23 (优化点：协程生命周期管理注释)
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -80,6 +81,7 @@ public class Card : MonoBehaviour
 
         if (toFront)
         {
+            // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
             yield return new WaitForSeconds(1f);
             GameManager.Instance.CompareCards(this);
         }

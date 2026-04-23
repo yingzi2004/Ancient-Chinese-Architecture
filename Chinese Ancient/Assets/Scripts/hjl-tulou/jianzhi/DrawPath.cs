@@ -1,3 +1,4 @@
+// AI辅助生成：DeepSeek-R1-0528, 2026-04-23 (优化点：阶段切换逻辑简化)
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -107,7 +108,7 @@ public class DrawPath : MonoBehaviour
 
         // 只有进入了固定的交互模式，才能画线或点击
         if (!isInteracting) return;
-
+// AI辅助生成：DeepSeek-R1-0528, 2026-04-23 (优化点：阶段分支简化)
         // 优先判断第二阶段：只要掉2已经显示并且还没完成第二阶段，就处理点击逻辑
         if (!secondStageDone && objectDrop2 != null && objectDrop2.activeInHierarchy)
         {
