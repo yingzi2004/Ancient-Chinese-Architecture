@@ -130,7 +130,6 @@ public class EndSequenceVFX : MonoBehaviour
             yield return Wait(initialDelay);
         }
         // --- 开始视觉效果序列 ---
-        // AI辅助生成：DeepSeek-V3.2, 2026-04-21
         // 计算总摇晃时间，覆盖后续效果
         float estimatedTotalTime = blurInDuration + (blinkCount * (singleBlinkDuration + 0.3f)) + fadeToBlackDuration;
         shakeDuration = Mathf.Max(shakeDuration, estimatedTotalTime);
@@ -308,10 +307,17 @@ public class EndSequenceVFX : MonoBehaviour
             float yOffset = Mathf.Cos(phase * 0.8f) * (strength * 1.5f) * k;
             target.localPosition = originPos + new Vector3(xOffset, yOffset, 0f);
             // 旋转计算
+<<<<<<< Updated upstream
             // AI辅助生成：DeepSeek-V3.2, 2026-04-21
             float pitchOffset = Mathf.Cos(phase * 0.9f) * (strength * 15f) * k;
             float yawOffset = Mathf.Sin(phase * 1.1f) * (strength * 15f) * k;
             float rollOffset = Mathf.Sin(phase * 0.7f) * (strength * 10f) * k;
+=======
+            float pitchOffset = Mathf.Cos(phase * 0.9f) * (strength * 15f) * k; 
+            float yawOffset = Mathf.Sin(phase * 1.1f) * (strength * 15f) * k;   
+            float rollOffset = Mathf.Sin(phase * 0.7f) * (strength * 10f) * k;  
+            
+>>>>>>> Stashed changes
             target.localRotation = originRot * Quaternion.Euler(pitchOffset, yawOffset, rollOffset);
             yield return null;
         }

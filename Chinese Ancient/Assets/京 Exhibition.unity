@@ -5053,6 +5053,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   triggerOnce: 1
+  triggerOncePerGameSession: 1
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
   portraitSprite: {fileID: 21300000, guid: d0675f73109c3e4498154f48a6726c41, type: 3}
@@ -7059,7 +7060,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 324498065}
   m_HandleRect: {fileID: 0}
   m_Direction: 0
-  m_Value: 0.28736898
+  m_Value: 0.28736922
   m_Size: 0.56465256
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -8981,6 +8982,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   triggerOnce: 1
+  triggerOncePerGameSession: 1
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
   portraitSprite: {fileID: 21300000, guid: d0675f73109c3e4498154f48a6726c41, type: 3}
@@ -12966,7 +12968,7 @@ MonoBehaviour:
   voiceButton: {fileID: 0}
   closeButton: {fileID: 0}
   voiceButtonText: {fileID: 0}
-  toggleKey: 283
+  toggleKey: 282
   defaultOpen: 0
   controlCursor: 1
   lockModeWhenClosed: 1
@@ -20266,6 +20268,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   triggerOnce: 1
+  triggerOncePerGameSession: 1
   triggerDelay: 0.3
   npcDisplayName: "\u6309L\u952E\u7EE7\u7EED  \u5C0F\u5FAE"
   portraitSprite: {fileID: 21300000, guid: d0675f73109c3e4498154f48a6726c41, type: 3}
@@ -24899,7 +24902,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 211.94043, y: 20, z: 294.8794, w: -318.35175}
+  m_margin: {x: 199.5885, y: 20, z: 468.21844, w: -361.029}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

@@ -334,7 +334,7 @@ public class DrawPath : MonoBehaviour
         Debug.Log($"DrawPath SecondStage: drop2ScreenPos={drop2ScreenPos}, mouse={checkPoint}, dist={dist}");
 
         // 距离足够近，认为点中了掉2
-        if (dist <= drop2ClickRadius)  // 电脑客户端访问，2026年3月19号
+        if (dist <= drop2ClickRadius)
         {
             // 掉2 开始下落
             ObjectManager manager = objectDrop2.GetComponent<ObjectManager>();

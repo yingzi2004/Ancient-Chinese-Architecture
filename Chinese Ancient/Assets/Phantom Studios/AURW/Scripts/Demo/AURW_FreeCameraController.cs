@@ -7,7 +7,7 @@ namespace aurw
         public float walkSpeed = 5f;
         public float sprintSpeed = 10f;
         public float lookSpeed = 2f;
-        public float acceleration = 10f; // Suavizado de transición
+        public float acceleration = 10f; // Suavizado de transiciï¿½n
 
         [Header("Key Bindings")]
         public KeyCode exitKey = KeyCode.Escape;
@@ -63,7 +63,7 @@ namespace aurw
             float targetSpeed = Input.GetKey(sprintKey) ? sprintSpeed : walkSpeed;
 
             // Suaviza el cambio de velocidad
-            _currentSpeed = Mathf.Lerp(_currentSpeed, targetSpeed, acceleration * Time.deltaTime);// DeepSeek-R1-0528, 2026Äê3ÔÂ11ºÅ
+            _currentSpeed = Mathf.Lerp(_currentSpeed, targetSpeed, acceleration * Time.deltaTime);
 
             Vector3 move = Vector3.zero;
             if (Input.GetKey(KeyCode.W)) move += transform.forward;
