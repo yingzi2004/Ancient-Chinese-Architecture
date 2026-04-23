@@ -6,29 +6,29 @@ public class IncenseInteraction : MonoBehaviour
     [Header("烧香动画设置")]
     [Tooltip("每次拜的旋转角度（根据你的香模型朝向，X、Y或者Z轴可能需要调整）")]
     public Vector3 bowAngle = new Vector3(30f, 0f, 0f);
-    
+
     [Tooltip("每次拜的持续时间")]
     public float bowDuration = 1.0f;
-    
+
     [Header("香炉目标位置")]
     [Tooltip("请在香炉物体下新建一个空物体作为插香的位置，并拖拽到这里")]
     public Transform incenseBurnerTarget;
-    
+
     [Tooltip("香飞往香炉的持续时间")]
     public float flyDuration = 1.5f;
 
     [Header("音效设置")]
     [Tooltip("用来播放声音的组件（可选，不填将尝试自动获取）")]
     public AudioSource audioSource;
-    [Tooltip("点击拜时的声音（此处放入“编钟声”）")]
+    [Tooltip("点击拜时的声音（此处放入编钟声）")]
     public AudioClip bianzhongSound;
-    [Tooltip("完成插香时的声音（此处放入“钟声”）")]
+    [Tooltip("完成插香时的声音（此处放入钟声）")]
     public AudioClip finishBellSound;
 
     [Header("特效设置")]
     [Tooltip("香头的位置（用来定烟飘出的起点。请在香底下建个空物体移到顶部并拖到这，不填默认位置）")]
     public Transform incenseTip;
-    
+
     [Tooltip("烟雾的材质（解决粉块问题，请参考聊天框里的步骤创建一个材质并拖入这里）")]
     public Material smokeMaterial;
 
@@ -44,7 +44,7 @@ public class IncenseInteraction : MonoBehaviour
     {
         // 记录香最初的旋转状态
         originalRotation = transform.rotation;
-        
+
         // 自动获取AudioSource
         if (audioSource == null)
         {
@@ -83,7 +83,7 @@ public class IncenseInteraction : MonoBehaviour
         }
     }
 
-    // 为了方便你在普通测试模式下直接用鼠标点击“香”也能触发
+    // 为了方便你在普通测试模式下直接用鼠标点击"香"也能触发
     private void OnMouseDown()
     {
         Interact();
@@ -126,10 +126,10 @@ public class IncenseInteraction : MonoBehaviour
     {
         isAnimating = true;
 
-        // 先执行最后一次“拜”
+        // 先执行最后一次"拜"
         Quaternion forwardRotation = originalRotation * Quaternion.Euler(bowAngle);
         float halfDuration = bowDuration / 2f;
-        
+
         float elapsedTime = 0f;
         while (elapsedTime < halfDuration)
         {
@@ -137,7 +137,7 @@ public class IncenseInteraction : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        
+
         elapsedTime = 0f;
         while (elapsedTime < halfDuration)
         {
@@ -178,23 +178,23 @@ public class IncenseInteraction : MonoBehaviour
         // 飞出后精确固定在香炉位置
         transform.position = incenseBurnerTarget.position;
         transform.rotation = incenseBurnerTarget.rotation;
-        
+
         // 可选：插进去后可以让香成为香炉的子物体，这样移动香炉时香跟着走
         transform.parent = incenseBurnerTarget.parent;
-        
+
         // 播放插完香后的钟声
         if (audioSource != null && finishBellSound != null)
         {
             audioSource.PlayOneShot(finishBellSound);
         }
-        
+
         // 播放玩家双手合十动画
         if (playerHandsAnim != null)
         {
             playerHandsAnim.PlayPrayAnimation();
         }
 
-        // --- 纯代码动态生成天坛祭天专属“青烟化星芒”螺旋上升特效 ---
+        // --- 纯代码动态生成天坛祭天专属"青烟化星芒"螺旋上升特效 ---
         GenerateQingyanEffect();
 
         isAnimating = false;
@@ -214,7 +214,7 @@ public class IncenseInteraction : MonoBehaviour
         GameObject smokeObj = new GameObject("Qingyan_Spiral_VFX");
         smokeObj.transform.position = spawnPos;
         // 把粒子喷射方向朝上 (绕X转-90度后，Unity的局部Z轴变成世界上方)
-        smokeObj.transform.rotation = Quaternion.Euler(-90, 0, 0); 
+        smokeObj.transform.rotation = Quaternion.Euler(-90, 0, 0);
         smokeObj.transform.SetParent(transform); // 挂在香底，随着香炉可能移动
 
         ParticleSystem smokePS = smokeObj.AddComponent<ParticleSystem>();
@@ -239,7 +239,7 @@ public class IncenseInteraction : MonoBehaviour
         // 形状 (Shape)
         var shape = smokePS.shape;
         shape.shapeType = ParticleSystemShapeType.Circle; // 使用园形让其有柱状感
-        shape.radius = 0.015f; 
+        shape.radius = 0.015f;
 
         // 运动轨迹：螺旋上升特效的核心 (Velocity Over Lifetime)
         var vol = smokePS.velocityOverLifetime;
@@ -264,7 +264,7 @@ public class IncenseInteraction : MonoBehaviour
         var sol = smokePS.sizeOverLifetime;
         sol.enabled = true;
         AnimationCurve sizeCurve = new AnimationCurve();
-        sizeCurve.AddKey(0f, 1f); 
+        sizeCurve.AddKey(0f, 1f);
         sizeCurve.AddKey(1f, 0f); // 烟雾越往上越细，最终化无
         sol.size = new ParticleSystem.MinMaxCurve(1f, sizeCurve);
 
@@ -276,7 +276,7 @@ public class IncenseInteraction : MonoBehaviour
         starObj.transform.SetParent(smokeObj.transform);
         // 定位在半空中（相对父物体Z轴上移大约2米的位置，也就是烟雾消失之处）
         starObj.transform.localPosition = new Vector3(0, 0, 2.0f);
-        
+
         ParticleSystem starPS = starObj.AddComponent<ParticleSystem>();
         ParticleSystemRenderer starRenderer = starObj.GetComponent<ParticleSystemRenderer>();
         if (smokeMaterial != null) starRenderer.material = smokeMaterial;
@@ -286,7 +286,7 @@ public class IncenseInteraction : MonoBehaviour
         starMain.startSpeed = 0.1f;
         starMain.startSize = new ParticleSystem.MinMaxCurve(0.02f, 0.05f); // 粒子非常小，像星光
         starMain.startColor = new Color(0.7f, 1f, 1f, 1f); // 高亮青白色
-        starMain.gravityModifier = -0.05f; 
+        starMain.gravityModifier = -0.05f;
 
         var starEmission = starPS.emission;
         starEmission.rateOverTime = 20f; // 产生20颗/秒的散落星芒
@@ -316,6 +316,6 @@ public class IncenseInteraction : MonoBehaviour
         // 随机乱飘感 (Noise)
         var noise = starPS.noise;
         noise.enabled = true;
-        noise.strength = 0.3f; 
+        noise.strength = 0.3f;
     }
 }

@@ -3,25 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public enum StateEnum
 {
     Hidden,
     Matched,
 }
 
-
-
 public class Card : MonoBehaviour
 {
-
     bool _rotating;
-
-  public StateEnum CurrentState { get; private set; }
+    public StateEnum CurrentState { get; private set; }
     Material _selfMat;
 
     public string FruitName { get; private set; }
-    
+
     public void Initial(string fruitName)
     {
         FruitName = fruitName;
@@ -38,16 +33,10 @@ public class Card : MonoBehaviour
         }
     }
 
-
-
-
     public void SwitchState(StateEnum targetState)
     {
         CurrentState = targetState;
     }
-
-
-
 
     public void Rotate(bool toFront = true)
     {
@@ -56,15 +45,12 @@ public class Card : MonoBehaviour
             return;
         }
 
-
         _rotating = true;
 
         GameManager.Instance.AddCard(this);
 
         StartCoroutine(RotateCor(toFront));
-
     }
-
 
     IEnumerator RotateCor(bool toFront)
     {
@@ -75,7 +61,6 @@ public class Card : MonoBehaviour
         Quaternion originRot = transform.rotation;
         Quaternion desRot = tmp.transform.rotation;
         Destroy(tmp);
-
 
         while (true)
         {
@@ -88,10 +73,8 @@ public class Card : MonoBehaviour
                 break;
             }
 
-
             yield return null;
         }
-
 
         _rotating = false;
 
@@ -105,9 +88,7 @@ public class Card : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
             GameManager.Instance.Clear();
         }
-
     }
-
 
     public void Highlight()
     {
@@ -117,6 +98,5 @@ public class Card : MonoBehaviour
     public void Normal()
     {
         _selfMat.color = Color.white;
-
     }
 }

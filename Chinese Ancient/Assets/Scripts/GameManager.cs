@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
 class FruitConfig
 {
     public List<string> FruitList;
 }
-
 
 public class GameManager : MonoBehaviour
 {
@@ -24,10 +22,8 @@ public class GameManager : MonoBehaviour
     List<Card> _compareCardList;
     List<Card> _rotateCardList;
 
-
     int step;
     bool _gameover;
-
 
     // Start is called before the first frame update
     void Start()
@@ -40,8 +36,6 @@ public class GameManager : MonoBehaviour
 
         string config = Resources.Load<TextAsset>("config").text;
         var fruits = JsonUtility.FromJson<FruitConfig>(config);
-
-
 
         List<string> randomList = new List<string>();
         List<string> originList = new List<string>();
@@ -62,7 +56,6 @@ public class GameManager : MonoBehaviour
             originList.RemoveAt(random);
         }
 
-
         Vector3 offset = Vector3.down * (row - 1) / 2 * (_cardH + _spaceY) + Vector3.left * (col - 1) / 2 * (_cardH + _spaceX);
         for (int i = 0; i < row; i++)
         {
@@ -80,12 +73,6 @@ public class GameManager : MonoBehaviour
 
     }
 
-
-
-
-
-
-
     // Update is called once per frame
     void Update()
     {
@@ -93,7 +80,6 @@ public class GameManager : MonoBehaviour
         {
             return;
         }
-
 
         MouseDetect();
         MouseInput();
@@ -118,7 +104,6 @@ public class GameManager : MonoBehaviour
         _rotateCardList.Add(card);
     }
 
-
     public void CompareCards(Card card)
     {
         _compareCardList.Add(card);
@@ -133,10 +118,6 @@ public class GameManager : MonoBehaviour
                 {
                     Victory();
                 }
-
-
-
-
             }
             else
             {
@@ -194,7 +175,6 @@ public class GameManager : MonoBehaviour
                 _currentTarget.Highlight();
             }
 
-
         }
         else if (_currentTarget!=null)
         {
@@ -205,7 +185,6 @@ public class GameManager : MonoBehaviour
 
     bool IsVictory()
     {
-
         bool isVictory = true;
         for (int i = 0; i < _cardList.Count; i++)
         {

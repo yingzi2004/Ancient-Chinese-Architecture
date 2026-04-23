@@ -44,7 +44,7 @@ public class PlayerHandsAnim : MonoBehaviour
     {
         // 尝试获取玩家控制器，如果在鞠躬期间需要禁用玩家的鼠标控制，就锁定它
         PlayerController playerCtrl = mainCamera.GetComponentInParent<PlayerController>();
-        if (playerCtrl == null && Camera.main != null) 
+        if (playerCtrl == null && Camera.main != null)
             playerCtrl = Camera.main.GetComponentInParent<PlayerController>();
 
         if (playerCtrl != null)
@@ -67,7 +67,7 @@ public class PlayerHandsAnim : MonoBehaviour
             {
                 t += Time.deltaTime;
                 float percent = Mathf.SmoothStep(0, 1, t / (singleBowDuration / 2));
-                
+
                 mainCamera.localRotation = Quaternion.Slerp(originalCamRot, targetCamBowRot, percent);
                 yield return null;
             }
@@ -78,11 +78,11 @@ public class PlayerHandsAnim : MonoBehaviour
             {
                 t += Time.deltaTime;
                 float percent = Mathf.SmoothStep(0, 1, t / (singleBowDuration / 2));
-                
+
                 mainCamera.localRotation = Quaternion.Slerp(targetCamBowRot, originalCamRot, percent);
                 yield return null;
             }
-            
+
             // 微微停顿一下，让每一拜有力量感
             yield return new WaitForSeconds(0.2f);
         }
