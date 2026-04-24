@@ -6,7 +6,7 @@ public class PuzzlePiece : MonoBehaviour, IInteractable
     [HideInInspector] public bool isCorrect = false;
     private float targetAngle = 0f;
     [Header("旋转校正")]
-    public float baseOffset = 0f; // 针对你旋转90度墙面的修正
+    public float baseOffset = 0f;
     public void Interact()
     {
         OnInteract();
@@ -33,7 +33,7 @@ public class PuzzlePiece : MonoBehaviour, IInteractable
         float currentZ = Mathf.Repeat(targetAngle, 360f);
         isCorrect = (Mathf.Abs(currentZ) < 0.1f);
     }
-    // 外部调用：强制同步状态（用于加载存档后）
+    // 外部调用：强制同步状态
     public void CheckStatus()
     {
         // 反推 targetAngle，防止后续旋转错乱

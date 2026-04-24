@@ -13,7 +13,6 @@ public class ObjectManager : MonoBehaviour
             transform.Translate(Vector3.down * fallSpeed * Time.deltaTime);
         }
     }
-
     // 由 DrawPath.cs 在判定成功时调用
     public void StartFalling()
     {

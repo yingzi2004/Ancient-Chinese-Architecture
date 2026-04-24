@@ -21,7 +21,6 @@ public class PlayerPositionRestorer : MonoBehaviour
 
     void Start()
     {
-        // 查找玩家对象
         if (player == null)
         {
             PlayerController playerController = FindObjectOfType<PlayerController>();
@@ -37,7 +36,6 @@ public class PlayerPositionRestorer : MonoBehaviour
             return;
         }
 
-        // 检查是否从纸牌游戏场景返回
         string previousScene = PlayerPrefs.GetString("PreviousScene", "");
 
         // 只有从纸牌游戏返回时才恢复位置
@@ -70,7 +68,7 @@ public class PlayerPositionRestorer : MonoBehaviour
 
                 finalRotation = Quaternion.Euler(rotX, rotY, rotZ);
 
-                // 应用偏移（如果启用）
+                // 应用偏移
                 if (enableReturnOffset)
                 {
                     // 根据玩家的朝向计算偏移

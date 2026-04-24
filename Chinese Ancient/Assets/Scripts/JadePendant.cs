@@ -59,7 +59,6 @@ public class JadePendant : MonoBehaviour
             originalMaterial = rend.material;
         }
 
-        // 如果没有设置玩家引用，尝试通过标签查找
         if (playerTransform == null)
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -69,7 +68,7 @@ public class JadePendant : MonoBehaviour
             }
             else
             {
-                // 尝试查找Main Camera
+
                 Camera mainCam = Camera.main;
                 if (mainCam != null)
                 {
@@ -82,7 +81,6 @@ public class JadePendant : MonoBehaviour
             }
         }
 
-        // 检查碰撞体
         if (col == null)
         {
             Debug.LogWarning($"[{gameObject.name}] 没有找到Collider组件，已自动添加BoxCollider");
@@ -91,10 +89,8 @@ public class JadePendant : MonoBehaviour
         }
         // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
 
-        // 查找任务管理器
         questManager = FindObjectOfType<JadePendantQuestManager>();
 
-        // 自动添加发光效果组件
         if (useGlowEffect && GetComponent<ItemGlowHighlight>() == null)
         {
             gameObject.AddComponent<ItemGlowHighlight>();
@@ -106,14 +102,12 @@ public class JadePendant : MonoBehaviour
     {
         if (!canBePickedUp) return;
 
-        // 检查玩家是否在拾取范围内
         bool inRange = IsPlayerInRange();
 
         if (inRange)
         {
             HighlightObject();
 
-            // 键盘拾取 - 添加调试信息
             if (allowKeyboardPickup)
             {
                 if (Input.GetKeyDown(KeyCode.E))
@@ -133,7 +127,6 @@ public class JadePendant : MonoBehaviour
     {
         if (!canBePickedUp || !allowClickPickup) return;
 
-        // 检查距离
         if (IsPlayerInRange())
         {
             Pickup();
@@ -153,27 +146,22 @@ public class JadePendant : MonoBehaviour
 
         Debug.Log($"拾取了玉佩: {pendantId}");
 
-        // 通知任务管理器
         if (questManager != null)
         {
             questManager.OnJadePendantPickedUp(this);
         }
 
-        // 通知玩家拾取系统
         if (PlayerPickup.Instance != null)
         {
             PlayerPickup.Instance.AddPendantToInventory(this);
         }
 
-        // 通知绑定的NPC切换对话剧本
         if (targetNPC != null)
         {
             Debug.Log($"玉佩拾取：正在通知 NPC ({targetNPC.gameObject.name}) 切换到备用对话 {targetAlternateNodeIndex}");
             targetNPC.SwitchAlternateDialogue(targetAlternateNodeIndex);
         }
 
-
-        // 禁用碰撞体和渲染
         if (col != null) col.enabled = false;
         if (rend != null) rend.enabled = false;
 
@@ -234,7 +222,6 @@ public class JadePendant : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, pickupRange);
 
-        // 绘制到玩家的连线
         if (playerTransform != null)
         {
             Gizmos.color = IsPlayerInRange() ? Color.green : Color.red;
@@ -244,7 +231,6 @@ public class JadePendant : MonoBehaviour
 
     void OnGUI()
     {
-        // 显示拾取提示
         if (canBePickedUp && IsPlayerInRange() && rend != null && rend.enabled)
         {
             Camera cam = Camera.main;

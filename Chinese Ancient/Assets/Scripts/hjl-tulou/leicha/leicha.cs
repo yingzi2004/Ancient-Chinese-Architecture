@@ -68,13 +68,12 @@ public class LeichaController : MonoBehaviour
                     }
                     else
                     {
-                        // 点击了其他物体，忽略
+
                         Debug.Log("Clicked other object while waiting for Slot1: " + hitObj.name);
                     }
                 }
                 else
                 {
-                    // 已选中 Slot1：检查是否点击了 Slot2 或其子对象
                     if (IsMatch(hitObj, slot2))
                     {
                         // 触发生成或激活
@@ -84,7 +83,7 @@ public class LeichaController : MonoBehaviour
                     }
                     else
                     {
-                        // 点击了非 Slot2：取消选择（恢复为未选中 Slot1 状态）
+                        // 点击了非 Slot2：取消选择
                         slot1Selected = false;
                         Debug.Log("Slot1 selection cancelled by clicking other object: " + hitObj.name);
                     }
@@ -118,7 +117,6 @@ public class LeichaController : MonoBehaviour
 
         Debug.Log($"SpawnOrActivate called. spawnPrefab reference: {spawnPrefab.name}, scene valid: {spawnPrefab.scene.IsValid()}, activeInHierarchy: {spawnPrefab.activeInHierarchy}");
 
-        // 如果 spawnPrefab 指向场景内对象（已放好位置和角度），则直接激活
         if (spawnPrefab.scene.IsValid())
         {
             if (!spawnPrefab.activeInHierarchy)
@@ -134,7 +132,6 @@ public class LeichaController : MonoBehaviour
             return;
         }
 
-        // 否则视为预制件资源 -> 在相机前方实例化
         Camera cam = Camera.main;
         if (cam == null) return;
 

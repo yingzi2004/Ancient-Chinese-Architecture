@@ -9,7 +9,6 @@ public class UIManager : MonoBehaviour
 
     Text _step;
 
-    // Start is called before the first frame update
     void Start()
     {
         _step = transform.Find("Text").GetComponent<Text>();
@@ -21,7 +20,6 @@ public class UIManager : MonoBehaviour
         _step.text = "STEP:" + step;
     }
 
-    // Update is called once per frame
     void Update()
     {
 

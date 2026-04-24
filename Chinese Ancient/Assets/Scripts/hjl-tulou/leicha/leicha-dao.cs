@@ -35,11 +35,11 @@ public class LeichaDao : MonoBehaviour
 
     void Reset()
     {
-        // 确保有碰撞体以接收点击事件（OnMouseDown）
+        // 确保有碰撞体以接收点击事件
         if (GetComponent<Collider>() == null)
         {
             var box = gameObject.AddComponent<BoxCollider>();
-            // 如果没有渲染器，碰撞体尺寸可能不合适；这里先用默认值（Unity 会按默认 BoxCollider 尺寸创建）
+            // 如果没有渲染器，碰撞体尺寸可能不合适；这里先用默认值
         }
     }
 
@@ -58,7 +58,7 @@ public class LeichaDao : MonoBehaviour
         Vector3 startPos = transform.localPosition;
         Quaternion startRot = transform.localRotation;
 
-        // 如果设置了 pourTarget，则先水平转向目标（仅绕 local up 轴）
+        // 如果设置了 pourTarget，则先水平转向目标
         Quaternion alignedRot = startRot;
         if (pourTarget != null && yawAlignDuration > 0f)
         {
@@ -67,7 +67,7 @@ public class LeichaDao : MonoBehaviour
             Vector3 toTargetProj = Vector3.ProjectOnPlane(toTarget, transform.up);
             if (toTargetProj.sqrMagnitude > 0.0001f)
             {
-                // 目标朝向（世界空间），取 Y 轴偏转角
+                // 目标朝向，取 Y 轴偏转角
                 float targetYaw = Mathf.Atan2(toTargetProj.x, toTargetProj.z) * Mathf.Rad2Deg;
                 float currentYaw = transform.eulerAngles.y;
                 float yawOffset = Mathf.DeltaAngle(currentYaw, targetYaw);
@@ -86,7 +86,7 @@ public class LeichaDao : MonoBehaviour
             }
         }
 
-        // 计算抬起目标位置（沿 local up 方向）
+        // 计算抬起目标位置
         Vector3 targetPos = startPos + transform.InverseTransformVector(Vector3.up) * liftHeight;
 
         float tt = 0f;
@@ -101,7 +101,7 @@ public class LeichaDao : MonoBehaviour
 
         // 倾斜倒茶
         tt = 0f;
-        Quaternion pourStartRot = transform.localRotation; // use current (may be aligned)
+        Quaternion pourStartRot = transform.localRotation; 
         Quaternion targetRot = pourStartRot * Quaternion.AngleAxis(pourAngle, pourAxis.normalized);
         while (tt < pourDuration)
         {
@@ -114,7 +114,7 @@ public class LeichaDao : MonoBehaviour
         // 保持
         yield return new WaitForSeconds(holdDuration);
 
-        // 回正（回到抬起后的旋转）
+        // 回正
         tt = 0f;
         while (tt < returnDuration)
         {
@@ -123,7 +123,6 @@ public class LeichaDao : MonoBehaviour
             transform.localRotation = Quaternion.Slerp(targetRot, pourStartRot, f);
             yield return null;
         }
-
         // 放下
         tt = 0f;
         while (tt < returnDuration)

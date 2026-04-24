@@ -12,11 +12,10 @@ public class DrawPath : MonoBehaviour
     public float lineWidth = 0.01f;
     // 线条相对碰撞体表面的偏移量（防止闪烁，数值要非常小）
     public float surfaceOffset = 0.001f;
-    // 真正用于发射射线的摄像机（拖玩家视角的那台摄像机进来）
     public Camera drawCamera;
     
     [Header("Objects")]
-    public Collider fanweiCollider; // 拖动判定范围（改成3D的Collider）
+    public Collider fanweiCollider; // 拖动判定范围
     public GameObject object1;        // 1物体
     public GameObject objectFanwei;   // fanwei物体
     public GameObject objectDrop1;    // 掉1物体
@@ -33,8 +32,6 @@ public class DrawPath : MonoBehaviour
     public float maxDrawDistance = 3f;
 
     private List<Vector3> points = new List<Vector3>();
-
-    // 认为“绕一圈”所需的最少采样点数量，可以在 Inspector 中调整
     public int requiredPoints = 120;
 
     // 第一阶段画轮廓，第二阶段点击掉2
@@ -66,7 +63,6 @@ public class DrawPath : MonoBehaviour
         if (lineRenderer == null)
             lineRenderer = GetComponent<LineRenderer>();
 
-        // 如果场景里没有现成的 LineRenderer，就在当前物体上自动创建一个
         if (lineRenderer == null)
         {
             lineRenderer = gameObject.AddComponent<LineRenderer>();
@@ -87,13 +83,11 @@ public class DrawPath : MonoBehaviour
             lineRenderer.sortingOrder = 10;
         }
 
-        // 默认使用 Camera.main，但推荐在 Inspector 里手动指定玩家视角的摄像机
         if (drawCamera == null)
         {
             drawCamera = Camera.main;
         }
 
-        // 初始状态下隐藏掉落物体、成品
         if (objectDrop1 != null) objectDrop1.SetActive(false);
         if (objectDrop2 != null) objectDrop2.SetActive(false);
         if (object3 != null)     object3.SetActive(false);
@@ -103,13 +97,13 @@ public class DrawPath : MonoBehaviour
 
     void Update()
     {
-        // 核心：按下 F 键来进入/退出剪纸模式
+
         HandleInteractionToggle();
 
         // 只有进入了固定的交互模式，才能画线或点击
         if (!isInteracting) return;
 // AI辅助生成：DeepSeek-R1-0528, 2026-04-23 (优化点：阶段分支简化)
-        // 优先判断第二阶段：只要掉2已经显示并且还没完成第二阶段，就处理点击逻辑
+
         if (!secondStageDone && objectDrop2 != null && objectDrop2.activeInHierarchy)
         {
             HandleSecondStage();
@@ -125,7 +119,7 @@ public class DrawPath : MonoBehaviour
     {
         if (object1 == null || drawCamera == null) return;
 
-        // 如果还没完成剪纸（第一或第二阶段还没结束）才允许进入
+        // 如果还没完成剪纸才允许进入
         if (secondStageDone) 
         {
             if (hintUI != null && hintUI.activeSelf) hintUI.SetActive(false);
@@ -169,9 +163,8 @@ public class DrawPath : MonoBehaviour
                             playerController.transform.SetPositionAndRotation(targetPos, viewPoint.rotation);
                             if (playerController.cameraTransform != null)
                             {
-                                // 获取 ViewPoint 的 X 轴旋转并加上微调参数（俯仰角）赋给摄像机
+                                // 获取 ViewPoint 的 X 轴旋转并加上微调参数赋给摄像机
                                 playerController.cameraTransform.localRotation = Quaternion.Euler(viewPoint.localEulerAngles.x + pitchOffset, 0f, 0f);
-                                // 同时把玩家整体赋上 ViewPoint 的 Y 轴旋转
                                 playerController.transform.rotation = Quaternion.Euler(0f, viewPoint.eulerAngles.y, 0f);
                             }
                         }
@@ -179,14 +172,13 @@ public class DrawPath : MonoBehaviour
                         playerController.isInspecting = true;
                         playerController.SetCursorState(false); 
                     }
-                    useScreenCenter = false; // 强行改为使用鼠标来画线
+                    useScreenCenter = false; 
                     Cursor.visible = true;
                     Cursor.lockState = CursorLockMode.None;
                     Debug.Log("剪纸模式：开启正视角交互");
                 }
                 else
                 {
-                    // 退出交互模式，恢复视角移动和位置
                     if (playerController != null)
                     {
                         // 还原位置和旋转
@@ -205,7 +197,7 @@ public class DrawPath : MonoBehaviour
         }
         else
         {
-            // 离得太远自动退出
+
             if (isInteracting)
             {
                 isInteracting = false;
@@ -224,11 +216,9 @@ public class DrawPath : MonoBehaviour
         }
     }
 
-    // 第一阶段：画线裁剪 1 + fanwei，触发 掉1
     void HandleFirstStage()
     {
-        // ... 原本关于距离判断被移到了 HandleInteractionToggle 去了，这里只需要专心画线
-        // 鼠标按下，开始绘制，清空之前的轨迹
+
         if (Input.GetMouseButtonDown(0))
         {
             Debug.Log("DrawPath: MouseButtonDown");
@@ -245,7 +235,7 @@ public class DrawPath : MonoBehaviour
                 return;
             }
 
-            // 通过射线检测准心（或是鼠标）所指的空间位置
+            // 通过射线检测准心所指的空间位置
             Vector3 screenPos = useScreenCenter
                 ? new Vector3(Screen.width / 2f, Screen.height / 2f, 0f)
                 : (Vector3)Input.mousePosition;
@@ -253,11 +243,10 @@ public class DrawPath : MonoBehaviour
             Ray ray = drawCamera.ScreenPointToRay(screenPos);
             RaycastHit hit;
             
-            // 使用射线碰触到物体的位置。如果在3D中，你需要确保背景或者画布上有碰撞体（比如BoxCollider）
+            // 使用射线碰触到物体的位置。如果在3D中，你需要确保背景或者画布上有碰撞体
             if (Physics.Raycast(ray, out hit, 100f))
             {
-                // 让线条紧贴在被射中的表面上
-                // 使用命中点 + 法线 * 一个很小的偏移量
+
                 Vector3 worldPos = hit.point + hit.normal * surfaceOffset;
 
                 Debug.DrawRay(ray.origin, ray.direction * hit.distance, Color.green, 0.1f);
@@ -326,8 +315,7 @@ public class DrawPath : MonoBehaviour
 
         // 掉2 在屏幕上的坐标
         Vector3 drop2ScreenPos = drawCamera.WorldToScreenPoint(objectDrop2.transform.position);
-        
-        // 既然进入了F交互固定模式，用的是鼠标而不是准心
+
         Vector2 checkPoint = Input.mousePosition;
 
         float dist = Vector2.Distance(checkPoint, new Vector2(drop2ScreenPos.x, drop2ScreenPos.y));
@@ -364,17 +352,10 @@ public class DrawPath : MonoBehaviour
         }
     }
 
-    // 路径判定逻辑：检测画的点是否在 fanwei 范围内
     bool CheckDrawSuccess()
     {
-        // 点数太少，说明划得不够长，直接失败
+        // 点数太少，失败
         if (points.Count < requiredPoints) return false;
-
-        // 我们在 Update 里已经限制只有射到 fanweiCollider 才会记录点，
-        // 所以这里简单用“长度够不够”来当作是否绕完一圈的判定即可。
-        // 如果你之后想更严格，可以再在这里加入更复杂的判断。
-
-        // 只要点数达到要求，就判定成功
         return true;
     }
 }

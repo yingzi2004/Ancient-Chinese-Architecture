@@ -13,7 +13,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
 
     [Header("对话内容")]
     [SerializeField] private string npcDisplayName = "按L键继续  小微"; // NPC显示名称
-    [SerializeField] private Sprite portraitSprite; // 默认立绘图片
+    [SerializeField] private Sprite portraitSprite; 
 
     [SerializeField] private Sprite[] expressionPortraits;
 
@@ -55,7 +55,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
     [Header("事件设置")]
     public UnityEngine.Events.UnityEvent onDialogueEnd = new UnityEngine.Events.UnityEvent();
 
-    // 静态内存（整个游戏运行期间共享）
+    // 静态内存
     private static System.Collections.Generic.HashSet<string> playedDialogueHashes = new System.Collections.Generic.HashSet<string>();
     private static System.Collections.Generic.HashSet<string> triggeredGroupIDs = new System.Collections.Generic.HashSet<string>();
     private static System.Collections.Generic.HashSet<string> globalTriggeredLocationIDs = new System.Collections.Generic.HashSet<string>();
@@ -93,7 +93,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
                 DestroyImmediate(existingPanel);
             }
 
-            // 创建DialogueManager GameObject
+            //创建DialogueManager GameObject
             GameObject dmObj = new GameObject("DialogueManager_AutoCreated");
             DontDestroyOnLoad(dmObj); // 防止被意外销毁
             dialogueManager = dmObj.AddComponent<DialogueManager>();
@@ -133,7 +133,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
             Debug.Log($"[{locationName}] 创建了Canvas");
         }
 
-        // 创建DialoguePanel
+        //创建DialoguePanel
         GameObject panelObj = new GameObject("DialoguePanel");
         panelObj.transform.SetParent(canvas.transform, false);
 
@@ -144,22 +144,16 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
 
         Image panelImage = panelObj.AddComponent<Image>();
         panelImage.color = new Color(0.1f, 0.1f, 0.1f, 0.95f);
-
-        // 创建立绘图片 - 显示在左上方
         GameObject portraitObj = CreatePortraitImage(panelObj.transform);
-
-        // 创建NPC名称 - 显示在右下角，包含继续提示
         GameObject nameObj = CreateTextElement(panelObj.transform, "NPCName", npcDisplayName,
             new Vector2(1, 0), new Vector2(-10, 10), new Vector2(280, 30), 18);
         Text nameText = nameObj.GetComponent<Text>();
         nameText.alignment = TextAnchor.MiddleRight;
-        nameText.color = new Color(0.8f, 0.8f, 0.8f, 1f); // 浅灰色
+        nameText.color = new Color(0.8f, 0.8f, 0.8f, 1f); 
 
-        // 创建对话内容 - 显示在立绘右侧
         GameObject dialogueObj = CreateTextElement(panelObj.transform, "DialogueText", "对话内容...",
             new Vector2(0.5f, 0.5f), new Vector2(60, 0), new Vector2(450, 100), 18);
 
-        // 创建继续提示 - 已合并到NPC名称中，但仍保留用于DialogueManager
         GameObject continueObj = CreateTextElement(panelObj.transform, "ContinuePrompt", "",
             new Vector2(0.5f, 0), new Vector2(0, 5), new Vector2(300, 30), 16);
         continueObj.SetActive(false); // 隐藏，因为已经在NPC名称中显示
@@ -214,7 +208,6 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
         GameObject portraitObj = new GameObject("PortraitImage");
         portraitObj.transform.SetParent(parent, false);
 
-        // 设置RectTransform - 位置在左上方
         RectTransform portraitRect = portraitObj.AddComponent<RectTransform>();
         portraitRect.anchorMin = new Vector2(0, 1); // 左上角锚点
         portraitRect.anchorMax = new Vector2(0, 1);
@@ -252,7 +245,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
 
     private Sprite LoadPortraitSprite()
     {
-        // 使用AssetDatabase加载（仅编辑器）
+        // 使用AssetDatabase加载
         #if UNITY_EDITOR
         string[] possiblePaths = new string[]
         {
@@ -317,21 +310,21 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
 
         Debug.Log($"[{locationName}] 检测到碰撞，对象: {other.name}");
 
-        // 0. 外部前置任务检查（例如交出火折子亮灯笼后才能触发）
+        //外部前置任务检查
         if (requireExternalCondition && !isConditionMet)
         {
             Debug.Log($"[{locationName}] 前置任务暂未满足，不弹对话，跳过");
             return;
         }
 
-        // 1. 本地单次触发检查
+        //本地单次触发检查
         if (triggerOnce && hasTriggered)
         {
             Debug.Log($"[{locationName}] 已触发过，跳过");
             return;
         }
 
-        // 1.5 跨场景全局单次触发检查（依靠 场景名+LocationName 锁定唯一身份）
+        //跨场景全局单次触发检查
         string globalId = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name + "_" + locationName;
         if (triggerOncePerGameSession && globalTriggeredLocationIDs.Contains(globalId))
         {
@@ -339,14 +332,14 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
             return;
         }
 
-        // 2. 组级触发检查 (不同位置的同组触发器实现"一方触发，全组静默")
+        //组级触发检查
         if (!string.IsNullOrEmpty(sharedGroupID) && triggeredGroupIDs.Contains(sharedGroupID))
         {
             Debug.Log($"[{locationName}] 同组 '{sharedGroupID}' 的其他触发器已触发过，跳过");
             return;
         }
 
-        // 3. 全局文案去重检查 (只要说过这句话，就在全游戏里不再触发同一句话)
+        //全局文案去重检查
         if (globalPreventSameDialogue && playedDialogueHashes.Contains(GetDialogueHash()))
         {
             Debug.Log($"[{locationName}] 相同的文案早已在别处播放过，防重复去重生效，跳过");
@@ -410,7 +403,6 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
             processedLines[i] = line;
         }
 
-        // 开始对话 - 使用配置的NPC显示名称和处理后的富文本台词，并传递延后显示的索引
         dialogueManager.StartAutoDialogue(npcDisplayName, processedLines, portraitSprite, expressionPortraits, () => {
             Debug.Log($"[{locationName}] 对话结束回调触发！正在调用 onDialogueEnd ({onDialogueEnd?.GetPersistentEventCount() ?? 0} 个监听器)");
 
@@ -493,9 +485,6 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
         TriggerDialogue();
     }
 
-    /// <summary>
-    /// 被外部事件调用：标记任务已完成，并且如果玩家正身处触发器范围内，自动立刻弹对话开始！
-    /// </summary>
     public void SetConditionMet()
     {
         if (requireExternalCondition && !isConditionMet)
@@ -503,7 +492,7 @@ public class LocationDialogueTrigger_Auto : MonoBehaviour
             isConditionMet = true;
             Debug.Log($"[{locationName}] 前置任务已满足，触发器状态：{isConditionMet}。允许和小微对话了！");
 
-            // （可选）体贴功能：如果玩家交火折子的时候刚好就站在这段对话触发器圈子里，就让他直接触发对白
+            //体贴功能：如果玩家交火折子的时候刚好就站在这段对话触发器圈子里，就让他直接触发对白
             if (isPlayerInTrigger && !hasTriggered)
             {
                 Invoke(nameof(TriggerDialogue), triggerDelay);

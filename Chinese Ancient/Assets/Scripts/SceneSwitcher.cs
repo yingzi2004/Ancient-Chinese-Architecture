@@ -37,7 +37,6 @@ public class SceneSwitcher : MonoBehaviour
 
     void Update()
     {
-        // 防止重复触发
         if (playerInZone)
         {
             return;
@@ -46,7 +45,6 @@ public class SceneSwitcher : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        // 检查进入的是否是玩家
         if (IsPlayer(other))
         {
             Debug.Log("玩家进入区域，准备跳转...");
@@ -65,7 +63,6 @@ public class SceneSwitcher : MonoBehaviour
 
     bool IsPlayer(Collider col)
     {
-        // 检查碰撞体是否属于玩家
         if (col.GetComponent<PlayerController>() != null)
             return true;
         if (col.GetComponentInParent<PlayerController>() != null)
