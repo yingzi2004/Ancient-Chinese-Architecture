@@ -5,11 +5,9 @@ public class LotusFlower : MonoBehaviour
     public Transform player;
     public Transform playerHand;
     public Transform npc;
-    [Header("距离与按键设置")]
+    [Header("距离设置")]
     public float pickDistance = 3f;
-    public KeyCode pickKey = KeyCode.R;
     public float giveDistance = 4f;
-    public KeyCode giveKey = KeyCode.F;
     [Header("完成任务后的对话（必须在这个脚本配好新的对话）")]
     public DialogNode afterGiveDialogNode;
     // 状态标记
@@ -34,20 +32,40 @@ public class LotusFlower : MonoBehaviour
     }
     private void Update()
     {
-        if (player == null) return;
+        if (player == null || Camera.main == null) return;
         //还没摘取荷花，此时判断玩家和荷花的距离
         if (!isPicked)
         {
-            if (Input.GetKeyDown(pickKey))
+            if (Input.GetMouseButtonDown(0))
             {
                 float distToPlayer = Vector3.Distance(transform.position, player.position);
                 if (distToPlayer <= pickDistance)
                 {
-                    PickLotus();
+                    // 使用 RaycastAll 以防被玩家自身碰撞体或水面挡住射线，延长射线距离（100米）
+                    Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0));
+                    RaycastHit[] hits = Physics.RaycastAll(ray, 100f);
+                    bool hitTarget = false;
+                    foreach (var hit in hits)
+                    {
+                        if (hit.transform == transform || hit.transform.IsChildOf(transform))
+                        {
+                            hitTarget = true;
+                            break;
+                        }
+                    }
+                    if (hitTarget)
+                    {
+                        PickLotus();
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"<color=yellow>[交互提示]</color> 距离已满足，但是准心没对准！\n如果已对准但还是不行，请检查【荷花物体】上是否添加了碰撞体组件（如 BoxCollider）！射线必须有Collider才能点到。");
+                    }
                 }
                 else
                 {
-                    Debug.Log($"<color=yellow>[采摘交互]</color> 距离荷花太远啦，当前距离: {distToPlayer:F2}米，要求距离内: {pickDistance}米。由于你乘船位置比较高，可以在荷花物体面板里把 Pick Distance 调大！");
+                    // 这里原本太远时不处理交互，为了让你知道点击生效了，打印一下
+                    // Debug.Log($"距离荷花太远，当前: {distToPlayer}");
                 }
             }
         }
@@ -58,9 +76,27 @@ public class LotusFlower : MonoBehaviour
                 float distToNPC = Vector3.Distance(player.position, npc.position);
                 if (distToNPC <= giveDistance)
                 {
-                    if (Input.GetKeyDown(giveKey))
+                    if (Input.GetMouseButtonDown(0))
                     {
-                        GiveLotusToNPC();
+                        Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0));
+                        RaycastHit[] hits = Physics.RaycastAll(ray, 100f);
+                        bool hitTarget = false;
+                        foreach (var hit in hits)
+                        {
+                            if (hit.transform == npc || hit.transform.IsChildOf(npc))
+                            {
+                                hitTarget = true;
+                                break;
+                            }
+                        }
+                        if (hitTarget)
+                        {
+                            GiveLotusToNPC();
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"<color=yellow>[交互提示]</color> 距离已满足，但是准心没对准NPC！\n如果已对准但还是不行，请检查【NPC物体】上是否添加了碰撞体组件（如 CapsuleCollider）！");
+                        }
                     }
                 }
             }
