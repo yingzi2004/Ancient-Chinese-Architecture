@@ -644,6 +644,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 46aea0de3dc2c2f438e02ea8c390e96e, type: 2}
+    - target: {fileID: -7397158834706353517, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 5e45e16c4b590b6448a6bdaebfd6d46f, type: 2}
     - target: {fileID: -6753687876025476286, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -1167,21 +1171,22 @@ PrefabInstance:
     - {fileID: 3203068458227806081, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
     - {fileID: 4546319889483900761, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
     - {fileID: 1962503148591899727, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
+    - {fileID: 1541266533953965305, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
       insertIndex: 1
       addedObject: {fileID: 802130798}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
-      insertIndex: 42
+      insertIndex: 41
       addedObject: {fileID: 1037811860}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
-      insertIndex: 43
+      insertIndex: 42
       addedObject: {fileID: 1833004757}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
-      insertIndex: 78
+      insertIndex: 77
       addedObject: {fileID: 768512484}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
-      insertIndex: 89
+      insertIndex: 88
       addedObject: {fileID: 1361431371}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
@@ -26878,7 +26883,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2695773338078281011, guid: a20808725880635478df5d8f37382c2c, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 97.92
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2695773338078281011, guid: a20808725880635478df5d8f37382c2c, type: 3}
       propertyPath: m_AnchoredPosition.x
