@@ -81,10 +81,10 @@ public class DialogueManager : MonoBehaviour
     private bool currentPreparedIsPlayer;
     private string currentPreparedSpeaker;
 
-    private Sprite defaultPortrait; // 默认立绘保存
-    private Sprite[] currentExpressions; // 当前对话序列对应的表情差分
+    private Sprite defaultPortrait; 
+    private Sprite[] currentExpressions; 
     
-    private int currentPortraitRevealIndex = 0; // 当前序列的立绘隐藏阈值
+    private int currentPortraitRevealIndex = 0; 
     private int currentNameRevealIndex = 0; // 当前序列的名字隐藏阈值
     private System.Action currentDialogueCallback; // 当前对话结束的回调
 
@@ -121,7 +121,7 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        // 自动查找UI元素（如果没有手动赋值）
+        // 自动查找UI元素
         AutoFindUIElements();
 
         // 检查UI元素是否正确加载
@@ -173,7 +173,7 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        // 默认开启说话人前缀解析（我：/NPC：/小谷：）
+        // 默认开启说话人前缀解析
         parseSpeakerPrefix = true;
     }
 
@@ -205,7 +205,7 @@ public class DialogueManager : MonoBehaviour
 
         if ((dialogueText != null || dialogueTextTMP != null) && currentDialogueSequence != null && currentDialogueIndex < currentDialogueSequence.Length)
         {
-            // 使用已准备好的文本（已去掉前缀并设置过说话人）
+            // 使用已准备好的文本
             if (string.IsNullOrEmpty(currentPreparedText))
             {
                 PrepareLine(currentDialogueSequence[currentDialogueIndex]);
@@ -229,7 +229,6 @@ public class DialogueManager : MonoBehaviour
 
     private void AutoFindUIElements()
     {
-        // 查找DialoguePanel
         if (dialoguePanel == null)
         {
             GameObject panel = GameObject.Find("DialoguePanel");
@@ -244,14 +243,11 @@ public class DialogueManager : MonoBehaviour
                 return;
             }
         }
-
-        // 查找NPCName Text
         if (npcNameText == null && npcNameTextTMP == null && dialoguePanel != null)
         {
             Transform nameTransform = dialoguePanel.transform.Find("NPCName");
             if (nameTransform == null) nameTransform = dialoguePanel.transform.Find("GuideNameText");
-            
-            // 尝试深度查找
+
             if (nameTransform == null)
             {
                 foreach (Text t in dialoguePanel.GetComponentsInChildren<Text>(true))
@@ -284,7 +280,6 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        // 查找DialogueText Text
         if (dialogueText == null && dialogueTextTMP == null && dialoguePanel != null)
         {
             Transform textTransform = dialoguePanel.transform.Find("DialogueText");
@@ -321,7 +316,6 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        // 查找OptionsContainer
         if (optionsContainer == null)
         {
             Transform containerTransform = dialoguePanel.transform.Find("OptionsContainer");
@@ -332,7 +326,7 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        // 查找选项按钮预制体（从Resources文件夹加载）
+        // 查找选项按钮预制体
         if (optionButtonPrefab == null)
         {
             optionButtonPrefab = Resources.Load<GameObject>("Prefabs/OptionButton");
@@ -421,7 +415,7 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        // 默认先显示NPC名（如果欢迎语带前缀，会在PrepareLine里覆盖）
+        // 默认先显示NPC名
         if (npcNameText != null) npcNameText.text = currentNpcName;
         if (npcNameTextTMP != null) npcNameTextTMP.text = currentNpcName;
 
@@ -458,8 +452,7 @@ public class DialogueManager : MonoBehaviour
             }
             else
             {
-                // 可选隐藏
-                // portraitImage.gameObject.SetActive(false);
+
             }
         }
 
@@ -487,7 +480,6 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        // 设置NPC名称
         if (npcNameText != null)
         {
             npcNameText.text = npcName;
@@ -498,7 +490,6 @@ public class DialogueManager : MonoBehaviour
             Debug.LogError("DialogueManager: npcNameText 为空！");
         }
 
-        // 开始播放对话序列
         StartCoroutine(PlayDialogueSequence(dialogueSequence));
     }
 
@@ -511,11 +502,9 @@ public class DialogueManager : MonoBehaviour
             yield break;
         }
 
-        // 保存对话序列
         currentDialogueSequence = dialogueSequence;
         currentDialogueIndex = 0;
 
-        // 清除之前的协程
         if (typingCoroutine != null)
         {
             StopCoroutine(typingCoroutine);
@@ -525,7 +514,6 @@ public class DialogueManager : MonoBehaviour
             StopCoroutine(autoCloseCoroutine);
         }
 
-        // 显示第一句
         ShowCurrentSentence();
     }
 
@@ -533,7 +521,6 @@ public class DialogueManager : MonoBehaviour
     {
         if (currentDialogueSequence == null || currentDialogueIndex >= currentDialogueSequence.Length)
         {
-            // 所有句子已显示完毕
             Debug.Log("DialogueManager: 对话序列播放完毕");
             autoCloseCoroutine = StartCoroutine(AutoCloseDialogue());
             return;
@@ -541,12 +528,10 @@ public class DialogueManager : MonoBehaviour
 
         Debug.Log($"DialogueManager: 播放第 {currentDialogueIndex + 1}/{currentDialogueSequence.Length} 句对话");
 
-        // 尝试切换表情差分及出场延后逻辑
         if (portraitImage != null)
         {
             if (currentDialogueIndex < currentPortraitRevealIndex)
             {
-                // 暂时隐藏立绘
                 portraitImage.gameObject.SetActive(false);
             }
             else
@@ -559,8 +544,7 @@ public class DialogueManager : MonoBehaviour
                 {
                     portraitImage.sprite = defaultPortrait;
                 }
-                
-                // 每次切图都开启UI适配属性，防止变形，但不强制原尺寸
+
                 if (portraitImage.sprite != null) 
                 {
                     portraitImage.preserveAspect = true;
@@ -569,7 +553,7 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        // 清除旧的选项按钮（如果有）
+        // 清除旧的选项按钮
         ClearOptions();
 
         // 隐藏继续提示
@@ -587,7 +571,7 @@ public class DialogueManager : MonoBehaviour
 
         PrepareLine(currentDialogueSequence[currentDialogueIndex]);
 
-        // 出场延后：如果在设定轮次之前，则名字不显示（或者显示？？？）
+        // 出场延后：如果在设定轮次之前，则名字不显示
         if (currentDialogueIndex < currentNameRevealIndex)
         {
             if (npcNameText != null) npcNameText.text = "";
@@ -604,7 +588,7 @@ public class DialogueManager : MonoBehaviour
         if (dialogueText != null) dialogueText.text = "";
         if (dialogueTextTMP != null) dialogueTextTMP.text = "";
 
-        // 逐字显示文本（支持富文本标签）
+        // 逐字显示文本
         for (int i = 0; i < text.Length; i++)
         {
             char c = text[i];
@@ -704,7 +688,6 @@ public class DialogueManager : MonoBehaviour
 
         if (parseSpeakerPrefix && TryParseSpeakerPrefix(input, npc, out speaker, out content, out isPlayer))
         {
-            // 已解析
         }
         else
         {
@@ -755,8 +738,6 @@ public class DialogueManager : MonoBehaviour
         }
 
         string s = raw.TrimStart();
-
-        // 找到最早出现的分隔符（支持 ':' 或 '：' 等）
         int sepIndex = -1;
         for (int i = 0; i < s.Length; i++)
         {
@@ -767,7 +748,6 @@ public class DialogueManager : MonoBehaviour
                 break;
             }
 
-            // 前缀过长就不再认为是说话人前缀
             if (i >= maxSpeakerPrefixLength)
             {
                 return false;
@@ -801,7 +781,6 @@ public class DialogueManager : MonoBehaviour
         else
         {
             speaker = label;
-            // 如果写的是“我：”，也识别为玩家
             if (label == "我" || label == playerName)
             {
                 isPlayer = true;
@@ -818,19 +797,16 @@ public class DialogueManager : MonoBehaviour
 
         PrepareLine(text);
 
-        // 清除之前的自动关闭
         if (autoCloseCoroutine != null)
         {
             StopCoroutine(autoCloseCoroutine);
         }
 
-        // 清除之前的打字机效果
         if (typingCoroutine != null)
         {
             StopCoroutine(typingCoroutine);
         }
 
-        // 开始新的打字机效果
         typingCoroutine = StartCoroutine(TypeText(currentPreparedText, options));
 
         Debug.Log("DialogueManager: 打字机协程已启动");
@@ -904,7 +880,7 @@ public class DialogueManager : MonoBehaviour
         {
             Debug.LogError("DialogueManager: optionButtonPrefab 为空，尝试从Resources加载");
 
-            // 尝试从Resources加载
+
             optionButtonPrefab = Resources.Load<GameObject>("Prefabs/OptionButton");
             if (optionButtonPrefab == null)
             {
@@ -928,23 +904,19 @@ public class DialogueManager : MonoBehaviour
         GameObject buttonObj = Instantiate(optionButtonPrefab, optionsContainer);
         Button button = buttonObj.GetComponent<Button>();
 
-        // 更可靠的Text组件查找方式
         Text buttonText = null;
 
-        // 方法1: 尝试在直接子对象中查找名为"Text"的对象
         Transform textTransform = buttonObj.transform.Find("Text");
         if (textTransform != null)
         {
             buttonText = textTransform.GetComponent<Text>();
         }
 
-        // 方法2: 如果没找到，使用GetComponentInChildren
         if (buttonText == null)
         {
             buttonText = buttonObj.GetComponentInChildren<Text>(false); // false表示不包括非活动对象
         }
 
-        // 方法3: 还是没找到，包括非活动对象
         if (buttonText == null)
         {
             buttonText = buttonObj.GetComponentInChildren<Text>(true);
@@ -955,14 +927,12 @@ public class DialogueManager : MonoBehaviour
             buttonText.text = option.optionText;
             Debug.Log($"DialogueManager: 选项按钮文字已设置为: {option.optionText}");
 
-            // 确保Text组件是激活的
             if (!buttonText.gameObject.activeSelf)
             {
                 buttonText.gameObject.SetActive(true);
                 Debug.Log("DialogueManager: Text对象已激活");
             }
 
-            // 确保Text组件启用
             if (!buttonText.enabled)
             {
                 buttonText.enabled = true;
@@ -1004,12 +974,12 @@ public class DialogueManager : MonoBehaviour
             else
             {
                 Debug.Log("DialogueManager: 显示回复，无后续选项，将自动关闭");
-                ShowDialogue(option.responseText, null); // null表示没有更多选项
+                ShowDialogue(option.responseText, null); 
             }
         }
         else
         {
-            // 如果没有回复文本，直接关闭对话框
+
             EndDialogue();
         }
     }
@@ -1022,7 +992,7 @@ public class DialogueManager : MonoBehaviour
 
     public void EndDialogue()
     {
-        // 清除协程
+
         if (typingCoroutine != null)
         {
             StopCoroutine(typingCoroutine);
@@ -1036,20 +1006,20 @@ public class DialogueManager : MonoBehaviour
         isTyping = false;
         waitingForContinue = false;
 
-        // 解锁玩家移动
+
         UnlockPlayerMovement();
 
-        // 重置对话序列状态
+
         currentDialogueSequence = null;
         currentDialogueIndex = 0;
 
-        // 隐藏对话面板
+
         if (dialoguePanel != null)
         {
             dialoguePanel.SetActive(false);
         }
 
-        // 隐藏继续提示
+
         if (continuePromptText != null)
         {
             continuePromptText.gameObject.SetActive(false);

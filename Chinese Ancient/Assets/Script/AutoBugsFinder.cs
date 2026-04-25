@@ -1,19 +1,16 @@
 using UnityEngine;
 using TMPro;
 
-// 这是一个挂载在场景里就能自动运行的排雷器
 public class AutoBugsFinder : MonoBehaviour
 {
     void Start()
     {
         Debug.Log("<color=green><b>====== 侦探已上线！正在全图扫描寻找病灶 ======</b></color>");
 
-        // 1. 揪出“飞升”的老鼠屎 (检查刚体)
         Rigidbody[] rbs = FindObjectsOfType<Rigidbody>(true);
         bool foundPhysicsBug = false;
         foreach (var rb in rbs)
         {
-            // 只要没勾选运动学（受重力/弹力影响），就给我全部列出来！
             if (!rb.isKinematic)
             {
                 Debug.LogError($"🚨【可疑的物理刚体！】👉 物体: <b>{rb.gameObject.name}</b>。它受物理引擎控制（未开启 isKinematic），极有可能就是乱飞的元凶！", rb.gameObject);
@@ -23,10 +20,7 @@ public class AutoBugsFinder : MonoBehaviour
         
         if (!foundPhysicsBug) Debug.Log("<color=yellow>没有揪出明显的物理刚体问题，飞升可能来自于动画脚本或父节点。</color>");
 
-        // 2. 揪出“Material 被销毁”的报错元凶
         bool foundTMPBug = false;
-        
-        // 扫 3D TMP
         TextMeshPro[] tmps3d = FindObjectsOfType<TextMeshPro>(true);
         foreach (var tmp in tmps3d)
         {

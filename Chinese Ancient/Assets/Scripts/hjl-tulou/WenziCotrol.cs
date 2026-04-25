@@ -171,7 +171,6 @@ public class WenziCotrol : MonoBehaviour
         Vector3 worldOutward = customOutwardDirection.sqrMagnitude > 0.0001f
             ? customOutwardDirection.normalized
             : transform.forward;
-        // Convert world offset to local vertex space so outwardDistance stays in meters even when text has scale.
         Vector3 worldOffset = worldOutward * outwardDistance;
         Vector3 localOffset = targetText.transform.InverseTransformVector(worldOffset);
 
@@ -193,7 +192,7 @@ public class WenziCotrol : MonoBehaviour
             yield return new WaitForSeconds(interval);
         }
 
-        // 防御性设置：确保最终全量可见并保持在墙面排版。
+        //确保最终全量可见并保持在墙面排版。
         targetText.maxVisibleCharacters = int.MaxValue;
         targetText.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices);
 

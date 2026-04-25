@@ -52,13 +52,9 @@ public class IncenseInteraction : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 当玩家准心对准香并按下点击键时，你的射线脚本可以调用这个方法。
-    /// 同时，我也保留了OnMouseDown以方便你在不启动第一人称情况下的鼠标右键测试。
-    /// </summary>
     public void Interact()
     {
-        // 如果正在播放动画，或者香已经插好了（点击达到3次），就不再响应新点击
+        // 如果正在播放动画，或者香已经点击达到3次，就不再响应新点击
         if (isAnimating || currentClicks >= 3) return;
 
         currentClicks++;
@@ -83,22 +79,19 @@ public class IncenseInteraction : MonoBehaviour
         }
     }
 
-    // 为了方便你在普通测试模式下直接用鼠标点击"香"也能触发
     private void OnMouseDown()
     {
         Interact();
     }
 
-    // 拜一次的动画协程
     private IEnumerator BowAnimationRoutine()
     {
         isAnimating = true;
 
-        // 计算往前探的旋转角度（通常是绕X轴旋转，如果模型倒了可以改成-30或者调整bowAngle参数）
         Quaternion forwardRotation = originalRotation * Quaternion.Euler(bowAngle);
         float halfDuration = bowDuration / 2f;
 
-        // 1. 往前拜
+        //往前拜
         float elapsedTime = 0f;
         while (elapsedTime < halfDuration)
         {
@@ -107,7 +100,7 @@ public class IncenseInteraction : MonoBehaviour
             yield return null;
         }
 
-        // 2. 往回直立
+        //往回直立
         elapsedTime = 0f;
         while (elapsedTime < halfDuration)
         {
@@ -116,7 +109,7 @@ public class IncenseInteraction : MonoBehaviour
             yield return null;
         }
 
-        // 确保最终回正
+        //确保最终回正
         transform.rotation = originalRotation;
         isAnimating = false;
     }
@@ -165,7 +158,7 @@ public class IncenseInteraction : MonoBehaviour
         while (elapsedTime < flyDuration)
         {
             float t = elapsedTime / flyDuration;
-            // 加入平滑插值（缓入缓出）让飞行动作更自然
+            // 加入平滑插值让飞行动作更自然
             float smoothStep = t * t * (3f - 2f * t);
 
             transform.position = Vector3.Lerp(startPos, incenseBurnerTarget.position, smoothStep);
@@ -179,7 +172,7 @@ public class IncenseInteraction : MonoBehaviour
         transform.position = incenseBurnerTarget.position;
         transform.rotation = incenseBurnerTarget.rotation;
 
-        // 可选：插进去后可以让香成为香炉的子物体，这样移动香炉时香跟着走
+        //插进去后可以让香成为香炉的子物体，这样移动香炉时香跟着走
         transform.parent = incenseBurnerTarget.parent;
 
         // 播放插完香后的钟声
@@ -193,27 +186,18 @@ public class IncenseInteraction : MonoBehaviour
         {
             playerHandsAnim.PlayPrayAnimation();
         }
-
-        // --- 纯代码动态生成天坛祭天专属"青烟化星芒"螺旋上升特效 ---
         GenerateQingyanEffect();
 
         isAnimating = false;
     }
 
-    /// <summary>
-    /// 用代码在程序运行时动态拼装一个复杂的炫酷粒子系统
-    /// </summary>
     private void GenerateQingyanEffect()
     {
-        // 确定特效生成位置
         Vector3 spawnPos = incenseTip != null ? incenseTip.position : transform.position + Vector3.up * 0.3f;
 
-        // ==========================================
-        // 1. 创建主系统：青色螺旋上升的烟柱
-        // ==========================================
         GameObject smokeObj = new GameObject("Qingyan_Spiral_VFX");
         smokeObj.transform.position = spawnPos;
-        // 把粒子喷射方向朝上 (绕X转-90度后，Unity的局部Z轴变成世界上方)
+
         smokeObj.transform.rotation = Quaternion.Euler(-90, 0, 0);
         smokeObj.transform.SetParent(transform); // 挂在香底，随着香炉可能移动
 
@@ -221,36 +205,33 @@ public class IncenseInteraction : MonoBehaviour
         ParticleSystemRenderer smokeRenderer = smokeObj.GetComponent<ParticleSystemRenderer>();
         if (smokeMaterial != null) smokeRenderer.material = smokeMaterial;
 
-        // 主设置 (Main)
         var main = smokePS.main;
         main.duration = 5f;
         main.loop = true;
         main.startLifetime = 3f;  // 烟能飘到半空的高度
         main.startSpeed = 0.5f;    // 基础向上抛送速度
         main.startSize = 0.15f;    // 烟泡初始粗细
-        main.startColor = new Color(0.1f, 0.8f, 0.9f, 0.4f); // 祭天青色调 (半透明)
+        main.startColor = new Color(0.1f, 0.8f, 0.9f, 0.4f); // 祭天青色调
         main.simulationSpace = ParticleSystemSimulationSpace.World; // 烟与世界坐标绑定，不随香体转动
         main.gravityModifier = -0.05f; // 轻微负重力，产生向上拉的力量
 
-        // 发射器 (Emission)
         var emission = smokePS.emission;
         emission.rateOverTime = 30f; // 烟流浓度
 
-        // 形状 (Shape)
         var shape = smokePS.shape;
         shape.shapeType = ParticleSystemShapeType.Circle; // 使用园形让其有柱状感
         shape.radius = 0.015f;
 
-        // 运动轨迹：螺旋上升特效的核心 (Velocity Over Lifetime)
+        // 运动轨迹：螺旋上升特效的核心
         var vol = smokePS.velocityOverLifetime;
         vol.enabled = true;
-        vol.orbitalZ = 6f; // 绕中心的旋转角速度（形成盘旋）
+        vol.orbitalZ = 6f; // 绕中心的旋转角速度
         vol.orbitalX = 0f;
-        vol.orbitalOffsetX = 0.04f; // 圆心偏移使盘旋范围变大
+        vol.orbitalOffsetX = 0.04f; 
         vol.orbitalOffsetY = 0.04f;
         vol.y = 0.8f;      // 沿着垂直向上轴的爬升速度
 
-        // 颜色消散 (Color Over Lifetime)
+        // 颜色消散
         var col = smokePS.colorOverLifetime;
         col.enabled = true;
         Gradient grad = new Gradient();
@@ -260,7 +241,7 @@ public class IncenseInteraction : MonoBehaviour
         );
         col.color = grad;
 
-        // 大小消散 (Size Over Lifetime)
+        // 大小消散
         var sol = smokePS.sizeOverLifetime;
         sol.enabled = true;
         AnimationCurve sizeCurve = new AnimationCurve();
@@ -268,13 +249,9 @@ public class IncenseInteraction : MonoBehaviour
         sizeCurve.AddKey(1f, 0f); // 烟雾越往上越细，最终化无
         sol.size = new ParticleSystem.MinMaxCurve(1f, sizeCurve);
 
-
-        // ==========================================
-        // 2. 创建子系统：高处消散的星点光斑
-        // ==========================================
         GameObject starObj = new GameObject("Dissipating_Stars");
         starObj.transform.SetParent(smokeObj.transform);
-        // 定位在半空中（相对父物体Z轴上移大约2米的位置，也就是烟雾消失之处）
+        // 定位在半空中
         starObj.transform.localPosition = new Vector3(0, 0, 2.0f);
 
         ParticleSystem starPS = starObj.AddComponent<ParticleSystem>();
@@ -304,7 +281,7 @@ public class IncenseInteraction : MonoBehaviour
         );
         starColor.color = starGrad;
 
-        // 星点闪烁 (借助Size Over Lifetime的波峰波谷)
+        // 星点闪烁 
         var starSize = starPS.sizeOverLifetime;
         starSize.enabled = true;
         AnimationCurve starSizeCurve = new AnimationCurve();
@@ -313,7 +290,7 @@ public class IncenseInteraction : MonoBehaviour
         starSizeCurve.AddKey(1f, 0f);   // 彻底熄灭
         starSize.size = new ParticleSystem.MinMaxCurve(1f, starSizeCurve);
 
-        // 随机乱飘感 (Noise)
+        // 随机乱飘感
         var noise = starPS.noise;
         noise.enabled = true;
         noise.strength = 0.3f;

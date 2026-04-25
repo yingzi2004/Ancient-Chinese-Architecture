@@ -5,11 +5,9 @@ public class LotusFlower : MonoBehaviour
     public Transform player;
     public Transform playerHand;
     public Transform npc;
-    [Header("距离与按键设置")]
+    [Header("距离设置")]
     public float pickDistance = 3f;
-    public KeyCode pickKey = KeyCode.R;
     public float giveDistance = 4f;
-    public KeyCode giveKey = KeyCode.F;
     [Header("完成任务后的对话（必须在这个脚本配好新的对话）")]
     public DialogNode afterGiveDialogNode;
     // 状态标记
@@ -26,7 +24,6 @@ public class LotusFlower : MonoBehaviour
             }
             else
             {
-                // 尝试其他方法寻找玩家
                 PlayerController pc = FindObjectOfType<PlayerController>();
                 if (pc != null) player = pc.transform;
                 else if (Camera.main != null) player = Camera.main.transform;
@@ -35,41 +32,77 @@ public class LotusFlower : MonoBehaviour
     }
     private void Update()
     {
-        if (player == null) return;
-        // 状态 1：还没摘取荷花，此时判断玩家和荷花的距离
+        if (player == null || Camera.main == null) return;
+        //还没摘取荷花，此时判断玩家和荷花的距离
         if (!isPicked)
         {
-            if (Input.GetKeyDown(pickKey))
+            if (Input.GetMouseButtonDown(0))
             {
                 float distToPlayer = Vector3.Distance(transform.position, player.position);
                 if (distToPlayer <= pickDistance)
                 {
-                    PickLotus();
+                    // 使用 RaycastAll 以防被玩家自身碰撞体或水面挡住射线，延长射线距离（100米）
+                    Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0));
+                    RaycastHit[] hits = Physics.RaycastAll(ray, 100f);
+                    bool hitTarget = false;
+                    foreach (var hit in hits)
+                    {
+                        if (hit.transform == transform || hit.transform.IsChildOf(transform))
+                        {
+                            hitTarget = true;
+                            break;
+                        }
+                    }
+                    if (hitTarget)
+                    {
+                        PickLotus();
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"<color=yellow>[交互提示]</color> 距离已满足，但是准心没对准！\n如果已对准但还是不行，请检查【荷花物体】上是否添加了碰撞体组件（如 BoxCollider）！射线必须有Collider才能点到。");
+                    }
                 }
                 else
                 {
-                    Debug.Log($"<color=yellow>[采摘交互]</color> 距离荷花太远啦，当前距离: {distToPlayer:F2}米，要求距离内: {pickDistance}米。由于你乘船位置比较高，可以在荷花物体面板里把 Pick Distance 调大！");
+                    // 这里原本太远时不处理交互，为了让你知道点击生效了，打印一下
+                    // Debug.Log($"距离荷花太远，当前: {distToPlayer}");
                 }
             }
         }
-        // 状态 2：已经摘下来在手上了，但是还没给 NPC
         else if (isPicked && !isGiven)
         {
             if (npc != null)
             {
-                // 判断玩家和 NPC 的距离
                 float distToNPC = Vector3.Distance(player.position, npc.position);
                 if (distToNPC <= giveDistance)
                 {
-                    // 取消原本可能触发对话选项的 F 键冲突：可以在这里进行判断，或者直接按 F 交付
-                    if (Input.GetKeyDown(giveKey))
+                    if (Input.GetMouseButtonDown(0))
                     {
-                        GiveLotusToNPC();
+                        Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0));
+                        RaycastHit[] hits = Physics.RaycastAll(ray, 100f);
+                        bool hitTarget = false;
+                        foreach (var hit in hits)
+                        {
+                            if (hit.transform == npc || hit.transform.IsChildOf(npc))
+                            {
+                                hitTarget = true;
+                                break;
+                            }
+                        }
+                        if (hitTarget)
+                        {
+                            GiveLotusToNPC();
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"<color=yellow>[交互提示]</color> 距离已满足，但是准心没对准NPC！\n如果已对准但还是不行，请检查【NPC物体】上是否添加了碰撞体组件（如 CapsuleCollider）！");
+                        }
                     }
                 }
             }
         }
     }
+    // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
     private void PickLotus()
     {
         isPicked = true;
@@ -77,24 +110,22 @@ public class LotusFlower : MonoBehaviour
         if (playerHand != null)
         {
             transform.SetParent(playerHand);
-            // 将荷花的局部坐标和旋转清零，使其准确贴合在"手"的位置
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
         }
         else
         {
-            // 如果没指定特定的手部节点，就直接挂在玩家身上，并稍微往前偏移
             transform.SetParent(player);
             transform.localPosition = new Vector3(0.5f, -0.5f, 1f);
             transform.localRotation = Quaternion.identity;
         }
         Debug.Log("<color=cyan>[荷花任务]</color> 已摘取荷花！请返回寻找NPC。");
     }
+    // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
     private void GiveLotusToNPC()
     {
         isGiven = true;
         Debug.Log("<color=cyan>[荷花任务]</color> 荷花已交付给NPC，触发对话并消失！");
-        // 触发 NPC 身上的对话代码
         if (npc != null)
         {
             NPCInteractTrigger trigger1 = npc.GetComponent<NPCInteractTrigger>();
@@ -116,12 +147,10 @@ public class LotusFlower : MonoBehaviour
                 Debug.LogError("<color=red>[荷花任务]</color> 找不到NPC的对话脚本（NPCInteractTrigger）！请检查荷花的 Npc 槽位是否拖错了人！");
             }
         }
-        // 荷花交付后直接消失
         gameObject.SetActive(false);
     }
     private void OnDrawGizmosSelected()
     {
-        // 在编辑器里画两个圈方便你调试距离
         if (!isPicked)
         {
             Gizmos.color = Color.green;

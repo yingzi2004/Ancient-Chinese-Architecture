@@ -168,6 +168,7 @@ public class BookGameController : MonoBehaviour
         }
         StartCoroutine(FlipRoutine(FlipMode.LeftToRight));
     }
+    // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
     private IEnumerator FlipRoutine(FlipMode mode)
     {
         isFlipping = true;

@@ -1,8 +1,6 @@
 using System.Collections;
 using UnityEngine;
 
-// 这是一个围绕指定轴心点旋转研磨棒的动作脚本，点击后执行研磨动作
-// 注意：此脚本需要附加碰撞体才能接收点击，Pestle是研磨棒，其Pivot应该是整体模型
 public class leicha_mo : MonoBehaviour
 {
     [Tooltip("研磨棒模型引用，圆周运动将围绕此对象的原始点作为原点。")]
@@ -79,16 +77,13 @@ public class leicha_mo : MonoBehaviour
     {
         isGrinding = true;
 
-        //记录原位置用于复位
         Vector3 startPos = transform.position;
         Quaternion startRot = transform.rotation;
 
-        // 确定 pivot 使用优先级：手动指定 > 父对象 > 无
         Transform effectivePivot = pivot;
         if (effectivePivot == null)
             effectivePivot = transform.parent != null ? transform.parent : null;
 
-        // If no pivot is assigned, use the current object center as pivot.
         Vector3 pivotPos = effectivePivot != null ? effectivePivot.position : transform.position;
 
         //计算初始偏移和半径
@@ -98,28 +93,26 @@ public class leicha_mo : MonoBehaviour
         float usedRadius = Mathf.Max(0f, baseRadius * Mathf.Clamp01(radiusScale));
         if (usedRadius > 0.0001f)
         {
-            //规范化偏移到指定半径方向（此方法）
+            //规范化偏移到指定半径方向
             offset = (offset.sqrMagnitude > 0.0001f)
                 ? offset.normalized * usedRadius
                 : transform.TransformDirection(Vector3.forward) * usedRadius;
         }
         else
         {
-            // Keep zero radius so rotation happens around the rod's own center.
             offset = Vector3.zero;
         }
 
-        // Apply maximum cap if set
         if (maxRadius > 0f && usedRadius > maxRadius)
         {
             usedRadius = maxRadius;
             offset = offset.normalized * usedRadius;
         }
 
-        //旋转轴（世界空间单位向量，归一化）
+        //旋转轴
         Vector3 worldAxis = axis.sqrMagnitude > 0.0001f ? axis.normalized : Vector3.up;
 
-        // 总角度（度）
+        // 总角度
         float totalAngle = 360f * rotations;
         float elapsed = 0f;
         float totalDuration = Mathf.Max(0.01f, rotations * rotationDuration);
@@ -133,7 +126,6 @@ public class leicha_mo : MonoBehaviour
 
             Quaternion rot = Quaternion.AngleAxis(angleDeg, worldAxis);
 
-            // Radius == 0 means self-centered rotation (no orbital movement).
             if (usedRadius <= 0.0001f)
             {
                 transform.position = startPos;
@@ -162,7 +154,7 @@ public class leicha_mo : MonoBehaviour
             yield return null;
         }
 
-        //结束时恢复到初始状态（避免难看的漂移）
+        //结束时恢复到初始状态
         transform.position = startPos;
         transform.rotation = startRot;
 

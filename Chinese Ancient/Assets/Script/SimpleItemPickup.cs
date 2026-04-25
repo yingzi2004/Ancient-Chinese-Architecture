@@ -6,7 +6,6 @@ public class SimpleItemPickup : MonoBehaviour, IInteractable
     public bool hideOnPickup = true;
     [Header("拾取成功后触发的事件（连接任务系统）")]
     public UnityEvent onPickupEvent;
-    // 当玩家的准星对准并按下交互键时，你们的系统会自动调用这个 Interact()
     public void Interact()
     {
         Debug.Log($"[物品拾取] 玩家拾取了: {gameObject.name}");
@@ -28,7 +27,6 @@ public class SimpleItemPickup : MonoBehaviour, IInteractable
             foreach (Light l in lights) l.enabled = false;
             ParticleSystem[] particles = GetComponentsInChildren<ParticleSystem>();
             foreach (ParticleSystem p in particles) p.Stop();
-            // 如果挂了我们之前新加的高亮脚本，也要立刻清理掉
             ItemGlowHighlight glow = GetComponent<ItemGlowHighlight>();
             if (glow != null) glow.DisableGlow();
         }

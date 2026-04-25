@@ -49,8 +49,6 @@ public class PlayerPickup : MonoBehaviour
     private void HandleInput()
     {
         // 拾取键 - 由玉佩脚本处理，这里主要用于其他拾取逻辑
-
-        // 丢弃键（可选）
         if (Input.GetKeyDown(KeyCode.G) && currentHeldPendant != null)
         {
             DropCurrentPendant();
@@ -65,7 +63,6 @@ public class PlayerPickup : MonoBehaviour
             pickedUpPendants.Add(pendant);
             Debug.Log($"已将玉佩 {pendant.pendantId} 添加到背包。当前共有 {pickedUpPendants.Count} 个玉佩。");
 
-            // 显示UI提示（可选）
             ShowPickupMessage($"拾取了玉佩！({pickedUpPendants.Count}/1)");
         }
     }
@@ -107,7 +104,7 @@ public class PlayerPickup : MonoBehaviour
 
     private void DropCurrentPendant()
     {
-        // 丢弃逻辑（可选实现）
+        // 丢弃逻辑
         Debug.Log("丢弃玉佩功能暂未实现");
     }
 

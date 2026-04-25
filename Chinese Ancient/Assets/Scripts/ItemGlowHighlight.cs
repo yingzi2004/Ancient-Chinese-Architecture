@@ -23,7 +23,7 @@ public class ItemGlowHighlight : MonoBehaviour
         Renderer rend = GetComponent<Renderer>();
         if (rend != null)
         {
-            // 实例化材质，防止修改影响其他公用同材质的物体
+
             originalMaterial = rend.material;
             originalMaterial.EnableKeyword("_EMISSION");
             Debug.Log($"[{gameObject.name}] 已开启材质自发光");
@@ -40,7 +40,6 @@ public class ItemGlowHighlight : MonoBehaviour
             pointLight.color = glowColor;
             pointLight.range = lightRange;
             pointLight.intensity = minIntensity;
-            // 提高渲染渲染优先级，防止光照被剔除
             pointLight.renderMode = LightRenderMode.ForcePixel;
             Debug.Log($"[{gameObject.name}] 已添加辅助点光源");
         }
@@ -56,7 +55,6 @@ public class ItemGlowHighlight : MonoBehaviour
 
         if (originalMaterial != null)
         {
-            // Unity HDR 颜色 = 颜色 * 强度
             Color finalColor = glowColor * currentIntensity;
             originalMaterial.SetColor("_EmissionColor", finalColor);
         }

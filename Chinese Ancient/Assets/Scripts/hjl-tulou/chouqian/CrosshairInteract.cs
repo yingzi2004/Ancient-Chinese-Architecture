@@ -10,13 +10,13 @@ public class CrosshairInteract : MonoBehaviour
 
     void Update()
     {
-        // 从主相机（或者屏幕中心）发射一条向前方的射线
+
         Ray ray = new Ray(transform.position, transform.forward);
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit, interactRange, interactableLayer))
         {
-            // 获取碰撞物体上的QianItem组件（支持挂在子物体上）
+            // 获取碰撞物体上的QianItem组件
             QianItem qian = hit.collider.GetComponent<QianItem>();
             if (qian == null)
             {
@@ -32,7 +32,7 @@ public class CrosshairInteract : MonoBehaviour
                     currentTarget.OnHoverEnter(); // 准心指向，触发边缘发黄光
                 }
 
-                // 按下鼠标左键（或VR扳机扣下等交互键）触发抽出功能
+                // 按下鼠标左键触发抽出功能
                 if (Input.GetMouseButtonDown(0))
                 {
                     currentTarget.OnClicked(transform); // 传入摄像机位置用于计算停靠点

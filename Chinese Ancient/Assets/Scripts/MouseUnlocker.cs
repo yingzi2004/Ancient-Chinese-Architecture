@@ -41,7 +41,6 @@ public class MouseUnlocker : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
         }
 
-        // 强制保持鼠标可见
         if (!Cursor.visible)
         {
             Cursor.visible = true;

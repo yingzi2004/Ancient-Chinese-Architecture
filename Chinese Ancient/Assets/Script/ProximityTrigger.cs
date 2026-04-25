@@ -25,16 +25,14 @@ public class ProximityTrigger : MonoBehaviour
     {
         if (videoPlayer == null) videoPlayer = GetComponent<VideoPlayer>();
         if (targetRenderer == null) targetRenderer = GetComponent<Renderer>();
-        // 核心修复：只有当 targetRenderer 存在，并且它身上有 material 时才获取主纹理
         if (targetRenderer != null && targetRenderer.sharedMaterial != null)
         {
             savedCoverTexture = coverTexture != null ? coverTexture : targetRenderer.sharedMaterial.mainTexture;
         }
         else
         {
-            savedCoverTexture = coverTexture; // 如果没有渲染器，就直接用面板配的图片
+            savedCoverTexture = coverTexture; 
         }
-        // 保存视频 RenderTexture
         if (videoPlayer != null && videoPlayer.targetTexture != null)
             videoRenderTexture = videoPlayer.targetTexture;
         // 初始化视频播放器
@@ -81,7 +79,6 @@ public class ProximityTrigger : MonoBehaviour
             {
                 if (!isVideoPlaying) PlayVideo();
                 onEnterRange?.Invoke();
-                // 自动尝试解锁功能：如果同一物体上挂载了LevelUnlocker，自动调用它，省去每次在面板连线的麻烦！
                 LevelUnlocker unlocker = GetComponent<LevelUnlocker>();
                 if (unlocker != null)
                 {
@@ -94,7 +91,7 @@ public class ProximityTrigger : MonoBehaviour
         else if (!withinRange && isInsideRange)
         {
             isInsideRange = false;
-            StopVideoAndShowCover(); // 停止视频并显示封面
+            StopVideoAndShowCover();
             onExitRange?.Invoke();
         }
     }
