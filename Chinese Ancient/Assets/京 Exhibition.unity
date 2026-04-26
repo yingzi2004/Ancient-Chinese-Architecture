@@ -1312,21 +1312,26 @@ PrefabInstance:
     - {fileID: -4923004560222071368, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
     - {fileID: 1277111161991352060, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
     - {fileID: -5206183205861240364, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
+    - {fileID: -2979582423082859560, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
+    - {fileID: 4233495662377979553, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
+    - {fileID: 1541266533953965305, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
+    - {fileID: 4855981932903759960, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
+    - {fileID: 3430154122858843799, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
-      insertIndex: 34
+      insertIndex: 33
       addedObject: {fileID: 1037811860}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
-      insertIndex: 35
+      insertIndex: 34
       addedObject: {fileID: 1833004757}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
-      insertIndex: 60
+      insertIndex: 59
       addedObject: {fileID: 768512484}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
-      insertIndex: 67
+      insertIndex: 66
       addedObject: {fileID: 1361431371}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
-      insertIndex: 73
+      insertIndex: 72
       addedObject: {fileID: 1774436165}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 666602370706033372, guid: a0906e1fd1994164b953b89cebff2673, type: 3}
@@ -20905,7 +20910,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1201.2205, y: 536.68933}
+  m_AnchoredPosition: {x: 1201.2205, y: 537.69}
   m_SizeDelta: {x: 2376, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1357927133
@@ -22339,8 +22344,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4283757840
-  m_fontColor: {r: 0.0627451, g: 0.9607843, b: 0.3286572, a: 1}
+    rgba: 4285917429
+  m_fontColor: {r: 0.9622642, g: 0.9104025, b: 0.45843717, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -30911,7 +30916,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 88ac51fd105d433439ee0b6b9790b84a, type: 3}
-  m_Color: {r: 0.7609178, g: 0.8113208, b: 0.71564615, a: 1}
+  m_Color: {r: 0.8962264, g: 0.8962264, b: 0.8962264, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
