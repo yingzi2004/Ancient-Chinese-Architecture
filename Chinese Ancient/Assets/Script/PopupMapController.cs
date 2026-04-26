@@ -60,10 +60,24 @@ public class PopupMapController : MonoBehaviour
         }
         else
         {
-            // AI辅助生成：DeepSeek-R1-0528, 2026-04-23
-            for (int j = 0; j < unlockedArray.Length; j++)
+            // 通过获取当前场景名称，直接映射到对应的建筑图标上进行跳动
+            string currentSceneName = SceneManager.GetActiveScene().name.Trim();
+            for (int k = 0; k < buildings.Count; k++)
             {
-                if (unlockedArray[j]) pulsingIndex = j;
+                if (buildings[k].targetSceneName != null && buildings[k].targetSceneName.Trim() == currentSceneName)
+                {
+                    pulsingIndex = k;
+                    break;
+                }
+            }
+
+            // 如果场景名称没匹配上，依然走旧逻辑作为兜底
+            if (pulsingIndex == -1)
+            {
+                for (int j = 0; j < unlockedArray.Length; j++)
+                {
+                    if (unlockedArray[j]) pulsingIndex = j;
+                }
             }
         }
         for (int i = 0; i < buildings.Count; i++)

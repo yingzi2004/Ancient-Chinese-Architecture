@@ -200,11 +200,11 @@ public class F1AIChatUI : MonoBehaviour
                 }
                 else if (location.Contains("晋商") || location.Contains("山西") || location.Contains("窑洞") || location.Contains("晋派场馆") || location.Contains("晋场馆"))
                 {
-                    targetSceneName = "Jin Exhibition";
+                    targetSceneName = "晋Exhibition";
                 }
                 else if (location.Contains("天坛") || location.Contains("京派") || location.Contains("北京") || location.Contains("故宫") || location.Contains("京派场馆") || location.Contains("京场馆"))
                 {
-                    targetSceneName = "Jing Exhibition";
+                    targetSceneName = "京 Exhibition";
                 }
                 else
                 {
