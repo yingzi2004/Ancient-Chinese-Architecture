@@ -190,48 +190,21 @@ public class F1AIChatUI : MonoBehaviour
 
                 // 按照场馆名称对应关系映射到正确的场景名称
                 string targetSceneName = "";
-
-                // --- 明确列出每一个 else if 避免包含匹配错误 ---
-
-                // 1. 闽派场馆 (室内)
-                if (location.Contains("闽派场馆") || location.Contains("土楼场馆") || location.Contains("闽派展馆") || location.Contains("土楼展馆"))
+                if (location.Contains("土楼") || location.Contains("福建") || location.Contains("闽派场馆") || location.Contains("闽场馆"))
                 {
                     targetSceneName = "Min Exhibition";
                 }
-                // 2. 闽派 (室外大场景)
-                else if (location.Contains("土楼") || location.Contains("福建") || location.Contains("闽派") || location.Contains("闽"))
-                {
-                    targetSceneName = "闽派";
-                }
-                // 3. 苏派场馆 (室内)
-                else if (location.Contains("苏派场馆") || location.Contains("苏州场馆") || location.Contains("苏派展馆") || location.Contains("苏州展馆"))
+                else if (location.Contains("苏州") || location.Contains("园林") || location.Contains("拙政园") || location.Contains("苏派场馆") || location.Contains("苏场馆"))
                 {
                     targetSceneName = "Su Exhibition";
                 }
-                // 4. 苏派 (室外大场景)
-                else if (location.Contains("苏州") || location.Contains("园林") || location.Contains("拙政园") || location.Contains("苏派") || location.Contains("苏"))
-                {
-                    targetSceneName = "苏派";
-                }
-                // 5. 晋派场馆 (室内)
-                else if (location.Contains("晋派场馆") || location.Contains("晋商场馆") || location.Contains("晋派展馆") || location.Contains("晋商展馆"))
+                else if (location.Contains("晋商") || location.Contains("山西") || location.Contains("窑洞") || location.Contains("晋派场馆") || location.Contains("晋场馆"))
                 {
                     targetSceneName = "晋Exhibition";
                 }
-                // 6. 晋派 (室外大场景)
-                else if (location.Contains("晋商") || location.Contains("山西") || location.Contains("窑洞") || location.Contains("晋派") || location.Contains("晋"))
-                {
-                    targetSceneName = "晋派";
-                }
-                // 7. 京派场馆 (室内)
-                else if (location.Contains("京派场馆") || location.Contains("天坛场馆") || location.Contains("京派展馆") || location.Contains("天坛展馆") || location.Contains("北京场馆"))
+                else if (location.Contains("天坛") || location.Contains("京派") || location.Contains("北京") || location.Contains("故宫") || location.Contains("京派场馆") || location.Contains("京场馆"))
                 {
                     targetSceneName = "京 Exhibition";
-                }
-                // 8. 京派 (室外大场景)
-                else if (location.Contains("天坛") || location.Contains("京派") || location.Contains("北京") || location.Contains("故宫") || location.Contains("京"))
-                {
-                    targetSceneName = "京派";
                 }
                 else
                 {
@@ -240,26 +213,8 @@ public class F1AIChatUI : MonoBehaviour
 
                 Debug.Log("AI执行传送到场景：" + targetSceneName);
 
-                // 使用 FindObjectsInactive.Include 确保即使地图界面隐藏也能找到控制器
-                PopupMapController mapController = FindFirstObjectByType<PopupMapController>(FindObjectsInactive.Include);
+                PopupMapController mapController = FindFirstObjectByType<PopupMapController>();
                 bool isUnlocked = true; 
-
-                // 如果能找到地图控制器，则根据对应关系检查是否解锁
-                if (mapController != null && mapController.unlockedArray != null)
-                {
-                    if ((targetSceneName == "闽派" || targetSceneName == "Min Exhibition") && mapController.unlockedArray.Length > 0)
-                        isUnlocked = mapController.unlockedArray[0];
-                    else if ((targetSceneName == "苏派" || targetSceneName == "Su Exhibition") && mapController.unlockedArray.Length > 1)
-                        isUnlocked = mapController.unlockedArray[1];
-                    else if ((targetSceneName == "晋派" || targetSceneName == "晋Exhibition") && mapController.unlockedArray.Length > 2)
-                        isUnlocked = mapController.unlockedArray[2];
-                    else if ((targetSceneName == "京派" || targetSceneName == "京 Exhibition") && mapController.unlockedArray.Length > 3)
-                        isUnlocked = mapController.unlockedArray[3];
-                }
-                else
-                {
-                    Debug.LogWarning("未找到 PopupMapController，默认无法判断正确进度。");
-                }
 
                 if (isUnlocked && !string.IsNullOrEmpty(targetSceneName))
                 {
@@ -270,12 +225,6 @@ public class F1AIChatUI : MonoBehaviour
                     //必须等待当前一帧(可能是UI或者网络事件帧)彻底执行完，
                     // 让旧的 EventSystem 收尾结束，然后再销毁旧场景
                     StartCoroutine(DeferredLoadScene(targetSceneName));
-                }
-                else if (!isUnlocked)
-                {
-                    Debug.Log("拦截到非法传送：该场馆未解锁，停止跃迁。");
-                    // 动态把这句回复给篡改掉，免得AI说大话又没动作
-                    finalReply = "哎呀客官，该场馆现在还没有解锁呢，咱们先在附近转转吧~";
                 }
             }
         }
